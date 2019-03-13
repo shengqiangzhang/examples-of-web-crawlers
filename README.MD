@@ -3,7 +3,7 @@
 1. [点击这里下载][1]下载chrome浏览器
 2. 查看chrome浏览器的版本号，[点击这里下载][2]对应版本号的chromedriver驱动
 3. pip安装下列包
-    - [x] pip install selenium
+- [x] pip install selenium
 4. [点击这里][3]登录微博，并通过微博绑定淘宝账号密码
 5. 在main中填写chromedriver的绝对路径
 6. 在main中填写微博账号密码
@@ -33,8 +33,8 @@
 1. [点击这里下载][1]下载chrome浏览器
 2. 查看chrome浏览器的版本号，[点击这里下载][2]对应版本号的chromedriver驱动
 3. pip安装下列包
-    - [x] pip install selenium
-    - [x] pip install pyquery
+- [x] pip install selenium
+- [x] pip install pyquery
 4. [点击这里][3]登录微博，并通过微博绑定淘宝账号密码
 5. 在main中填写chromedriver的绝对路径
 6. 在main中填写微博账号密码
