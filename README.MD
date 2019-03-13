@@ -21,9 +21,10 @@
 
 ## 演示图片
 ![](1.淘宝模拟登录/example.gif)  
+[图片查看不了点击这里][4]
+
   
-  
-  
+
 # 2.天猫商品数据爬虫
 ## 使用教程
 1. [点击这里下载][1]下载chrome浏览器
@@ -49,9 +50,11 @@
 ## 演示图片
 ![](2.天猫商品数据爬虫(已模拟登录)/example.gif)
 ![](2.天猫商品数据爬虫(已模拟登录)/example2.png)
+[图片查看不了点击这里][4]
 
 
 
 [1]:https://www.google.com/chrome/
 [2]:http://chromedriver.storage.googleapis.com/index.html
 [3]:https://account.weibo.com/set/bindsns/bindtaobao
+[4]:https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/1.%E6%B7%98%E5%AE%9D%E6%A8%A1%E6%8B%9F%E7%99%BB%E5%BD%95/example.gif
