@@ -21,6 +21,7 @@
 ## 演示图片
 
 ![](example.gif)
+![](example2.png)
 
 
 [1]:https://www.google.com/chrome/

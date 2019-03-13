@@ -167,10 +167,13 @@ class taobao_infos:
             self.next_page(page)
 
             # 等待滑动验证码出现,超时时间为5秒，每0.5秒检查一次
+            # 大部分情况不会出现滑动验证码，所以如果有需要可以注释掉下面的代码
             # sleep(5)
-            WebDriverWait(self.browser, 5, 0.5).until(EC.presence_of_element_located((By.ID, "nc_1_n1z")))
+            WebDriverWait(self.browser, 5, 0.5).until(EC.presence_of_element_located((By.ID, "nc_1_n1z"))) #等待滑动拖动控件出现
             try:
-                swipe_button = self.browser.find_element_by_id('nc_1_n1z')
+                swipe_button = self.browser.find_element_by_id('nc_1_n1z') #获取滑动拖动控件
+
+                #模拟拽托
                 action = ActionChains(self.browser) # 实例化一个action对象
                 action.click_and_hold(swipe_button).perform() # perform()用来执行ActionChains中存储的行为
                 action.reset_actions()
