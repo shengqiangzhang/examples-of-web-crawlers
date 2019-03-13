@@ -1,0 +1,10 @@
+# mac OSX
+
+# 忽略所有以.DS_Store结尾的文件
+*.DS_Store
+
+# 忽略venv文件夹下的所有文件
+/venv/
+
+# 忽略.idea文件夹下的所有文件
+/.idea/
