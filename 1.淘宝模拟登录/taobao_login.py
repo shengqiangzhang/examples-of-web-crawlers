@@ -27,25 +27,25 @@ class taobao_infos:
         # 打开网页
         self.browser.get(self.url)
 
-        # 自适应等待，点击密码登录选项
-        self.browser.implicitly_wait(30) #智能等待，直到网页加载完毕，最长等待时间为30s
-        self.browser.find_element_by_xpath('//*[@class="forget-pwd J_Quick2Static"]').click()
+        # 等待 密码登录选项 出现
+        password_login = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.qrcode-login > .login-links > .forget-pwd')))
+        password_login.click()
 
-        # 自适应等待，点击微博登录宣传
-        self.browser.implicitly_wait(30)
-        self.browser.find_element_by_xpath('//*[@class="weibo-login"]').click()
+        # 等待 微博登录选项 出现
+        weibo_login = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.weibo-login')))
+        weibo_login.click()
 
-        # 自适应等待，输入微博账号
-        self.browser.implicitly_wait(30)
-        self.browser.find_element_by_name('username').send_keys(weibo_username)
+        # 等待 微博账号 出现
+        weibo_user = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.username > .W_input')))
+        weibo_user.send_keys(weibo_username)
 
-        # 自适应等待，输入微博密码
-        self.browser.implicitly_wait(30)
-        self.browser.find_element_by_name('password').send_keys(weibo_password)
+        # 等待 微博密码 出现
+        weibo_pwd = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.password > .W_input')))
+        weibo_pwd.send_keys(weibo_password)
 
-        # 自适应等待，点击确认登录按钮
-        self.browser.implicitly_wait(30)
-        self.browser.find_element_by_xpath('//*[@class="btn_tip"]/a/span').click()
+        # 等待 登录按钮 出现
+        submit = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.btn_tip > a > span')))
+        submit.click()
 
         # 直到获取到淘宝会员昵称才能确定是登录成功
         taobao_name = self.wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, '.site-nav-bd > ul.site-nav-bd-l > li#J_SiteNavLogin > div.site-nav-menu-hd > div.site-nav-user > a.site-nav-login-info-nick ')))
@@ -64,9 +64,9 @@ class taobao_infos:
 
 if __name__ == "__main__":
 
-    chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" #改成你的chromedriver的完整路径地址
-    weibo_username = "你的微博账号" #改成你的微博账号
-    weibo_password = "你的微博密码" #改成你的微博密码
+    chromedriver_path = "/Users/bird/Desktop/chromedriver" #改成你的chromedriver的完整路径地址
+    weibo_username = "15626145270" #改成你的微博账号
+    weibo_password = "zsqzttlxh...." #改成你的微博密码
 
     a = taobao_infos()
     a.login() #登录
