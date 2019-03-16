@@ -172,6 +172,48 @@
 
 
 
+
+
+
+
+# 5.爬取5K分辨率超清唯美壁纸
+
+## 简介
+
+壁纸的选择其实很大程度上能看出电脑主人的内心世界，有的人喜欢风景，有的人喜欢星空，有的人喜欢美女，有的人喜欢动物。然而，终究有一天你已经产生审美疲劳了，但你下定决定要换壁纸的时候，又发现网上的壁纸要么分辨率低，要么带有水印。
+
+<br />
+
+<br />
+
+这里有一款Mac下的小清新壁纸神器[Pap.er][8]，可能是Mac下最好的壁纸软件，**自带5K超清分辨率壁纸**，富有多种类型壁纸，当我们想在Windows或者Linux下使用的时候，就可以考虑将**5K超清分辨率壁纸**爬取下来。
+
+## 使用教程
+
+1. 确保以下库均已安装：
+
+```python
+# 如果没有安装，请使用pip install module安装
+import requests
+import filetype
+import os
+import json
+from contextlib import closing
+```
+
+## 演示图片
+
+![](5.爬取5K分辨率超清唯美壁纸/example1.png)
+
+![](5.爬取5K分辨率超清唯美壁纸/example2.gif)
+
+
+
+
+
+
+
+
 # 补充
 
 项目持续更新，欢迎您[star本项目][5]
@@ -193,3 +235,4 @@
 [5]:https://github.com/shengqiangzhang/examples-of-web-crawlers
 [6]:http://opensource.org/licenses/MIT
 [7]:https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/3.%E6%B7%98%E5%AE%9D%E5%B7%B2%E4%B9%B0%E5%88%B0%E7%9A%84%E5%AE%9D%E8%B4%9D%E6%95%B0%E6%8D%AE%E7%88%AC%E8%99%AB(%E5%B7%B2%E6%A8%A1%E6%8B%9F%E7%99%BB%E5%BD%95)/example.gif
+[8]:http://paper.meiyuan.in/
