@@ -1,10 +1,11 @@
 # -*- coding:utf-8 -*-
 
-
-import requests
-import filetype
-import os
-import json
+from requests import get
+from filetype import guess
+from os import rename
+from os import makedirs
+from os.path import exists
+from json import loads
 from contextlib import closing
 
 
@@ -13,7 +14,7 @@ def Down_load(file_url, file_full_name, now_photo_count, all_photo_count):
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"}
 
     # 开始下载图片
-    with closing(requests.get(file_url, headers=headers, stream=True)) as response:
+    with closing(get(file_url, headers=headers, stream=True)) as response:
         chunk_size = 1024  # 单次请求最大值
         content_size = int(response.headers['content-length'])  # 文件总大小
         data_count = 0 # 当前已传输的大小
@@ -26,8 +27,8 @@ def Down_load(file_url, file_full_name, now_photo_count, all_photo_count):
                 print("\r %s：[%s%s] %d%% %d/%d" % (file_full_name, done_block * '█', ' ' * (50 - 1 - done_block), now_jd, now_photo_count, all_photo_count), end=" ")
 
     # 下载完图片后获取图片扩展名，并为其增加扩展名
-    file_type = filetype.guess(file_full_name)
-    os.rename(file_full_name, file_full_name + '.' + file_type.extension)
+    file_type = guess(file_full_name)
+    rename(file_full_name, file_full_name + '.' + file_type.extension)
 
 
 
@@ -46,8 +47,8 @@ def crawler_photo(type_id, photo_count):
 
     # 获取图片列表数据
     headers = {"User-Agent": "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36"}
-    respond = requests.get(url, headers=headers)
-    photo_data = json.loads(respond.content)
+    respond = get(url, headers=headers)
+    photo_data = loads(respond.content)
 
     # 已经下载的图片张数
     now_photo_count = 1
@@ -59,8 +60,8 @@ def crawler_photo(type_id, photo_count):
     for photo in photo_data:
 
         # 创建一个文件夹存放我们下载的图片
-        if not os.path.exists('./' + str(type_id)):
-            os.makedirs('./' + str(type_id))
+        if not exists('./' + str(type_id)):
+            makedirs('./' + str(type_id))
 
         # 准备下载的图片链接
         file_url = photo['urls']['raw']
@@ -82,17 +83,31 @@ if __name__ == '__main__':
 
     # 最新 1, 最热 2, 女生 3, 星空 4
     # 爬取类型为3的图片(女生),一共准备爬取20000张
-    print("程序已经开始运行,请稍等……")
-    crawler_photo(1, 10)
-    crawler_photo(2, 10)
-    crawler_photo(3, 10)
-    crawler_photo(4, 10)
+    wall_paper_id = 1
+    wall_paper_count = 10
+    while(True):
+
+        # 换行符
+        print('\n\n')
+
+        # 选择壁纸类型
+        wall_paper_id = input("壁纸类型：最新壁纸 1, 最热壁纸 2, 女生壁纸 3, 星空壁纸 4\n请输入编号以便选择5K超清壁纸类型：")
+        # 判断输入是否正确
+        while(wall_paper_id  != str(1) and wall_paper_id  != str(2) and wall_paper_id  != str(3) and wall_paper_id  != str(4)):
+            wall_paper_id = input("壁纸类型：最新壁纸 1, 最热壁纸 2, 女生壁纸 3, 星空壁纸 4\n请输入编号以便选择5K超清壁纸类型：")
 
 
+        # 选择要下载的壁纸数量
+        wall_paper_count = input("请输入要下载的5K超清壁纸的数量：")
+        # 判断输入是否正确
+        while(int(wall_paper_count) <= 0):
+            wall_paper_count = input("请输入要下载的5K超清壁纸的数量：")
 
 
-
-
+        # 开始爬取5K高清壁纸
+        print("正在下载5K超清壁纸，请稍等……")
+        crawler_photo(int(wall_paper_id), int(wall_paper_count))
+        print('\n下载5K高清壁纸成功!')
 
 
 
