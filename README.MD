@@ -24,14 +24,12 @@
 6. 在main中填写微博账号密码
 
 ```python
-
-	#改成你的chromedriver的完整路径地址
-    chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" 
-    #改成你的微博账号
-    weibo_username = "改成你的微博账号"
-    #改成你的微博密码
-    weibo_password = "改成你的微博密码"
-    
+#改成你的chromedriver的完整路径地址
+chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" 
+#改成你的微博账号
+weibo_username = "改成你的微博账号"
+#改成你的微博密码
+weibo_password = "改成你的微博密码"
 ```
 
 ## 演示图片
@@ -56,14 +54,12 @@
 6. 在main中填写微博账号密码
 
 ```python
-
-	#改成你的chromedriver的完整路径地址
-    chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" 
-    #改成你的微博账号
-    weibo_username = "改成你的微博账号"
-    #改成你的微博密码
-    weibo_password = "改成你的微博密码"
-
+#改成你的chromedriver的完整路径地址
+chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" 
+#改成你的微博账号
+weibo_username = "改成你的微博账号"
+#改成你的微博密码
+weibo_password = "改成你的微博密码"
 ```
 
 ## 演示图片
@@ -94,14 +90,12 @@
 6. 在main中填写微博账号密码
 
 ```python
-
-    #改成你的chromedriver的完整路径地址
-    chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" 
-    #改成你的微博账号
-    weibo_username = "改成你的微博账号"
-    #改成你的微博密码
-    weibo_password = "改成你的微博密码"
-
+#改成你的chromedriver的完整路径地址
+chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" 
+#改成你的微博账号
+weibo_username = "改成你的微博账号"
+#改成你的微博密码
+weibo_password = "改成你的微博密码"
 ```
 
 ## 演示图片
