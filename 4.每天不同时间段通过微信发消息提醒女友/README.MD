@@ -163,6 +163,8 @@ def send_message(your_message):
 
 ![](example1.png)
 ![](example2.png)
+![](example3.png)
+![](example4.png)
 
 
 ## 完整源代码
