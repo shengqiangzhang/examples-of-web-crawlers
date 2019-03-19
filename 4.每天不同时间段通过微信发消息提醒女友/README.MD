@@ -5,37 +5,108 @@
 
 <br />
 
+**现在，再不用担心了**，用python就可以给女友定时发提示消息了，**而且不会漏过每一个关键时刻**，每天**早上起床、中午吃饭、晚上吃饭、晚上睡觉**，都会准时发消息给她了，而且还可以让她**学习英语单词**哦！
+
+<br />
+在生日来临之时，自动发祝福语。在节日来临之时，比如**三八妇女节、女神节、情人节、春节、圣诞节**，自动发问候语哦，再也不用担心他说你没有仪式感了😀
+
 <br />
 
-**现在，再不用担心了**，用python就可以给女友定时发提示消息了，**而且不会漏过每一个关键时刻**，每天**早上起床、中午吃饭、晚上吃饭、晚上睡觉**，都会准时发消息给她了，而且还可以让她**学习英语单词**哦！等你了解了全部这100行代码，你可以加上每个节日自动发问候语哦，比如**三八妇女节、女神节、情人节、春节、圣诞节**，再也不用担心他说你没有仪式感了！😀
-
-
+最重要的时候，实时可以知道女友的**情感情绪指数**哦，再也不用担心女友莫名其妙生气了。
 
 ## 编写思路
 为了方便快速开发，我们使用python中的wxpy模块完成微信的基本操作。
 
-首先，，我们开始设置一些相关的参数，这些参数一看就懂，所以无需多言
+首先，，我们设置一个**config.ini**配置文件，并从这个配置文件开始读取信息。这些参数一看就懂，所以无需多言。
 ```python
-# 设置你的微信名称和对方的微信名称，记住，不是微信ID也不是微信备注
-# 你的微型名称，记住，不是微信ID也不是微信备注
-my_wechat_name = u'你的微信名字'
+# 读取配置文件
+cf = configparser.ConfigParser()
+cf.read("./config.ini",encoding='UTF-8')
+    
+# 设置女友的微信名称，记住，不是微信ID也不是微信备注
 # 你女友的微信名称，记住，不是微信ID也不是微信备注
-my_lady_wechat_name = u'她的微信名字'
+my_lady_wechat_name = cf.get("configuration", "my_lady_wechat_name")
 
 # 设置早上起床时间，中午吃饭时间，下午吃饭时间，晚上睡觉时间
-say_good_morning = "07:00"
-say_good_lunch = "11:50"
-say_good_dinner = "17:50"
-say_good_dream = "23:10"
+say_good_morning = cf.get("configuration", "say_good_morning")
+say_good_lunch = cf.get("configuration", "say_good_lunch")
+say_good_dinner = cf.get("configuration", "say_good_dinner")
+say_good_dream = cf.get("configuration", "say_good_dream")
 
-# 不同时间段想要发送的内容
-str_good_morning = "小宝贝~起床啦~\n\n已经7点钟啦，起来晒太阳啦！"
-str_good_lunch = "ლ(°◕‵ƹ′◕ლ)亲亲,不要太累啦，中午饭记得吃哦，劳逸结合(*^__^*) 嘻嘻……"
-str_good_dinner = "n(*≧▽≦*)n小可爱，又到了下班时间啦，一起来吃晚饭吧"
-str_good_dream = "⊙﹏⊙∥∣°猪猪，晚上23点了，时间不早了哦，记得早点休息。"
+# 设置女友生日信息
+# 几月，注意补全数字，为两位数，比如6月必须写成06
+birthday_month = cf.get("configuration", "birthday_month")
+# 几号，注意补全数字，为两位数，比如6号必须写成08
+birthday_day = cf.get("configuration", "birthday_day")
+
+# 读取早上起床时间，中午吃饭时间，下午吃饭时间，晚上睡觉时间的随机提示语
+# 一般这里的代码不要改动，需要增加提示语可以自己打开对应的文件修改
+#早上起床问候语列表，数据来源于新浪微博
+str_list_good_morning = ''
+with open("./remind_sentence/sentence_good_morning.txt", "r",encoding='UTF-8') as f:
+    str_list_good_morning = f.readlines()
+print(str_list_good_morning)
+
+#中午吃饭问候语列表，数据来源于新浪微博
+str_list_good_lunch = ''
+with open("./remind_sentence/sentence_good_lunch.txt", "r",encoding='UTF-8') as f:
+    str_list_good_lunch = f.readlines()
+print(str_list_good_lunch)
+
+#晚上吃饭问候语列表，数据来源于新浪微博
+str_list_good_dinner = ''
+with open("./remind_sentence/sentence_good_dinner.txt", "r",encoding='UTF-8') as f:
+    str_list_good_dinner = f.readlines()
+print(str_list_good_dinner)
+
+#晚上睡觉问候语列表，数据来源于新浪微博
+str_list_good_dream = ''
+with open("./remind_sentence/sentence_good_dream.txt", "r",encoding='UTF-8') as f:
+    str_list_good_dream = f.readlines()
+print(str_list_good_dream)
+
+# 设置晚上睡觉问候语是否在原来的基础上再加上每日学英语精句
+# False表示否 True表示是
+if((cf.get("configuration", "flag_learn_english")) == '1'):
+	flag_learn_english = True
+else:
+	flag_learn_english = False
+print(flag_learn_english)
+
+# 设置所有问候语结束是否加上表情符号
+# False表示否 True表示是
+str_emoj = "(•‾̑⌣‾̑•)✧˖°----(๑´ڡ`๑)----(๑¯ิε ¯ิ๑)----(๑•́ ₃ •̀๑)----( ∙̆ .̯ ∙̆ )----(๑˘ ˘๑)----(●′ω`●)----(●･̆⍛･̆●)----ಥ_ಥ----_(:qゝ∠)----(´；ω；`)----( `)3')----Σ((( つ•̀ω•́)つ----╰(*´︶`*)╯----( ´´ิ∀´ิ` )----(´∩｀。)----( ื▿ ื)----(｡ŏ_ŏ)----( •ิ _ •ิ )----ヽ(*΄◞ิ౪◟ิ‵ *)----( ˘ ³˘)----(; ´_ゝ`)----(*ˉ﹃ˉ)----(◍'౪`◍)ﾉﾞ----(｡◝‿◜｡)----(ಠ .̫.̫ ಠ)----(´◞⊖◟`)----(。≖ˇェˇ≖｡)----(◕ܫ◕)----(｀◕‸◕´+)----(▼ _ ▼)----( ◉ืൠ◉ื)----ㄟ(◑‿◐ )ㄏ----(●'◡'●)ﾉ♥----(｡◕ˇ∀ˇ◕）----( ◔ ڼ ◔ )----( ´◔ ‸◔`)----(☍﹏⁰)----(♥◠‿◠)----ლ(╹◡╹ლ )----(๑꒪◞౪◟꒪๑)"
+str_list_emoj = str_emoj.split('----')
+if ((cf.get("configuration", "flag_wx_emoj")) == '1'):
+	flag_wx_emoj = True
+else:
+	flag_wx_emoj = False
+print(str_list_emoj)
+
+# 设置节日祝福语
+# 情人节祝福语
+str_Valentine = cf.get("configuration", "str_Valentine")
+print(str_Valentine)
+
+# 三八妇女节祝福语
+str_Women = cf.get("configuration", "str_Women")
+print(str_Women)
+
+# 平安夜祝福语
+str_Christmas_Eve = cf.get("configuration", "str_Christmas_Eve")
+print(str_Christmas_Eve)
+
+# 圣诞节祝福语
+str_Christmas = cf.get("configuration", "str_Christmas")
+print(str_Christmas)
+
+# 她生日的时候的祝福语
+str_birthday = cf.get("configuration", "str_birthday")
+print(str_birthday)
 ```
 
-如果你愿意，可以在上面对时间的判断中，加入一些其他你想要的，比如**节日问候(情人节、圣诞节、三八妇女节等)**，这样你女友就更开心啦！后期如果有时间，我将会加上以上节日问候功能。😀
+如果你愿意，可以在上面对时间的判断中，加入一些其他你想要的，这样你女友就更开心啦！后期如果有时间，我将会加上以上节日问候功能。😀
+
 
 
 
@@ -59,7 +130,6 @@ else:
 ```
 
 
-
 设置完相关参数以后，我们再来学习一下，如何每天教女友`学英语`
 ```python
 # 获取每日励志精句
@@ -70,6 +140,34 @@ def get_message():
     return note,content
 ```
 
+
+
+只有每天的问候和节日问候是仅仅不够的，我们必须时刻知道她的情绪指数，这里可以使用snowNlp或者jieba来做分析，但是为了能够在打包成exe可执行文件时使得程序尽可能小，我们采取直接调用接口的方式来做。代码如下：
+```python
+# 接收女友消息监听器
+# 女友微信名
+my_girl_friend = bot.friends().search(my_lady_wechat_name)[0]
+# chats=my_girl_friend 表示接收消息的对象，也就是女友
+# except_self=False 表示同时也接收自己发的消息，不需要接收自己消息的可以去掉
+@bot.register(chats=my_girl_friend, except_self=False)
+def print_others(msg):
+    # 输出聊天内容
+    print(msg.text)
+
+    # 做极其简单的情感分析
+    # 结果仅供参考，请勿完全相信
+    postData = {'data':msg.text}
+    response = post('https://bosonnlp.com/analysis/sentiment?analysisType=',data=postData)
+    data = response.text
+
+    # 情感评分指数(越接近1表示心情越好，越接近0表示心情越差)
+    now_mod_rank = (data.split(',')[0]).replace('[[','')
+    print("来自女友的消息:%s\n当前情感得分:%s\n越接近1表示心情越好，越接近0表示心情越差，情感结果仅供参考，请勿完全相信！\n\n" % (msg.text, now_mod_rank))
+
+    # 发送信息到文件传输助手
+    mood_message = u"来自女友的消息:" + msg.text + "\n当前情感得分:" + now_mod_rank + "\n越接近1表示心情越好，越接近0表示心情越差，情感结果仅供参考，请勿完全相信！\n\n"
+    bot.file_helper.send(mood_message)
+```
 
 
 教完女友`学英语`后，开始把我们的关心语发给他。这里涉及到wxpy模块的相关操作，很简单，看我的例子就会了。
@@ -84,11 +182,8 @@ def send_message(your_message):
         my_friend.send(your_message)
     except:
 
-        # 你的微信名称
-        my_friend = bot.friends().search(my_wechat_name)[0]
-
-        # 提示
-        my_friend.send(u"守护女友出问题了，赶紧去看看咋回事~")
+        # 出问题时，发送信息到文件传输助手
+        bot.file_helper.send(u"守护女友出问题了，赶紧去看看咋回事~")
 ```
 
 
@@ -100,64 +195,38 @@ def send_message(your_message):
         # 提示
         print("守护中，时间:%s"% time.ctime())
 
+        # 每天定时问候，早上起床，中午吃饭，晚上吃饭，晚上睡觉
         # 获取时间，只获取时和分，对应的位置为倒数第13位到倒数第8位
         now_time = time.ctime()[-13:-8]
-
         if (now_time == say_good_morning):
-            if(first_say_good_morning == False):
-                message = str_good_morning
-                send_message(message)
-                first_say_good_morning = True
-                first_say_good_lunch = False
-                first_say_good_dinner = False
-                first_say_good_dream = False
-                print("提醒女友早上起床:%s" % time.ctime())
+            # 随机取一句问候语
+            message = choice(str_list_good_morning)
 
+            # 是否加上随机表情
+            if(flag_wx_emoj):
+                message = message + choice(str_list_emoj)
 
-        这下面还有很多代码，我就不列出来了
+            send_message(message)
+            print("提醒女友早上起床:%s" % time.ctime())
 
-        # 延时10秒
-        time.sleep(10)
+		…………这下面还有很多代码，我就不列出来了…………
+
+        # 延时60秒
+        time.sleep(60)
 ```
 
-上面的`first_say_good_morning`，`first_say_good_lunch`，`first_say_good_dinner`，`first_say_good_dream`是干什么用的呢？其实是用来做标志检测的，防止同一时间断内多次发送同样的消息给女友，发多了被拉黑怎么办😰，所以标志位是必须要的。
-
-
-最后，输入`start_care()`开始守护女友模式吧~
-
-
+最后，输入以下代码开始守护女友模式吧~
+```python
+    # 开始守护女友
+    t = Thread(target=start_care, name='start_care')
+    t.start()
+```
 
 ## 使用教程
 
 1. pip安装下列包
 - [x] pip install wxpy
 - [x] pip install requests
-2. 设置你的微信名字和她的微信名字
-
-```python
-    # 设置你的微信名称和对方的微信名称，记住，不是微信ID也不是微信备注
-    # 你的微型名称，记住，不是微信ID也不是微信备注
-    my_wechat_name = u'你的微信名字'
-    # 你女友的微信名称，记住，不是微信ID也不是微信备注
-    my_lady_wechat_name = u'她的微信名字'
-```
-3. 设置早上起床时间，中午吃饭时间，下午吃饭时间，晚上睡觉时间
-```python
-    # 设置早上起床时间，中午吃饭时间，下午吃饭时间，晚上睡觉时间
-    say_good_morning = "07:00"
-    say_good_lunch = "11:50"
-    say_good_dinner = "17:50"
-    say_good_dream = "23:10"
-```
-
-4. 设置想要提醒的内容
-```python
-    # 不同时间段想要发送的内容
-    str_good_morning = "小宝贝~起床啦~\n\n已经7点钟啦，起来晒太阳啦！"
-    str_good_lunch = "ლ(°◕‵ƹ′◕ლ)亲亲,不要太累啦，中午饭记得吃哦，劳逸结合(*^__^*) 嘻嘻……"
-    str_good_dinner = "n(*≧▽≦*)n小可爱，又到了下班时间啦，一起来吃晚饭吧"
-    str_good_dream = "⊙﹏⊙∥∣°猪猪，晚上23点了，时间不早了哦，记得早点休息。"
-```
 
 ## 演示图片
 
