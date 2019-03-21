@@ -278,6 +278,9 @@ def print_others(msg):
     # 输出聊天内容
     print(msg.text)
 
+    # 可采用snownlp或者jieba等进行分词、情感分析，由于打包后文件体积太大，故暂时不采用这种方式
+    # 仅仅是直接调用网络接口
+    
     # 做极其简单的情感分析
     # 结果仅供参考，请勿完全相信
     postData = {'data':msg.text}
