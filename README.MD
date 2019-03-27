@@ -342,16 +342,14 @@ from contextlib import closing
 ## 配置说明
 
 ```python
-
-# 确保安装以下库，如果没有，请在python3环境下执行pip install 模块名
-import requests
-import random
-import re
-import queue
-import threading
-import csv
-import json
-
+	# 确保安装以下库，如果没有，请在python3环境下执行pip install 模块名
+	import requests
+	import random
+	import re
+	import queue
+	import threading
+	import csv
+	import json
 ```
 
 
