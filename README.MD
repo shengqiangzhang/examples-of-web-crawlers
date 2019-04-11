@@ -1,20 +1,23 @@
-# 简介
+# <p align="center">一些python爬虫例子,对新手比较友好</p>
+
+
+<p align="center">
+    <a href="https://github.com/python/cpython"><img src="https://img.shields.io/badge/Python-3.7-blue.svg"></a>
+    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/badge/platform-Windows%7CLinux%7CmacOS-blue.svg"></a>
+    <a href="https://opensource.org/licenses/mit-license.php"><img src="https://badges.frapsoft.com/os/mit/mit.svg?v=103"></a>
+    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/stargazers"><img src="https://img.shields.io/github/stars/shengqiangzhang/examples-of-web-crawlers.svg?style=social"></a>
+    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/network/members"><img src="https://img.shields.io/github/forks/shengqiangzhang/examples-of-web-crawlers.svg?style=social"></a>
+</p>
+
+
+## 简介
 一些常见的网站爬虫例子，代码通用性较高，时效性较久。**项目代码对新手比较友好**，尽量用简单的python代码，并配有大量注释。
 
 
 
-# 编写环境
 
-| system         | macOS Sierra 10.12.6 |
-| -------------- | -------------------- |
-| python Version | Python 3.7.0         |
-| Python IDE     | PyCharm              |
-
-
-
-
-# 1.淘宝模拟登录
-## 使用教程
+## 1.淘宝模拟登录
+### 使用教程
 1. [点击这里下载][1]下载chrome浏览器
 2. 查看chrome浏览器的版本号，[点击这里下载][2]对应版本号的chromedriver驱动
 3. pip安装下列包
@@ -32,9 +35,8 @@ weibo_username = "改成你的微博账号"
 weibo_password = "改成你的微博密码"
 ```
 
-## 演示图片
-![](1.淘宝模拟登录/example.gif)  
-[图片查看不了点击这里][4]
+### 演示图片
+![](1.淘宝模拟登录/example.gif)
 
   
 
@@ -42,8 +44,9 @@ weibo_password = "改成你的微博密码"
 
 
 
-# 2.天猫商品数据爬虫
-## 使用教程
+
+## 2.天猫商品数据爬虫
+### 使用教程
 1. [点击这里下载][1]下载chrome浏览器
 2. 查看chrome浏览器的版本号，[点击这里下载][2]对应版本号的chromedriver驱动
 3. pip安装下列包
@@ -62,10 +65,9 @@ weibo_username = "改成你的微博账号"
 weibo_password = "改成你的微博密码"
 ```
 
-## 演示图片
+### 演示图片
 ![](2.天猫商品数据爬虫(已模拟登录)/example.gif)
 ![](2.天猫商品数据爬虫(已模拟登录)/example2.png)
-[图片查看不了点击这里][4]
 
 
 
@@ -78,8 +80,8 @@ weibo_password = "改成你的微博密码"
 
 
 
-# 3.爬取淘宝我已购买的宝贝数据
-## 使用教程
+## 3.爬取淘宝我已购买的宝贝数据
+### 使用教程
 1. [点击这里下载][1]下载chrome浏览器
 2. 查看chrome浏览器的版本号，[点击这里下载][2]对应版本号的chromedriver驱动
 3. pip安装下列包
@@ -98,10 +100,9 @@ weibo_username = "改成你的微博账号"
 weibo_password = "改成你的微博密码"
 ```
 
-## 演示图片
+### 演示图片
 ![](3.淘宝已买到的宝贝数据爬虫(已模拟登录)/example.gif)
 ![](3.淘宝已买到的宝贝数据爬虫(已模拟登录)/example2.png)
-[图片查看不了点击这里][7]
 
 
 
@@ -113,8 +114,8 @@ weibo_password = "改成你的微博密码"
 
 
 
-# 4.每天不同时间段通过微信发消息提醒女友
-## 简介
+## 4.每天不同时间段通过微信发消息提醒女友
+### 简介
 
 有时候，你很想关心她，但是你太忙了，以至于她一直抱怨，觉得你不够关心她。你暗自下决心，下次一定要准时发消息给她，哪怕是几句话，可是你又忘记了。你觉得自己很委屈😭，但是她又觉得你不负责。
 
@@ -130,7 +131,7 @@ weibo_password = "改成你的微博密码"
 最重要的时候，实时可以知道女友的**情感情绪指数**哦，再也不用担心女友莫名其妙生气了。
 
 
-## 使用教程
+### 使用教程
 
 1. pip安装下列包
 - [x] pip install wxpy
@@ -188,7 +189,7 @@ str_Christmas = 小仙女，圣诞节快乐哦！（づ￣3￣）づ╭❤～
 str_birthday = 亲爱的，生日快乐，我已经给你准备好了礼物哦，明天你就能看到啦！(*@ο@*) 哇～
 ```
 
-## 演示图片
+### 演示图片
 
 ![](4.每天不同时间段通过微信发消息提醒女友/example1.png)
 ![](4.每天不同时间段通过微信发消息提醒女友/example2.png)
@@ -204,9 +205,9 @@ str_birthday = 亲爱的，生日快乐，我已经给你准备好了礼物哦�
 
 
 
-# 5.爬取5K分辨率超清唯美壁纸
+## 5.爬取5K分辨率超清唯美壁纸
 
-## 简介
+### 简介
 
 壁纸的选择其实很大程度上能看出电脑主人的内心世界，有的人喜欢风景，有的人喜欢星空，有的人喜欢美女，有的人喜欢动物。然而，终究有一天你已经产生审美疲劳了，但你下定决定要换壁纸的时候，又发现网上的壁纸要么分辨率低，要么带有水印。
 
@@ -216,7 +217,7 @@ str_birthday = 亲爱的，生日快乐，我已经给你准备好了礼物哦�
 
 这里有一款Mac下的小清新壁纸神器[Pap.er][8]，可能是Mac下最好的壁纸软件，**自带5K超清分辨率壁纸**，富有多种类型壁纸，当我们想在Windows或者Linux下使用的时候，就可以考虑将**5K超清分辨率壁纸**爬取下来。
 
-## 使用教程
+### 使用教程
 
 1. 确保以下库均已安装：
 
@@ -229,10 +230,9 @@ import json
 from contextlib import closing
 ```
 
-## 演示图片
+### 演示图片
 
 ![](5.爬取5K分辨率超清唯美壁纸/example1.png)
-
 ![](5.爬取5K分辨率超清唯美壁纸/example2.gif)
 
 
@@ -246,16 +246,13 @@ from contextlib import closing
 
 
 
-# 6.爬取豆瓣排行榜电影数据(含GUI界面版)
+## 6.爬取豆瓣排行榜电影数据(含GUI界面版)
 
-
-## 简介
+### 简介
 
 这个项目源于大三某课程设计。平常经常需要搜索一些电影，但是不知道哪些评分高且评价人数多的电影。为了方便使用，就将原来的项目重新改写了。当做是对爬虫技术、可视化技术的实践了。主要是通过从排行榜和从影片关键词两种方式爬取电影数据。
 
-
-
-## 使用教程
+### 使用教程
 
 1. 打开[http://chromedriver.storage.googleapis.com/index.html][9]，根据自己的操作系统下载对应的chromedriver
 2. 打开当前面目录下的**<u>getMovieInRankingList.py</u>**，定位到第59行，将`executable_path=/Users/bird/Desktop/chromedriver.exe`修改成你自己的chromedriver路径
@@ -263,17 +260,12 @@ from contextlib import closing
 - pip install Pillow
 - pip install selenium
 
-
-
-## 演示图片
+### 演示图片
 
 ![](6.爬取豆瓣排行榜电影数据(含GUI界面版)/example_rating.png)
-
 ![](6.爬取豆瓣排行榜电影数据(含GUI界面版)/example_keyword.png)
 
-
-
-## 包含功能
+### 包含功能
 
 - [x] 根据关键字搜索电影
 - [x] 根据排行榜(TOP250)搜索电影
@@ -284,7 +276,7 @@ from contextlib import closing
 - [ ] 等待更新
 
 
-## 存在问题
+### 存在问题
 
 目前没有加入反爬虫策略，如果运行出现403 forbidden提示，则说明暂时被禁止，解决方式如下：
 
@@ -303,24 +295,20 @@ from contextlib import closing
 
 
 
-# 7.多线程+代理池爬取天天基金网、股票数据(无需使用爬虫框架)
+## 7.多线程+代理池爬取天天基金网、股票数据(无需使用爬虫框架)
 
-
-## 简介
-
+### 简介
 提到爬虫，大部分人都会想到使用Scrapy工具，但是仅仅停留在会使用的阶段。为了增加对爬虫机制的理解，我们可以手动实现多线程的爬虫过程，同时，引入IP代理池进行基本的反爬操作。
 
 本次使用天天基金网进行爬虫，该网站具有反爬机制，同时数量足够大，多线程效果较为明显。
 
-
-## 技术路线
+### 技术路线
 
 - IP代理池
 - 多线程
 - 爬虫与反爬
 
-
-## 数据格式
+### 数据格式
 000056,建信消费升级混合,2019-03-26,1.7740,1.7914,0.98,2019-03-27 15:00
 
 000031,华夏复兴混合,2019-03-26,1.5650,1.5709,0.38,2019-03-27 15:00
@@ -335,11 +323,11 @@ from contextlib import closing
 
 000016,华夏纯债债券C,2019-03-26,1.1790,1.1793,0.03,2019-03-27 15:00
 
-## 功能截图
+### 功能截图
 
 ![](7.爬取天天基金网所有基金数据/example.gif)
 
-## 配置说明
+### 配置说明
 
 ```python
 	# 确保安装以下库，如果没有，请在python3环境下执行pip install 模块名
@@ -355,9 +343,7 @@ from contextlib import closing
 
 
 
-
-
-# 补充
+## 补充
 
 项目持续更新，欢迎您[star本项目][5]
 
@@ -366,7 +352,7 @@ from contextlib import closing
 
 
 
-# License
+## License
 [The MIT License (MIT)][6]
 
 
