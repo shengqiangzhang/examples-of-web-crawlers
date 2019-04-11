@@ -5,19 +5,15 @@
     <a href="https://github.com/python/cpython"><img src="https://img.shields.io/badge/Python-3.7-blue.svg"></a>
     <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/badge/platform-Windows%7CLinux%7CmacOS-blue.svg"></a>
     <a href="https://opensource.org/licenses/mit-license.php"><img src="https://badges.frapsoft.com/os/mit/mit.svg?v=103"></a>
-    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/stargazers"><img src="https://img.shields.io/github/stars/shengqiangzhang/examples-of-web-crawlers.svg?style=social"></a>
-    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/network/members"><img src="https://img.shields.io/github/forks/shengqiangzhang/examples-of-web-crawlers.svg?style=social"></a>
+    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/stargazers"><img src="https://img.shields.io/github/stars/shengqiangzhang/examples-of-web-crawlers.svg?style=plastic"></a>
+    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/network/members"><img src="https://img.shields.io/github/forks/shengqiangzhang/examples-of-web-crawlers.svg?style=plastic"></a>
 </p>
-
-<br />
 <br />
 
 ## 简介
 一些常见的网站爬虫例子，代码通用性较高，时效性较久。**项目代码对新手比较友好**，尽量用简单的python代码，并配有大量注释。
 
 
-
-<br />
 <br />
 
 ## [1.淘宝模拟登录][taobao_login]
