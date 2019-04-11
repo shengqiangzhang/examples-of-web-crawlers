@@ -9,12 +9,16 @@
     <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/network/members"><img src="https://img.shields.io/github/forks/shengqiangzhang/examples-of-web-crawlers.svg?style=social"></a>
 </p>
 
+<br />
+<br />
 
 ## 简介
 一些常见的网站爬虫例子，代码通用性较高，时效性较久。**项目代码对新手比较友好**，尽量用简单的python代码，并配有大量注释。
 
 
 
+<br />
+<br />
 
 ## [1.淘宝模拟登录][taobao_login]
 ### 使用教程
@@ -44,6 +48,8 @@ weibo_password = "改成你的微博密码"
 
 
 
+<br />
+<br />
 
 ## [2.天猫商品数据爬虫][tmall_crawler]
 ### 使用教程
@@ -79,6 +85,8 @@ weibo_password = "改成你的微博密码"
 
 
 
+<br />
+<br />
 
 ## [3.爬取淘宝我已购买的宝贝数据][taobao_buy_crawler]
 ### 使用教程
@@ -113,6 +121,8 @@ weibo_password = "改成你的微博密码"
 
 
 
+<br />
+<br />
 
 ## [4.每天不同时间段通过微信发消息提醒女友][say_to_lady]
 ### 简介
@@ -204,14 +214,14 @@ str_birthday = 亲爱的，生日快乐，我已经给你准备好了礼物哦�
 
 
 
+<br />
+<br />
 
 ## [5.爬取5K分辨率超清唯美壁纸][crawler_5K_wallpaper]
 
 ### 简介
 
 壁纸的选择其实很大程度上能看出电脑主人的内心世界，有的人喜欢风景，有的人喜欢星空，有的人喜欢美女，有的人喜欢动物。然而，终究有一天你已经产生审美疲劳了，但你下定决定要换壁纸的时候，又发现网上的壁纸要么分辨率低，要么带有水印。
-
-<br />
 
 <br />
 
@@ -245,6 +255,8 @@ from contextlib import closing
 
 
 
+<br />
+<br />
 
 ## [6.爬取豆瓣排行榜电影数据(含GUI界面版)][getMovieInRankingList]
 
@@ -294,6 +306,8 @@ from contextlib import closing
 
 
 
+<br />
+<br />
 
 ## [7.多线程+代理池爬取天天基金网、股票数据(无需使用爬虫框架)][fund_data]
 
@@ -342,6 +356,8 @@ from contextlib import closing
 
 
 
+<br />
+<br />
 
 ## 补充
 
@@ -351,6 +367,8 @@ from contextlib import closing
 
 
 
+<br />
+<br />
 
 ## License
 [The MIT License (MIT)][6]
