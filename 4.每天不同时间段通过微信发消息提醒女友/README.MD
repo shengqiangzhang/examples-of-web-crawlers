@@ -281,10 +281,16 @@ str_birthday = 亲爱的，生日快乐，我已经给你准备好了礼物哦�
 
 ## 演示图片
 
-![](example1.png)
-![](example2.png)
-![](example3.png)
-![](example4.png)
+<img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example1.png" width = "300"  alt="example1" /><img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example2.png" width = "300"  alt="example2" />
+
+<img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example3.png" width = "600"  alt="example3"/>
+
+<img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example4.png" width = "600"  alt="example4" />
+
+
+
+
+
 
 
 ## 完整源代码
