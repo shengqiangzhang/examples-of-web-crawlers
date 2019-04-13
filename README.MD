@@ -144,66 +144,15 @@ weibo_password = "改成你的微博密码"
 1. pip安装下列包
 - [x] pip install wxpy
 - [x] pip install requests
-- 设置你的微信名字和她的微信名字
 
 2. 设置以下内容
-```python
-[configuration]
-
-# 设置女友的微信名称，记住，不是微信ID也不是微信备注
-my_lady_wechat_name = 小强子
-
-
-# 设置女友生日信息
-# 若某一项月份或者日期不想设置，请输入99，不能留空
-# 几月，注意补全数字，为两位数，比如6月必须写成06
-birthday_month = 03
-# 几号，注意补全数字，为两位数，比如6号必须写成08
-birthday_day = 18
-
-
-# 设置早上起床时间，中午吃饭时间，下午吃饭时间，晚上睡觉时间
-# 若某一项时间不想设置，请输入99:00，不能留空
-say_good_morning = 03:09
-say_good_lunch = 03:10
-say_good_dinner = 03:11
-say_good_dream = 03:12
-
-
-# 设置晚上睡觉问候语是否在原来的基础上再加上每日学英语精句
-# 1表示是，0表示否
-flag_learn_english = 1
-
-
-# 设置所有问候语结束是否加上表情符号
-# 1表示是，0表示否
-flag_wx_emoj = 1
-
-
-# 设置节日祝福语
-# 情人节祝福语
-str_Valentine = 亲爱的，情人节快乐！我想和你一起分享生命中的每一天，直到永远。
-
-# 三八妇女节祝福语
-str_Women = 嘿，女神节到了，祝我的女神开心快乐！你每天都是那么好看^_^
-
-# 平安夜祝福语
-str_Christmas_Eve = 宝贝，平安夜快乐，你吃苹果了吗？n(*≧▽≦*)n
-
-# 圣诞节祝福语
-str_Christmas = 小仙女，圣诞节快乐哦！（づ￣3￣）づ╭❤～
-
-# 她生日的时候的祝福语
-str_birthday = 亲爱的，生日快乐，我已经给你准备好了礼物哦，明天你就能看到啦！(*@ο@*) 哇～
-```
+- [x] 设置config.ini相关信息
 
 ### 演示图片
 
-<img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example1.png" width = "310"  alt="example1" /><img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example2.png" width = "310"  alt="example2" />
+<img src="4.每天不同时间段通过微信发消息提醒女友/example1.png" width = "310"  alt="example1" /><img src="4.每天不同时间段通过微信发消息提醒女友/example2.png" width = "310"  alt="example2" />
 
-<img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example3.png" width = "620"  alt="example3"/>
-
-<img src="https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/4.%E6%AF%8F%E5%A4%A9%E4%B8%8D%E5%90%8C%E6%97%B6%E9%97%B4%E6%AE%B5%E9%80%9A%E8%BF%87%E5%BE%AE%E4%BF%A1%E5%8F%91%E6%B6%88%E6%81%AF%E6%8F%90%E9%86%92%E5%A5%B3%E5%8F%8B/example4.png" width = "620"  alt="example4" />
+<img src="4.每天不同时间段通过微信发消息提醒女友/example3.png" width = "620"  alt="example3"/>
 
 
 
