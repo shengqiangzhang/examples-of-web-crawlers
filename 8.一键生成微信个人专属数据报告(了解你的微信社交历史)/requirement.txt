@@ -1,0 +1,9 @@
+wxpy
+tqdm
+pyecharts
+pyecharts_snapshot
+echarts-countries-pypkg
+echarts-china-provinces-pypkg
+echarts-china-cities-pypkg
+echarts-china-counties-pypkg
+echarts-china-misc-pypkg
