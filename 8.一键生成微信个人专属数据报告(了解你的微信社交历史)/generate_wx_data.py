@@ -5,7 +5,9 @@ from platform import system
 import os
 import subprocess
 import shutil
-from tqdm import tqdm
+import queue
+import threading
+import time
 from pyecharts import Pie
 from pyecharts import Map
 
@@ -61,6 +63,25 @@ def region_distribution():
     map = Map("微信好友地区分布")
     map.add("", provice, values, visual_range=[0, 50], maptype='china', is_visualmap=True, visual_text_color='#000')
     map.render(path="data/好友地区分布.html")
+
+
+
+
+
+
+# 下载好友头像，此步骤消耗时间比较长
+def download_head_image(thread_name):
+
+    # 队列不为空的情况
+    while(not queue_head_image.empty()):
+        # 取出一个好友元素
+        user = queue_head_image.get()
+
+        # 下载该好友头像，并保存到指定位置
+        user.get_avatar(save_path='image/' + user.nick_name + '.jpg')
+
+        # 输出提示
+        print(u'线程%d:正在下载微信好友头像数据，进度%d/%d，请耐心等待……' %(thread_name, len(friends)-queue_head_image.qsize(), len(friends)))
 
 
 
@@ -133,7 +154,7 @@ if __name__ == '__main__':
         bot = Bot(console_qr=2,cache_path=True)
     else:
         # 自行确定
-        print("无法识别你的操作系统类型，请自己设置")
+        print(u"无法识别你的操作系统类型，请自己设置")
         exit()
 
 
@@ -163,14 +184,25 @@ if __name__ == '__main__':
 
 
 
-    # 获取好友头像，此步骤消耗时间比较长，故用采用tqdm进度条模块显示进度
-    # tqdm为进度条模块，可以用来显示进度条，封装程度高，使用方式简单
-    # 在测试的时候，为了节省时间，可以先使用friends[1:10]的方式来指定下载若干个好友头像数据
     print(u'正在获取微信好友头像信息，请耐心等待……')
-    for i in tqdm(friends[1:10], desc=u'正在处理好友头像信息', unit=u'个'):
-        i.get_avatar(save_path='image/' + i.nick_name + '.jpg')
-    print(u'\n微信好友头像信息获取完毕')
+    # 创建一个队列，用于多线程下载头像，提高下载速度
+    queue_head_image = queue.Queue()
 
+    # 将每个好友元素存入队列中
+    # 如果为了方便调试，可以仅仅插入几个数据，friends[1:10]
+    for user in friends[1:10]:
+        queue_head_image.put(user)
+
+    # 启动10个线程下载头像
+    for i in range(1, 10):
+        t = threading.Thread(target=download_head_image,args=(i,))
+        t.start()
+
+    # 等待微信好友头像数据下载完毕
+    while(not queue_head_image.empty()):
+        time.sleep(1)
+
+    print(u'微信好友头像信息获取完毕')
 
 
     # 生成一份最终的html文件
