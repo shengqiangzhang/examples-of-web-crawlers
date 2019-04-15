@@ -8,6 +8,3 @@
 
 # 忽略.idea文件夹下的所有文件
 /.idea/
-
-# 忽略测试文件
-only_my_test
