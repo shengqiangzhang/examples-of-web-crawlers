@@ -2,14 +2,31 @@
 
 from wxpy import *
 from platform import system
-import os
-import subprocess
-import shutil
-import queue
-import threading
-import time
+from os.path import exists
+from os import makedirs
+from shutil import rmtree
+from queue import Queue
+from threading import Thread
+from time import sleep
 from pyecharts import Pie
 from pyecharts import Map
+
+# 引入打开文件所用的库
+# Window与Linux和Mac OSX有所不同
+# lambda用来定义一个匿名函数，可实现类似c语言的define定义
+if('Windows' in system()):
+    # Windows
+    from os import startfile
+    open_html = lambda x : startfile(x)
+elif('Darwin' in system()):
+    # MacOSX
+    from subprocess import call
+    open_html = lambda x : call(["open", x])
+else:
+    # Linux
+    from subprocess import call
+    open_html = lambda x: call(["xdg-open", x])
+
 
 # 分析好友性别比例
 def sex_ratio():
@@ -86,25 +103,6 @@ def download_head_image(thread_name):
 
 
 
-# 调用系统方式自动打开某个html文件
-def open_html(file_name):
-    if('Windows' in system()):
-        # Windows
-        os.startfile(file_name)
-    elif('Darwin' in system()):
-        # MacOSX
-        subprocess.call(["open", file_name])
-    elif('Linux' in system()):
-        # Linux
-        subprocess.call(["xdg-open", file_name])
-    else:
-        # 自行确定
-        print("打开微信个人数据报告文件失败，请手动打开")
-        exit()
-
-
-
-
 # 生成一个html文件，并保存到文件file_name中
 def generate_html(file_name):
     with open(file_name, 'w', encoding='utf-8') as f:
@@ -121,24 +119,29 @@ def generate_html(file_name):
         f.write(data)
 
 
+
+# 初始化所需文件夹
+def init_folders():
+    if(not (exists('image'))):
+        makedirs('image')
+    else:
+        rmtree('image')
+        makedirs('image')
+
+    if(not (exists('data'))):
+        makedirs('data')
+    else:
+        rmtree('data')
+        makedirs('data')
+
+
+
 # 运行前，请先确保安装了所需库文件
 # 若没安装，请执行以下命令:pip install -r requirement.txt
 if __name__ == '__main__':
 
-    # 生成一些所需的目录
-    if(not (os.path.exists('image'))):
-        os.makedirs('image')
-    else:
-        shutil.rmtree('image')
-        os.makedirs('image')
-
-    if(not (os.path.exists('data'))):
-        os.makedirs('data')
-    else:
-        shutil.rmtree('data')
-        os.makedirs('data')
-
-
+    # 初始化所需文件夹
+    init_folders()
 
 
     # 启动微信机器人，自动根据操作系统执行不同的指令
@@ -186,7 +189,7 @@ if __name__ == '__main__':
 
     print(u'正在获取微信好友头像信息，请耐心等待……')
     # 创建一个队列，用于多线程下载头像，提高下载速度
-    queue_head_image = queue.Queue()
+    queue_head_image = Queue()
 
     # 将每个好友元素存入队列中
     # 如果为了方便调试，可以仅仅插入几个数据，friends[1:10]
@@ -195,12 +198,12 @@ if __name__ == '__main__':
 
     # 启动10个线程下载头像
     for i in range(1, 10):
-        t = threading.Thread(target=download_head_image,args=(i,))
+        t = Thread(target=download_head_image,args=(i,))
         t.start()
 
     # 等待微信好友头像数据下载完毕
     while(not queue_head_image.empty()):
-        time.sleep(1)
+        sleep(1)
 
     print(u'微信好友头像信息获取完毕')
 
