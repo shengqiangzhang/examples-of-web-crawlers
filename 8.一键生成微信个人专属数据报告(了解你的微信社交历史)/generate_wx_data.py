@@ -127,11 +127,8 @@ def analyze_signature():
     response = post('http://life.chacuo.net/convertexportword',data=postData)
     data = response.text.replace('{"status":1,"info":"ok","data":["','').replace('\/','').replace('\\\\','')
 
-    # 解码，windows与其他系统有所不同
-    if ('Windows' in system()):
-        data = data.encode('unicode_escape').decode('unicode_escape')
-    else:
-        data = data.encode('utf-8').decode('unicode_escape')
+    # 解码
+    data = data.encode('utf-8').decode('unicode_escape')
 
     # 将返回的分词结果json字符串转化为python对象，并做一些处理
     data = data.split("=====================================")[0]
@@ -160,7 +157,7 @@ def analyze_signature():
     wordcloud.add("", name, value, word_size_range=[20, 100])
     wordcloud.render('data/好友个性签名词云.html')
 
-    print(signature_dict)
+    # print(signature_dict)
 
 
 # 下载好友头像，此步骤消耗时间比较长
