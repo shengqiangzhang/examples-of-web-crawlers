@@ -1,5 +1,6 @@
 wxpy
 pyecharts
+requests
 pyecharts_snapshot
 echarts-countries-pypkg
 echarts-china-provinces-pypkg

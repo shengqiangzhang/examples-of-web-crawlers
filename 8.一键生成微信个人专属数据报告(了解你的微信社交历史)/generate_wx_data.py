@@ -10,6 +10,9 @@ from threading import Thread
 from time import sleep
 from pyecharts import Pie
 from pyecharts import Map
+from pyecharts import WordCloud
+from requests import post
+
 
 # 引入打开文件所用的库
 # Window与Linux和Mac OSX有所不同
@@ -107,6 +110,58 @@ def analyze_remark_name():
 
 
 
+# 分析个性签名
+def analyze_signature():
+
+    # 个性签名列表
+    data = []
+    for user in friends:
+        data.append(user.signature)
+
+    # 将个性签名列表转为string
+    data = ','.join(data)
+
+    # 进行分词处理，调用接口进行分词
+    # 这里不使用jieba或snownlp的原因是无法打包成exe文件或者打包后文件非常大
+    postData = {'data':data, 'type':'exportword', 'arg':'', 'beforeSend':'undefined'}
+    response = post('http://life.chacuo.net/convertexportword',data=postData)
+    data = response.text.replace('{"status":1,"info":"ok","data":["','').replace('\/','').replace('\\\\','')
+
+    # 解码，windows与其他系统有所不同
+    if ('Windows' in system()):
+        data = data.encode('unicode_escape').decode('unicode_escape')
+    else:
+        data = data.encode('utf-8').decode('unicode_escape')
+
+    # 将返回的分词结果json字符串转化为python对象，并做一些处理
+    data = data.split("=====================================")[0]
+
+    # 对分词结果数据进行去除一些无意义的词操作
+    stop_words = [',', '，', '.', '。', '!', '！', ':', '：', '\'', '‘', '’', '“', '”', '的', '了', '是', '=', '\r', '\n', '\r\n', '\t', '以下关键词', '[', ']', '{', '}', '(', ')', '（', '）', 'span', '<', '>', 'class', 'html', '?']
+    for x in stop_words:
+        data = data.replace(x, "")
+    data = data.replace('    ','')
+
+    # 将分词结果转化为list，根据分词结果，可以知道以2个空格为分隔符
+    data = data.split('  ')
+
+    # 进行词频统计，结果存入字典signature_dict中
+    signature_dict = {}
+    for word in data:
+        if(word in signature_dict.keys()):
+            signature_dict[word] += 1
+        else:
+            signature_dict[word] = 1
+
+    # 开始绘制词云
+    name = [x for x in signature_dict.keys()]
+    value = [x for x in signature_dict.values()]
+    wordcloud = WordCloud('微信好友个性签名词云图')
+    wordcloud.add("", name, value, word_size_range=[20, 100])
+    wordcloud.render('data/好友个性签名词云.html')
+
+    print(signature_dict)
+
 
 # 下载好友头像，此步骤消耗时间比较长
 def download_head_image(thread_name):
@@ -138,6 +193,7 @@ def generate_html(file_name):
             <iframe name="iframe1" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友性别比例.html" frameborder=0></iframe>
             <iframe name="iframe2" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友地区分布.html" frameborder=0></iframe>
             <iframe name="iframe3" marginwidth=0 marginheight=0 width=100% height=60% src="data/你最亲密的人.html" frameborder=0></iframe>
+            <iframe name="iframe4" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友个性签名词云.html" frameborder=0></iframe>
         '''
         f.write(data)
 
@@ -221,6 +277,10 @@ if __name__ == '__main__':
     analyze_remark_name()
     print(u'分析你最亲密的人完毕')
 
+
+    print(u'正在分析你的好友的个性签名，请耐心等待……')
+    analyze_signature()
+    print(u'分析你的好友的个性签名完毕')
 
     # 由于下载头像是多线程进行，并且存在可能下载时间比较久的情况
     # 所以当我们完成所有其他功能以后，需要等待微信好友头像数据下载完毕后再进行操作
