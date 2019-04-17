@@ -35,10 +35,10 @@ def sex_ratio():
     male, female, other = 0, 0, 0
 
     # 遍历
-    for i in friends_dict.keys():
-        if(friends_dict[i][2] == 1):
+    for user in friends:
+        if(user.sex == 1):
             male += 1
-        elif(friends_dict[i][2] == 2):
+        elif(user.sex == 2):
             female += 1
         else:
             other += 1
@@ -66,10 +66,10 @@ def region_distribution():
                      '宁夏': 0, '广西': 0, '西藏': 0, '香港': 0, '澳门': 0}
 
     # 遍历
-    for i in friends_dict.keys():
+    for user in friends:
         # 判断省份是否存在，有可能是外国的，这种情况不考虑
-        if (friends_dict[i][3] in province_dict):
-            key = friends_dict[i][3]
+        if (user.province in province_dict):
+            key = user.province
             province_dict[key] += 1
 
     provice = list(province_dict.keys())
@@ -82,6 +82,28 @@ def region_distribution():
     map.render(path="data/好友地区分布.html")
 
 
+
+# 分析备注名称
+def analyze_remark_name():
+    close_partner_dict = {'宝宝,猪,仙女,亲爱,老婆':0, '老公':0, '父亲,爸':0, '母亲,妈':0, '闺蜜,死党,基友':0}
+
+    # 遍历好友数据
+    for user in friends:
+        for key in close_partner_dict.keys():
+            # 判断该好友备注名是否包含close_partner_dict中的任意一个key
+            name = key.split(',')
+            for sub_name in name:
+                if(sub_name in user.remark_name):
+                    close_partner_dict[key] += 1
+                    break
+
+
+    name_list = ['最重要的她', '最重要的他', '爸爸', '妈妈', '死党']
+    num_list = [x for x in close_partner_dict.values()]
+
+    pie = Pie("可能是你最亲密的人")
+    pie.add("", name_list, num_list, is_label_show=True, is_legend_show=False)
+    pie.render('data/你最亲密的人.html')
 
 
 
@@ -115,6 +137,7 @@ def generate_html(file_name):
 
             <iframe name="iframe1" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友性别比例.html" frameborder=0></iframe>
             <iframe name="iframe2" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友地区分布.html" frameborder=0></iframe>
+            <iframe name="iframe3" marginwidth=0 marginheight=0 width=100% height=60% src="data/你最亲密的人.html" frameborder=0></iframe>
         '''
         f.write(data)
 
@@ -164,26 +187,8 @@ if __name__ == '__main__':
     # 获取好友数据
     print(u'正在获取微信好友数据信息，请耐心等待……')
     friends = bot.friends(update=False)
-    # 好友信息字典
-    friends_dict = {}
-    count = 0
-
-    # 将好友信息(除了头像)插入字典，方便后续处理数据，key:count，value:list
-    for i in friends:
-        friend_data_list = [i.nick_name, i.remark_name, i.sex, i.province, i.city, i.signature]
-        friends_dict.update({count : friend_data_list})
-        count += 1
+    # i.nick_name, i.remark_name, i.sex, i.province, i.city, i.signature
     print(u'微信好友数据信息获取完毕')
-
-
-    print(u'正在分析好友性别比例，请耐心等待……')
-    sex_ratio()
-    print(u'分析好友性别比例完毕')
-
-
-    print(u'正在分析好友地区分布，请耐心等待……')
-    region_distribution()
-    print(u'分析好友地区分布完毕')
 
 
 
@@ -200,12 +205,28 @@ if __name__ == '__main__':
     for i in range(1, 10):
         t = Thread(target=download_head_image,args=(i,))
         t.start()
+    print(u'微信好友头像信息获取完毕')
 
-    # 等待微信好友头像数据下载完毕
+
+    print(u'正在分析好友性别比例，请耐心等待……')
+    sex_ratio()
+    print(u'分析好友性别比例完毕')
+
+
+    print(u'正在分析好友地区分布，请耐心等待……')
+    region_distribution()
+    print(u'分析好友地区分布完毕')
+
+    print(u'正在分析你最亲密的人，请耐心等待……')
+    analyze_remark_name()
+    print(u'分析你最亲密的人完毕')
+
+
+    # 由于下载头像是多线程进行，并且存在可能下载时间比较久的情况
+    # 所以当我们完成所有其他功能以后，需要等待微信好友头像数据下载完毕后再进行操作
     while(not queue_head_image.empty()):
         sleep(1)
 
-    print(u'微信好友头像信息获取完毕')
 
 
     # 生成一份最终的html文件
