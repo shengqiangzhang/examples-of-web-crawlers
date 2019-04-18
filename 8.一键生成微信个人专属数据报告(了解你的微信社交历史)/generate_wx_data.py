@@ -12,6 +12,8 @@ from pyecharts import Pie
 from pyecharts import Map
 from pyecharts import WordCloud
 from requests import post
+import re
+from tqdm import tqdm
 
 
 # 引入打开文件所用的库
@@ -116,35 +118,44 @@ def analyze_signature():
     # 个性签名列表
     data = []
     for user in friends:
-        data.append(user.signature)
+
+        # 清除签名中的微信表情emoj，即<span class.*?</span>
+        # 使用正则查找并替换方式，user.signature为源文本，将<span class.*?</span>替换成空
+        new_signature = re.sub(re.compile(r"<span class.*?</span>", re.S), "", user.signature)
+
+        # 只保留签名为1行的数据，过滤为多行的签名
+        if(len(new_signature.split('\n')) == 1):
+            data.append(new_signature)
 
     # 将个性签名列表转为string
-    data = ','.join(data)
+    data = '\n'.join(data)
 
     # 进行分词处理，调用接口进行分词
     # 这里不使用jieba或snownlp的原因是无法打包成exe文件或者打包后文件非常大
     postData = {'data':data, 'type':'exportword', 'arg':'', 'beforeSend':'undefined'}
     response = post('http://life.chacuo.net/convertexportword',data=postData)
-    data = response.text.replace('{"status":1,"info":"ok","data":["','').replace('\/','').replace('\\\\','')
-
+    data = response.text.replace('{"status":1,"info":"ok","data":["', '')
     # 解码
     data = data.encode('utf-8').decode('unicode_escape')
 
     # 将返回的分词结果json字符串转化为python对象，并做一些处理
     data = data.split("=====================================")[0]
 
-    # 对分词结果数据进行去除一些无意义的词操作
-    stop_words = [',', '，', '.', '。', '!', '！', ':', '：', '\'', '‘', '’', '“', '”', '的', '了', '是', '=', '\r', '\n', '\r\n', '\t', '以下关键词', '[', ']', '{', '}', '(', ')', '（', '）', 'span', '<', '>', 'class', 'html', '?']
-    for x in stop_words:
-        data = data.replace(x, "")
-    data = data.replace('    ','')
-
     # 将分词结果转化为list，根据分词结果，可以知道以2个空格为分隔符
     data = data.split('  ')
 
+    # 对分词结果数据进行去除一些无意义的词操作
+    stop_words_list = [',', '，', '、', 'the', 'a', 'is', '…', '·', 'э', 'д', 'э', 'м', 'ж', 'и', 'л', 'т', 'ы', 'н', 'з', 'м', '…', '…', '…', '…', '…', '、', '.', '。', '!', '！', ':', '：', '~', '|', '▽', '`', 'ノ', '♪', 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '\'', '‘', '’', '“', '”', '的', '了', '是', '你', '我', '他', '她','=', '\r', '\n', '\r\n', '\t', '以下关键词', '[', ']', '{', '}', '(', ')', '（', '）', 'span', '<', '>', 'class', 'html', '?', '就', '于', '下', '在', '吗', '嗯']
+    tmp_data = []
+    for word in data:
+        if(word not in stop_words_list):
+            tmp_data.append(word)
+    data = tmp_data
+
+
     # 进行词频统计，结果存入字典signature_dict中
     signature_dict = {}
-    for word in data:
+    for word in tqdm(data,desc='正在统计好友签名数据', unit='个'):
         if(word in signature_dict.keys()):
             signature_dict[word] += 1
         else:
@@ -154,10 +165,8 @@ def analyze_signature():
     name = [x for x in signature_dict.keys()]
     value = [x for x in signature_dict.values()]
     wordcloud = WordCloud('微信好友个性签名词云图')
-    wordcloud.add("", name, value, word_size_range=[20, 100])
+    wordcloud.add("", name, value, shape='star', word_size_range=[1,100])
     wordcloud.render('data/好友个性签名词云.html')
-
-    # print(signature_dict)
 
 
 # 下载好友头像，此步骤消耗时间比较长
@@ -241,7 +250,7 @@ if __name__ == '__main__':
     print(u'正在获取微信好友数据信息，请耐心等待……')
     friends = bot.friends(update=False)
     # i.nick_name, i.remark_name, i.sex, i.province, i.city, i.signature
-    print(u'微信好友数据信息获取完毕')
+    print(u'微信好友数据信息获取完毕\n')
 
 
 
@@ -258,26 +267,26 @@ if __name__ == '__main__':
     for i in range(1, 10):
         t = Thread(target=download_head_image,args=(i,))
         t.start()
-    print(u'微信好友头像信息获取完毕')
+    print(u'微信好友头像信息获取完毕\n')
 
 
     print(u'正在分析好友性别比例，请耐心等待……')
     sex_ratio()
-    print(u'分析好友性别比例完毕')
+    print(u'分析好友性别比例完毕\n')
 
 
     print(u'正在分析好友地区分布，请耐心等待……')
     region_distribution()
-    print(u'分析好友地区分布完毕')
+    print(u'分析好友地区分布完毕\n')
 
     print(u'正在分析你最亲密的人，请耐心等待……')
     analyze_remark_name()
-    print(u'分析你最亲密的人完毕')
+    print(u'分析你最亲密的人完毕\n')
 
 
     print(u'正在分析你的好友的个性签名，请耐心等待……')
     analyze_signature()
-    print(u'分析你的好友的个性签名完毕')
+    print(u'分析你的好友的个性签名完毕\n')
 
     # 由于下载头像是多线程进行，并且存在可能下载时间比较久的情况
     # 所以当我们完成所有其他功能以后，需要等待微信好友头像数据下载完毕后再进行操作
@@ -289,7 +298,7 @@ if __name__ == '__main__':
     # 生成一份最终的html文件
     print(u'所有数据获取完毕，正在生成微信个人数据报告，请耐心等待……')
     generate_html('微信个人数据报告.html')
-    print(u'生成微信个人数据报告，该文件为当前目录下的[微信个人数据报告.html]')
+    print(u'生成微信个人数据报告完毕，该文件为当前目录下的[微信个人数据报告.html]\n')
 
 
     # 调用系统方式自动打开这个html文件

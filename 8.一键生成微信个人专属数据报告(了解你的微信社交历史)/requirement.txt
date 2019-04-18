@@ -1,5 +1,6 @@
 wxpy
 pyecharts
+tqdm
 requests
 pyecharts_snapshot
 echarts-countries-pypkg
