@@ -2,6 +2,7 @@ wxpy
 pyecharts
 tqdm
 requests
+pillow
 pyecharts_snapshot
 echarts-countries-pypkg
 echarts-china-provinces-pypkg

@@ -4,6 +4,7 @@ from wxpy import *
 from platform import system
 from os.path import exists
 from os import makedirs
+from os import listdir
 from shutil import rmtree
 from queue import Queue
 from threading import Thread
@@ -12,8 +13,11 @@ from pyecharts import Pie
 from pyecharts import Map
 from pyecharts import WordCloud
 from requests import post
-import re
 from tqdm import tqdm
+import PIL.Image as Image
+import re
+import random
+import math
 
 
 # 引入打开文件所用的库
@@ -177,8 +181,9 @@ def download_head_image(thread_name):
         # 取出一个好友元素
         user = queue_head_image.get()
 
-        # 下载该好友头像，并保存到指定位置
-        user.get_avatar(save_path='image/' + user.nick_name + '.jpg')
+        # 下载该好友头像，并保存到指定位置，生成一个15位数的随机字符串
+        random_file_name = ''.join([str(random.randint(0,9)) for x in range(15)])
+        user.get_avatar(save_path='image/' + random_file_name + '.jpg')
 
         # 输出提示
         print(u'线程%d:正在下载微信好友头像数据，进度%d/%d，请耐心等待……' %(thread_name, len(friends)-queue_head_image.qsize(), len(friends)))
@@ -200,6 +205,7 @@ def generate_html(file_name):
             <iframe name="iframe2" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友地区分布.html" frameborder=0></iframe>
             <iframe name="iframe3" marginwidth=0 marginheight=0 width=100% height=60% src="data/你最亲密的人.html" frameborder=0></iframe>
             <iframe name="iframe4" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友个性签名词云.html" frameborder=0></iframe>
+            <iframe name="iframe5" marginwidth=0 marginheight=0 width=100% height=60% src="data/微信好友头像拼接图.html" frameborder=0></iframe>
         '''
         f.write(data)
 
@@ -221,6 +227,60 @@ def init_folders():
 
 
 
+# 拼接所有微信好友头像
+def merge_head_image():
+    # 拼接头像
+    pics = listdir('image')  # 得到user目录下的所有文件，即各个好友头像
+    numPic = len(pics)
+    eachsize = int(math.sqrt(float(640 * 640) / numPic))  # 先圈定每个正方形小头像的边长，如果嫌小可以加大
+    numrow = int(640 / eachsize)
+    numcol = int(numPic / numrow)  # 向下取整
+    toImage = Image.new('RGB', (eachsize * numrow, eachsize * numcol))  # 先生成头像集模板
+
+    x = 0  # 小头像拼接时的左上角横坐标
+    y = 0  # 小头像拼接时的左上角纵坐标
+
+    for i in tqdm(pics,desc='正在拼接微信好友头像数据'):
+        try:
+            # 打开图片
+            img = Image.open('image/' + i)
+        except IOError:
+            print("Error: 没有找到文件或读取文件失败")
+        else:
+            # 缩小图片
+            img = img.resize((eachsize, eachsize), Image.ANTIALIAS)
+            # 拼接图片
+            toImage.paste(img, (x * eachsize, y * eachsize))
+            x += 1
+            if x == numrow:
+                x = 0
+                y += 1
+
+    toImage.save('data/拼接' + ".jpg")
+
+
+    # 生成一个网页
+    with open('data/微信好友头像拼接图.html', 'w', encoding='utf-8') as f:
+        data = '''
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+                  <meta charset="utf-8" /> 
+                  <title>微信好友头像拼接图</title> 
+            </head>
+            <body>
+                <p><font size=4px><strong>微信好友头像拼接图</strong></font></p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <img src="拼接.jpg" />
+            </body>
+            </html>
+        '''
+        f.write(data)
+
+
+
+
 # 运行前，请先确保安装了所需库文件
 # 若没安装，请执行以下命令:pip install -r requirement.txt
 if __name__ == '__main__':
@@ -230,13 +290,12 @@ if __name__ == '__main__':
 
 
     # 启动微信机器人，自动根据操作系统执行不同的指令
-    print(u'请扫描二维码以登录微信')
     if('Windows' in system()):
         # Windows
-        bot = Bot()
+        bot = Bot(cache_path=True)
     elif('Darwin' in system()):
         # MacOSX
-        bot = Bot()
+        bot = Bot(cache_path=True)
     elif('Linux' in system()):
         # Linux
         bot = Bot(console_qr=2,cache_path=True)
@@ -260,7 +319,7 @@ if __name__ == '__main__':
 
     # 将每个好友元素存入队列中
     # 如果为了方便调试，可以仅仅插入几个数据，friends[1:10]
-    for user in friends[1:10]:
+    for user in friends[1:200]:
         queue_head_image.put(user)
 
     # 启动10个线程下载头像
@@ -288,10 +347,17 @@ if __name__ == '__main__':
     analyze_signature()
     print(u'分析你的好友的个性签名完毕\n')
 
+
+
+
     # 由于下载头像是多线程进行，并且存在可能下载时间比较久的情况
     # 所以当我们完成所有其他功能以后，需要等待微信好友头像数据下载完毕后再进行操作
     while(not queue_head_image.empty()):
         sleep(1)
+
+    print(u'正在拼接所有微信好友头像数据，请耐心等待……')
+    merge_head_image()
+    print(u'拼接所有微信好友头像数据完毕\n')
 
 
 
