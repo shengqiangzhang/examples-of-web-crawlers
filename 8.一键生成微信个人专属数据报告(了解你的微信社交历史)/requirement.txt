@@ -1,6 +1,8 @@
 wxpy
 pyecharts
 requests
+pillow
 pyecharts_snapshot
 echarts-countries-pypkg
 echarts-china-provinces-pypkg
+opencv-python

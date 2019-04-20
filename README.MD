@@ -304,6 +304,64 @@ from contextlib import closing
 
 
 
+
+<br />
+<br />
+
+## [8.一键生成微信个人专属数据报告(了解你的微信社交历史))][generate_wx_data]
+
+### 简介
+
+你是否想过生成一份属于你的微信个人数据报告，了解你的微信社交历史。现在，我们基于python对微信好友进行全方位数据分析，包括：昵称、性别、年龄、地区、备注名、个性签名、头像、群聊、公众号等。
+
+其中，在分析好友类型方面，主要统计出你的陌生人、星标好友、不让他看我的朋友圈的好友、不看他的朋友圈的好友数据。在分析地区方面，主要统计所有好友在全国的分布以及对好友数最多的省份进行进一步分析。在其他方面，统计出你的好友性别比例、猜出你最亲密的好友，分析你的特殊好友，找出与你所在共同群聊数最多的好友数据，对你的好友个性签名进行分析，对你的好友头像进行分析，并进一步检测出使用真人头像的好友数据。
+
+目前网上关于这方面的数据分析文章比较多，但是运行起来比较麻烦，**而本程序的运行十分简单，只需要扫码登录一步操作即可。**
+
+### 功能截图
+
+![](8.一键生成微信个人专属数据报告(了解你的微信社交历史)/example1.png)
+![](8.一键生成微信个人专属数据报告(了解你的微信社交历史)/example2.png)
+![](8.一键生成微信个人专属数据报告(了解你的微信社交历史)/example5.png)
+![](8.一键生成微信个人专属数据报告(了解你的微信社交历史)/example6.png)
+![](8.一键生成微信个人专属数据报告(了解你的微信社交历史)/example7.png)
+![](8.一键生成微信个人专属数据报告(了解你的微信社交历史)/example8.png)
+![](8.一键生成微信个人专属数据报告(了解你的微信社交历史)/example10.png)
+
+
+### 如何运行
+```bash
+# 跳转到当前目录
+cd 目录名
+# 先卸载依赖库
+pip uninstall -y -r requirement.txt
+# 再重新安装依赖库
+pip install -r requirement.txt
+# 开始运行
+python generate_wx_data.py
+```
+
+### 如何打包成二进制可执行文件
+```bash
+# 安装pyinstaller
+pip install pyinstaller
+# 跳转到当前目录
+cd 目录名
+# 先卸载依赖库
+pip uninstall -y -r requirement.txt
+# 再重新安装依赖库
+pip install -r requirement.txt
+# 更新 setuptools
+pip install --upgrade setuptools
+# 开始打包
+pyinstaller generate_wx_data.py
+```
+
+
+
+
+
+
 <br />
 <br />
 
@@ -335,6 +393,8 @@ from contextlib import closing
 [getMovieInRankingList]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/6.%E7%88%AC%E5%8F%96%E8%B1%86%E7%93%A3%E6%8E%92%E8%A1%8C%E6%A6%9C%E7%94%B5%E5%BD%B1%E6%95%B0%E6%8D%AE(%E5%90%ABGUI%E7%95%8C%E9%9D%A2%E7%89%88)
 
 [fund_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/7.%E7%88%AC%E5%8F%96%E5%A4%A9%E5%A4%A9%E5%9F%BA%E9%87%91%E7%BD%91%E6%89%80%E6%9C%89%E5%9F%BA%E9%87%91%E6%95%B0%E6%8D%AE
+
+[generate_wx_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/8.%E4%B8%80%E9%94%AE%E7%94%9F%E6%88%90%E5%BE%AE%E4%BF%A1%E4%B8%AA%E4%BA%BA%E4%B8%93%E5%B1%9E%E6%95%B0%E6%8D%AE%E6%8A%A5%E5%91%8A(%E4%BA%86%E8%A7%A3%E4%BD%A0%E7%9A%84%E5%BE%AE%E4%BF%A1%E7%A4%BE%E4%BA%A4%E5%8E%86%E5%8F%B2)
 
 [1]:https://www.google.com/chrome/
 [2]:http://chromedriver.storage.googleapis.com/index.html
