@@ -18,10 +18,6 @@ import PIL.Image as Image
 import re
 import random
 import math
-from cv2 import CascadeClassifier
-from cv2 import imread
-from cv2 import cvtColor
-from cv2 import COLOR_BGR2GRAY
 
 
 # 引入打开文件所用的库
@@ -268,7 +264,6 @@ def generate_html(file_name):
             <iframe name="iframe7" marginwidth=0 marginheight=0 width=100% height=60% src="data/共同所在群聊分析.html" frameborder=0></iframe>
             <iframe name="iframe8" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友个性签名词云.html" frameborder=0></iframe>
             <iframe name="iframe9" marginwidth=0 marginheight=0 width=100% height=60% src="data/微信好友头像拼接图.html" frameborder=0></iframe>
-            <iframe name="iframe10" marginwidth=0 marginheight=0 width=100% height=60% src="data/使用人脸的微信好友头像拼接图.html" frameborder=0></iframe>
         '''
         f.write(data)
 
@@ -344,96 +339,6 @@ def merge_head_image():
         '''
         f.write(data)
 
-
-
-# 检测使用真实人脸的好友个数
-def detect_human_face():
-
-    # 得到user目录下的所有文件名称，即各个好友头像
-    pics = listdir('image')
-
-    # 使用人脸的头像个数
-    count_face_image = 0
-
-    # 存储使用人脸的头像的文件名
-    list_name_face_image = []
-
-    # 加载人脸识别模型
-    face_cascade = CascadeClassifier('model/haarcascade_frontalface_default.xml')
-
-    for index, file_name in enumerate(pics):
-        print(u'正在进行人脸识别，进度%d/%d，请耐心等待……' % (index+1, len(pics)))
-        # 读取图片
-        img = imread('image/' + file_name)
-
-        # 检测图片是否读取成功，失败则跳过
-        if img is None:
-            continue
-
-        # 对图片进行灰度处理
-        gray = cvtColor(img, COLOR_BGR2GRAY)
-        # 进行实际的人脸检测，传递参数是scaleFactor和minNeighbor,分别表示人脸检测过程中每次迭代时图
-        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-        if (len(faces) > 0):
-            count_face_image += 1
-            list_name_face_image.append(file_name)
-
-    print(u'使用人脸的头像%d/%d' %(count_face_image,len(pics)))
-
-
-
-    # 开始拼接使用人脸的头像
-    pics = list_name_face_image
-    numPic = len(pics)
-    eachsize = int(math.sqrt(float(640 * 640) / numPic))  # 先圈定每个正方形小头像的边长，如果嫌小可以加大
-    numrow = int(640 / eachsize)
-    numcol = int(numPic / numrow)  # 向下取整
-    toImage = Image.new('RGB', (eachsize * numrow, eachsize * numcol))  # 先生成头像集模板
-
-    x = 0  # 小头像拼接时的左上角横坐标
-    y = 0  # 小头像拼接时的左上角纵坐标
-
-    for index, i in enumerate(pics):
-
-        print(u'正在拼接使用人脸的微信好友头像数据，进度%d/%d，请耐心等待……' %(index+1,len(pics)))
-        try:
-            # 打开图片
-            img = Image.open('image/' + i)
-        except IOError:
-            print(u'Error: 没有找到文件或读取文件失败')
-        else:
-            # 缩小图片
-            img = img.resize((eachsize, eachsize), Image.ANTIALIAS)
-            # 拼接图片
-            toImage.paste(img, (x * eachsize, y * eachsize))
-            x += 1
-            if x == numrow:
-                x = 0
-                y += 1
-
-    toImage.save('data/使用人脸的拼接' + ".jpg")
-
-
-    # 生成一个网页
-    with open('data/使用人脸的微信好友头像拼接图.html', 'w', encoding='utf-8') as f:
-        data = '''
-            <!DOCTYPE html>
-            <html xmlns="http://www.w3.org/1999/xhtml">
-            <head>
-                  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-                  <meta charset="utf-8" /> 
-                  <title>使用人脸的微信好友头像拼接图</title> 
-            </head>
-            <body>
-                <p><font size=4px><strong>描述内容</strong></font></p>
-                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                <img src="使用人脸的拼接.jpg" />
-            </body>
-            </html>
-        '''
-
-        data = data.replace('描述内容','在{}个好友中，有{}个好友使用真实的人脸作为头像'.format(len(friends), count_face_image))
-        f.write(data)
 
 
 # 特殊好友分析
@@ -617,9 +522,6 @@ if __name__ == '__main__':
     merge_head_image()
     print(u'拼接所有微信好友头像数据完毕\n')
 
-    print(u'正在检测使用人脸作为头像的好友数量，请耐心等待……')
-    detect_human_face()
-    print(u'检测使用人脸作为头像的好友数量完毕\n')
 
 
     # 生成一份最终的html文件
