@@ -12,12 +12,16 @@ from time import sleep
 from pyecharts import Pie
 from pyecharts import Map
 from pyecharts import WordCloud
+from pyecharts import Bar
 from requests import post
-from tqdm import tqdm
 import PIL.Image as Image
 import re
 import random
 import math
+from cv2 import CascadeClassifier
+from cv2 import imread
+from cv2 import cvtColor
+from cv2 import COLOR_BGR2GRAY
 
 
 # 引入打开文件所用的库
@@ -91,6 +95,56 @@ def region_distribution():
     map.render(path="data/好友地区分布.html")
 
 
+    # 对好友数最多的省份进行一进步分析
+    max_count_province = ''
+    for key, value in province_dict.items():
+        if(value == max(province_dict.values())):
+            max_count_province = key
+            break
+
+    # 使用一个字典统计好友地区分布数量
+    city_dict = {}
+    # 遍历
+    for user in friends:
+        if(user.province == max_count_province):
+            # 更新键值对
+            if(user.city in city_dict.keys()):
+                city_dict[user.city] += 1
+            else:
+                city_dict[user.city] = 1
+
+    bar = Bar(max_count_province + '中,好友地区分布')
+    bar.add(name='地区分布', x_axis=[x for x in city_dict.keys()], y_axis=[x for x in city_dict.values()])
+    bar.render('data/某省好友地区分布.html')
+
+
+
+
+# 统计认识的好友的比例
+def statistics_friends():
+    # 初始化
+    unknown, known_male, known_female, known_other = 0, 0, 0, 0
+
+    # 遍历
+    for user in friends:
+        # 备注不为空
+        if((user.remark_name).strip()):
+            if(user.sex == 1):
+                known_male += 1
+            elif(user.sex == 2):
+                known_female += 1
+            else:
+                known_other += 1
+        else:
+            unknown += 1
+
+    name_list = ['未设置备注的好友', '设置备注的男性好友', '设置备注的女性好友', '设置备注的其他好友']
+    num_list = [unknown, known_male, known_female, known_other]
+
+    pie = Pie("你认识的好友比例", title_pos='center')
+    pie.add("", name_list, num_list, is_label_show=True, legend_orient="vertical", legend_pos="left")
+    pie.render('data/你认识的好友比例.html')
+
 
 # 分析备注名称
 def analyze_remark_name():
@@ -159,7 +213,10 @@ def analyze_signature():
 
     # 进行词频统计，结果存入字典signature_dict中
     signature_dict = {}
-    for word in tqdm(data,desc='正在统计好友签名数据', unit='个'):
+    for index, word in enumerate(data):
+
+        print(u'正在统计好友签名数据，进度%d/%d，请耐心等待……' % (index + 1, len(data)))
+
         if(word in signature_dict.keys()):
             signature_dict[word] += 1
         else:
@@ -201,11 +258,17 @@ def generate_html(file_name):
             <meta name='keywords' content='微信个人数据'>
             <meta name='description' content=''> 
 
-            <iframe name="iframe1" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友性别比例.html" frameborder=0></iframe>
-            <iframe name="iframe2" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友地区分布.html" frameborder=0></iframe>
-            <iframe name="iframe3" marginwidth=0 marginheight=0 width=100% height=60% src="data/你最亲密的人.html" frameborder=0></iframe>
-            <iframe name="iframe4" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友个性签名词云.html" frameborder=0></iframe>
-            <iframe name="iframe5" marginwidth=0 marginheight=0 width=100% height=60% src="data/微信好友头像拼接图.html" frameborder=0></iframe>
+            
+            <iframe name="iframe1" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友地区分布.html" frameborder=0></iframe>
+            <iframe name="iframe2" marginwidth=0 marginheight=0 width=100% height=60% src="data/某省好友地区分布.html" frameborder=0></iframe>
+            <iframe name="iframe3" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友性别比例.html" frameborder=0></iframe>
+            <iframe name="iframe4" marginwidth=0 marginheight=0 width=100% height=60% src="data/你认识的好友比例.html" frameborder=0></iframe>
+            <iframe name="iframe5" marginwidth=0 marginheight=0 width=100% height=60% src="data/你最亲密的人.html" frameborder=0></iframe>
+            <iframe name="iframe6" marginwidth=0 marginheight=0 width=100% height=60% src="data/特殊好友分析.html" frameborder=0></iframe>
+            <iframe name="iframe7" marginwidth=0 marginheight=0 width=100% height=60% src="data/共同所在群聊分析.html" frameborder=0></iframe>
+            <iframe name="iframe8" marginwidth=0 marginheight=0 width=100% height=60% src="data/好友个性签名词云.html" frameborder=0></iframe>
+            <iframe name="iframe9" marginwidth=0 marginheight=0 width=100% height=60% src="data/微信好友头像拼接图.html" frameborder=0></iframe>
+            <iframe name="iframe10" marginwidth=0 marginheight=0 width=100% height=60% src="data/使用人脸的微信好友头像拼接图.html" frameborder=0></iframe>
         '''
         f.write(data)
 
@@ -240,12 +303,15 @@ def merge_head_image():
     x = 0  # 小头像拼接时的左上角横坐标
     y = 0  # 小头像拼接时的左上角纵坐标
 
-    for i in tqdm(pics,desc='正在拼接微信好友头像数据'):
+    for index, i in enumerate(pics):
+
+        print(u'正在拼接微信好友头像数据，进度%d/%d，请耐心等待……' % (index + 1, len(pics)))
+
         try:
             # 打开图片
             img = Image.open('image/' + i)
         except IOError:
-            print("Error: 没有找到文件或读取文件失败")
+            print(u'Error: 没有找到文件或读取文件失败')
         else:
             # 缩小图片
             img = img.resize((eachsize, eachsize), Image.ANTIALIAS)
@@ -280,6 +346,187 @@ def merge_head_image():
 
 
 
+# 检测使用真实人脸的好友个数
+def detect_human_face():
+
+    # 得到user目录下的所有文件名称，即各个好友头像
+    pics = listdir('image')
+
+    # 使用人脸的头像个数
+    count_face_image = 0
+
+    # 存储使用人脸的头像的文件名
+    list_name_face_image = []
+
+    # 加载人脸识别模型
+    face_cascade = CascadeClassifier('model/haarcascade_frontalface_default.xml')
+
+    for index, file_name in enumerate(pics):
+        print(u'正在进行人脸识别，进度%d/%d，请耐心等待……' % (index+1, len(pics)))
+        # 读取图片
+        img = imread('image/' + file_name)
+
+        # 检测图片是否读取成功，失败则跳过
+        if img is None:
+            continue
+
+        # 对图片进行灰度处理
+        gray = cvtColor(img, COLOR_BGR2GRAY)
+        # 进行实际的人脸检测，传递参数是scaleFactor和minNeighbor,分别表示人脸检测过程中每次迭代时图
+        faces = face_cascade.detectMultiScale(gray, 1.3, 5)
+        if (len(faces) > 0):
+            count_face_image += 1
+            list_name_face_image.append(file_name)
+
+    print(u'使用人脸的头像%d/%d' %(count_face_image,len(pics)))
+
+
+
+    # 开始拼接使用人脸的头像
+    pics = list_name_face_image
+    numPic = len(pics)
+    eachsize = int(math.sqrt(float(640 * 640) / numPic))  # 先圈定每个正方形小头像的边长，如果嫌小可以加大
+    numrow = int(640 / eachsize)
+    numcol = int(numPic / numrow)  # 向下取整
+    toImage = Image.new('RGB', (eachsize * numrow, eachsize * numcol))  # 先生成头像集模板
+
+    x = 0  # 小头像拼接时的左上角横坐标
+    y = 0  # 小头像拼接时的左上角纵坐标
+
+    for index, i in enumerate(pics):
+
+        print(u'正在拼接使用人脸的微信好友头像数据，进度%d/%d，请耐心等待……' %(index+1,len(pics)))
+        try:
+            # 打开图片
+            img = Image.open('image/' + i)
+        except IOError:
+            print(u'Error: 没有找到文件或读取文件失败')
+        else:
+            # 缩小图片
+            img = img.resize((eachsize, eachsize), Image.ANTIALIAS)
+            # 拼接图片
+            toImage.paste(img, (x * eachsize, y * eachsize))
+            x += 1
+            if x == numrow:
+                x = 0
+                y += 1
+
+    toImage.save('data/使用人脸的拼接' + ".jpg")
+
+
+    # 生成一个网页
+    with open('data/使用人脸的微信好友头像拼接图.html', 'w', encoding='utf-8') as f:
+        data = '''
+            <!DOCTYPE html>
+            <html xmlns="http://www.w3.org/1999/xhtml">
+            <head>
+                  <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+                  <meta charset="utf-8" /> 
+                  <title>使用人脸的微信好友头像拼接图</title> 
+            </head>
+            <body>
+                <p><font size=4px><strong>描述内容</strong></font></p>
+                &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                <img src="使用人脸的拼接.jpg" />
+            </body>
+            </html>
+        '''
+
+        data = data.replace('描述内容','在{}个好友中，有{}个好友使用真实的人脸作为头像'.format(len(friends), count_face_image))
+        f.write(data)
+
+
+# 特殊好友分析
+def analyze_special_friends():
+
+    # 星标好友(很重要的人), 不让他看我的朋友圈的好友, 不看他朋友圈的好友, 消息置顶好友, 陌生人
+    star_friends, hide_my_post_friends, hide_his_post_friends, sticky_on_top_friends, stranger_friends = 0, 0, 0, 0, 0
+
+    for user in friends:
+
+
+        # 星标好友为1,为0表示非星标,不存在星标选项的为陌生人
+        if('StarFriend' in (user.raw).keys()):
+            if((user.raw)['StarFriend'] == 1):
+                star_friends += 1
+        else:
+            stranger_friends += 1
+
+        # 好友类型及权限：1和3好友，259和33027不让他看我的朋友圈，65539和65537和66051不看他的朋友圈，65795两项设置全禁止, 73731陌生人
+        if((user.raw)['ContactFlag'] in [259, 33027, 65795]):
+            hide_my_post_friends += 1
+        if ((user.raw)['ContactFlag'] in [66051, 65537, 65539, 65795]):
+            hide_his_post_friends += 1
+
+        # 消息置顶好友为2051
+        if ((user.raw)['ContactFlag'] in [2051]):
+            sticky_on_top_friends += 1
+
+        # 陌生人
+        if ((user.raw)['ContactFlag'] in [73731]):
+            stranger_friends += 1
+
+
+    bar = Bar('特殊好友分析')
+    bar.add(name='', x_axis=['星标', '不让他看我朋友圈', '不看他朋友圈', '消息置顶', '陌生人'], y_axis=[star_friends, hide_my_post_friends, hide_his_post_friends, sticky_on_top_friends, stranger_friends], legend_orient="vertical", legend_pos="left")
+    bar.render('data/特殊好友分析.html')
+
+
+
+# 共同所在群聊成员分析
+def group_common_in():
+
+    # 获取所有活跃的群聊
+    groups = bot.groups()
+
+    # 每个好友与你相同的群聊个数
+    dict_common_in = {}
+
+    # 遍历所有好友，第0个为你自己，所以去掉
+    for x in friends[1:]:
+        # 依次在每个群聊中搜索
+        for y in groups:
+            # x在y中
+            if(x in y):
+                # 获取微信名称
+                name = x.nick_name
+                # 判断是否有备注，有的话就使用备注
+                if(x.remark_name and x.remark_name != ''):
+                    name = x.remark_name
+
+                # 增加计数
+                if(name in dict_common_in.keys()):
+                    dict_common_in[name] += 1
+                else:
+                    dict_common_in[name] = 1
+
+    # 从dict_common_in结果中取出前n大个数据
+    n = 0
+
+    if(len(dict_common_in) > 5):
+        n = 6
+    elif(len(dict_common_in) > 4):
+        n = 5
+    elif(len(dict_common_in) > 3):
+        n = 4
+    elif(len(dict_common_in) > 2):
+        n = 3
+    elif(len(dict_common_in) > 1):
+        n = 2
+    elif(len(dict_common_in) > 0):
+        n = 1
+
+    # 排序，并转化为list
+    sort_list = sorted(dict_common_in.items(), key=lambda item: item[1], reverse=True)
+
+    # 取出前n大的值
+    sort_list = sort_list[:n]
+
+
+    bar = Bar('共同所在群聊分析')
+    bar.add(name='', x_axis=[x[0] for x in sort_list], y_axis=[x[1] for x in sort_list], legend_orient="vertical", legend_pos="left")
+    bar.render('data/共同所在群聊分析.html')
+
 
 # 运行前，请先确保安装了所需库文件
 # 若没安装，请执行以下命令:pip install -r requirement.txt
@@ -312,6 +559,10 @@ if __name__ == '__main__':
     print(u'微信好友数据信息获取完毕\n')
 
 
+    print(u'正在分析你的群聊，请耐心等待……')
+    group_common_in()
+    print(u'分析群聊完毕\n')
+
 
     print(u'正在获取微信好友头像信息，请耐心等待……')
     # 创建一个队列，用于多线程下载头像，提高下载速度
@@ -319,7 +570,7 @@ if __name__ == '__main__':
 
     # 将每个好友元素存入队列中
     # 如果为了方便调试，可以仅仅插入几个数据，friends[1:10]
-    for user in friends[1:200]:
+    for user in friends[1:30]:
         queue_head_image.put(user)
 
     # 启动10个线程下载头像
@@ -338,10 +589,17 @@ if __name__ == '__main__':
     region_distribution()
     print(u'分析好友地区分布完毕\n')
 
+    print(u'正在统计你认识的好友，请耐心等待……')
+    statistics_friends()
+    print(u'统计你认识的好友完毕\n')
+
     print(u'正在分析你最亲密的人，请耐心等待……')
     analyze_remark_name()
     print(u'分析你最亲密的人完毕\n')
 
+    print(u'正在分析你的特殊好友，请耐心等待……')
+    analyze_special_friends()
+    print(u'分析你的特殊好友完毕\n')
 
     print(u'正在分析你的好友的个性签名，请耐心等待……')
     analyze_signature()
@@ -359,6 +617,9 @@ if __name__ == '__main__':
     merge_head_image()
     print(u'拼接所有微信好友头像数据完毕\n')
 
+    print(u'正在检测使用人脸作为头像的好友数量，请耐心等待……')
+    detect_human_face()
+    print(u'检测使用人脸作为头像的好友数量完毕\n')
 
 
     # 生成一份最终的html文件
