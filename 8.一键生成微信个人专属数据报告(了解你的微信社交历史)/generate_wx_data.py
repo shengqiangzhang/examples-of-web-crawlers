@@ -539,7 +539,7 @@ if __name__ == '__main__':
     # 启动微信机器人，自动根据操作系统执行不同的指令
     if('Windows' in system()):
         # Windows
-        bot = Bot(cache_path=True)
+        bot = Bot()
     elif('Darwin' in system()):
         # MacOSX
         bot = Bot(cache_path=True)
