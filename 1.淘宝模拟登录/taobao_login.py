@@ -63,10 +63,11 @@ class taobao_infos:
 # 5.打开https://account.weibo.com/set/bindsns/bindtaobao并通过微博绑定淘宝账号密码
 
 if __name__ == "__main__":
+    
 
-    chromedriver_path = "/Users/bird/Desktop/chromedriver" #改成你的chromedriver的完整路径地址
-    weibo_username = "15626145270" #改成你的微博账号
-    weibo_password = "zsqzttlxh...." #改成你的微博密码
+    chromedriver_path = "/Users/bird/Desktop/chromedriver.exe" #改成你的chromedriver的完整路径地址
+    weibo_username = "改成你的微博账号" #改成你的微博账号
+    weibo_password = "改成你的微博密码" #改成你的微博密码
 
     a = taobao_infos()
     a.login() #登录
