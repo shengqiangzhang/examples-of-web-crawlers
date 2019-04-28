@@ -8,3 +8,6 @@
 
 # 忽略.idea文件夹下的所有文件
 /.idea/
+
+# 只忽略__pycache__目录，不忽略__pycache__文件
+__pycache__/
