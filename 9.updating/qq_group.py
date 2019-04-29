@@ -125,57 +125,22 @@ class QQGroup(object):
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_group_list', self.cookies_merge_dict, submit_data)
         group_info = json.loads(html.text)
-        print(group_info)
+        # print(group_info)
         return group_info['join']
+
+
 
     def get_members_in_group(self,group_number):
 
         # 获取某个群的群成员
         # bkn由参数skey通过另一个加密函数得到
         bkn = hash33_bkn(self.cookies_merge_dict['skey'])
-
-        # 由于接口限制每次最多获取20个成员的信息，所以我们先获取一遍，得到群成员的数量，再在后面重复获取几次
-        submit_data = {'gc': group_number, 'st': '0', 'end': '0', 'sort': '0', 'bkn': bkn, }
-        html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/search_group_members', self.cookies_merge_dict, submit_data)
+        url = 'http://qinfo.clt.qq.com/cgi-bin/qun_info/get_members_info_v1?friends=1&name=1&gc=' + str(group_number) + '&bkn=' + str(bkn) + '&src=qinfo_v3'
+        html = get_html(url, self.cookies_merge_dict)
         group_member = json.loads(html.text)
-        group_count = group_member['count']
-        # print(group_count)
-
-        now_count = 0
-        members_in_group_list = []
-        while(now_count <= group_count):
-            if(now_count <= group_count - 20):
-                submit_data = {'gc': group_number, 'st': str(now_count), 'end': str(now_count + 20), 'sort': '0', 'bkn': bkn, }
-                html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/search_group_members', self.cookies_merge_dict, submit_data)
-                group_member = json.loads(html.text)
-                # print('end_count:{}'.format(now_count+20))
-                # print(group_member['mems'])
-                #将群成员数据合并到原有的列表中
-                members_in_group_list += group_member['mems']
-                now_count += 20
-            else:
-                submit_data = {'gc': group_number, 'st': str(now_count), 'end': str(group_count), 'sort': '0', 'bkn': bkn, }
-                html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/search_group_members', self.cookies_merge_dict, submit_data)
-                group_member = json.loads(html.text)
-                # print('end_count:{}'.format(group_count))
-                # print(group_member['mems'])
-                #将群成员数据合并到原有的列表中
-                members_in_group_list += group_member['mems']
-                now_count += 20
+        return group_member
 
 
-            print(members_in_group_list)
-            time.sleep(2)
-
-
-        # 对得到的群成员列表进行去重操作
-        tmp_list = []
-        for member in members_in_group_list:
-            if member not in tmp_list:
-                tmp_list.append(member)
-
-        members_in_group_list = tmp_list
-        return members_in_group_list
 
 
     def get_all_friends_in_qq(self):
@@ -188,6 +153,9 @@ class QQGroup(object):
         friend_info = json.loads(html.text)
         # print(friend_info['result'])
         return friend_info['result']
+
+
+
 
     def get_info_in_qq_friend(self,qq_number):
 
@@ -222,6 +190,7 @@ class QQGroup(object):
 
 
 
+
     def get_profile_picture(self, qq_number, size=100):
         # 获取指定qq的头像，size的值可为40、100、140，默认为100
         # 屏蔽https证书警告
@@ -230,4 +199,32 @@ class QQGroup(object):
         # https://q4.qlogo.cn/g?b=qq&nk=10000&s=140
         html = requests.get('https://q4.qlogo.cn/g?b=qq&nk=' + str(qq_number) + '&s=' + str(size), verify=False)
         return html.content
+
+
+
+    def get_quit_of_group(self):
+        # 获取最近30天内退出的群
+        # 需要提交的数据
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict['skey'])
+        submit_data = {'bkn': str(bkn)}
+
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Content-Type': 'text/plain',
+            'origin': 'https://huifu.qq.com',
+            'referer' : 'https://huifu.qq.com/recovery/index.html?frag=0'
+        }
+
+        # 屏蔽https证书警告
+        requests.packages.urllib3.disable_warnings()
+        # 网页访问,post方式
+        html = requests.post('https://huifu.qq.com/cgi-bin/gr_grouplist', data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
+
+        # 将好友信息解析为python对象
+        friend_info = json.loads(html.text)
+        print(friend_info)
+
 
