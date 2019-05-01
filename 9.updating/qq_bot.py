@@ -3,6 +3,7 @@
 # 引用自定义库
 from element_encrypt import hash33_token
 from element_encrypt import hash33_bkn
+from element_encrypt import get_sck
 from url_request import get_html
 from url_request import post_html
 
@@ -253,7 +254,6 @@ class Bot(object):
         bkn = hash33_bkn(self.cookies_merge_dict['skey'])
         qq_number = str(self.qq_number)
         skey = str(self.cookies_merge_dict['skey'])
-        submit_data = {'skey': str(self.cookies_merge_dict['skey']), 'uin': str(self.cookies_merge_dict['uin'])}
         url = 'https://proxy.vip.qq.com/cgi-bin/srfentry.fcgi?bkn=' + str(bkn) + '&ts=&g_tk=' + str(bkn) + '&data={"11053":{"iAppId":1,"iKeyType":1,"sClientIp":"","sSessionKey":"' + skey + '","sUin":"' + qq_number + '"}}'
 
         # 设置请求头,模拟人工
@@ -269,7 +269,7 @@ class Bot(object):
         # 屏蔽https证书警告
         requests.packages.urllib3.disable_warnings()
         # 网页访问,post方式
-        html = requests.get(url, data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
+        html = requests.get(url, cookies=self.cookies_merge_dict, headers=header, verify=False)
 
         # 将返回数据解析为python对象
         result = json.loads(html.text)
@@ -294,7 +294,6 @@ class Bot(object):
         bkn = hash33_bkn(self.cookies_merge_dict['skey'])
         qq_number = str(self.qq_number)
         skey = str(self.cookies_merge_dict['skey'])
-        submit_data = {'skey': str(self.cookies_merge_dict['skey']), 'uin': str(self.cookies_merge_dict['uin'])}
         url = 'https://proxy.vip.qq.com/cgi-bin/srfentry.fcgi?bkn=' + str(bkn) + '&ts=&g_tk=' + str(bkn) + '&data={"11053":{"iAppId":1,"iKeyType":1,"sClientIp":"","sSessionKey":"' + skey + '","sUin":"' + qq_number + '"}}'
 
         # 设置请求头,模拟人工
@@ -310,7 +309,7 @@ class Bot(object):
         # 屏蔽https证书警告
         requests.packages.urllib3.disable_warnings()
         # 网页访问,post方式
-        html = requests.get(url, data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
+        html = requests.get(url, cookies=self.cookies_merge_dict, headers=header, verify=False)
 
         # 将返回数据解析为python对象
         result = json.loads(html.text)
@@ -320,13 +319,10 @@ class Bot(object):
 
 
     def get_qb(self):
-        #获取该账户的qb值
+        # 获取该账户的qb值
         # 需要提交的数据
-        # bkn由参数skey通过另一个加密函数得到
-        bkn = hash33_bkn(self.cookies_merge_dict['skey'])
         qq_number = str(self.qq_number)
         skey = str(self.cookies_merge_dict['skey'])
-        submit_data = {'skey': str(self.cookies_merge_dict['skey']), 'uin': str(self.cookies_merge_dict['uin'])}
         url = 'https://api.unipay.qq.com/v1/r/1450000186/wechat_query?cmd=4&pf=vip_m-pay_html5-html5&pfkey=pfkey&from_h5=1&from_https=1&openid=' + qq_number + '&openkey=' + skey + '&session_id=uin&session_type=skey'
 
         # 设置请求头,模拟人工
@@ -340,14 +336,41 @@ class Bot(object):
 
         # 屏蔽https证书警告
         requests.packages.urllib3.disable_warnings()
-        # 网页访问,post方式
-        html = requests.get(url, data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
+        # 网页访问,get方式
+        html = requests.get(url, cookies=self.cookies_merge_dict, headers=header, verify=False)
 
         # 将返回数据解析为python对象
         result = json.loads(html.text)
 
         qb_value = float(result['qb_balance']) / 100
         return qb_value
+
+
+    def get_pay_for_another(self):
+        # 获取帮别人的代付
+        # 需要提交的数据
+        skey = str(self.cookies_merge_dict['skey'])
+        url = 'https://pay.qq.com/cgi-bin/personal/account_msg.cgi?p=0.6796416908412624&cmd=1&sck=' + get_sck(skey) + '&type=100&showitem=2&per=100&pageno=1&r=0.3177912609760205'
+
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://pay.qq.com/infocenter/infocenter.shtml?asktype=100',
+            'Connection': 'keep-alive'
+        }
+
+        # 屏蔽https证书警告
+        requests.packages.urllib3.disable_warnings()
+        # 网页访问,get方式
+        html = requests.get(url, cookies=self.cookies_merge_dict, headers=header, verify=False)
+
+        # 将返回数据解析为python对象
+        result = json.loads(html.text)
+        # print(result)
+
+        return result['resultinfo']['list']
 
 
 

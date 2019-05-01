@@ -2,20 +2,6 @@
 
 # 引用自定义库
 from qq_bot import Bot
-import element_encrypt
-
-
-# 引用第三方库
-import time
-import random
-
-
-
-
-
-
-
-
 
 
 if __name__ == "__main__":
@@ -59,7 +45,10 @@ if __name__ == "__main__":
     # 获取qb值
     print('qb值',bot.get_qb())
 
-    # 代付查询https://pay.qq.com/infocenter/infocenter.shtml
+    # 获取代付信息
+    print('查询代付信息',bot.get_pay_for_another())
+
+
     # qq音乐以前空间上传的歌单
 
 
