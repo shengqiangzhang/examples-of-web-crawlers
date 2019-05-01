@@ -11,6 +11,7 @@ from url_request import post_html
 import requests
 import time
 import json
+import re
 from platform import system
 
 # 引入打开文件所用的库
@@ -31,9 +32,9 @@ else:
 
 
 
-class QQGroup(object):
+class Bot(object):
     """
-    QQ群对象，用于获取指定QQ号的群信息及群成员信息，
+    QQ机器人对象，用于获取指定QQ号的群信息及群成员信息，
     同时，该接口可获取指定QQ的所有好友分组，但是获取的好友数据仅包含备注名和QQ号
     """
 
@@ -41,6 +42,7 @@ class QQGroup(object):
 
         self.is_login = False
         self.cookies_merge_dict = ''
+        self.qq_number = ''
 
 
         # 访问网页，为了获取参数pt_login_sig
@@ -101,18 +103,23 @@ class QQGroup(object):
         # 登录成功后，把返回的cookies合并进去
         cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
         cookies_merge_dict.update(cookies_back_dict)
-        print(u'当前cookies:{}'.format(cookies_merge_dict))
+        # print(u'当前cookies:{}'.format(cookies_merge_dict))
+
+        # 获取此次登录的qq号码
+        qq_list = re.findall(r'&uin=(.+?)&service', html.text)
+        self.qq_number = qq_list[0]
+
 
         # 登录成功后，会返回一个地址，需要对该地址进行访问以便获取新的返回cookies
-        data_list = (html.text.replace("')", '')).split("',")
-        url = (data_list[2])[1:]
-        # print(url, nick_name)
+        startIndex = (html.text).find('http')
+        endIndex = (html.text).find('pt_3rd_aid=0')
+        url = (html.text)[startIndex:endIndex] + 'pt_3rd_aid=0'
         # 这里需要注意的是，需要禁止重定向，才能正确获得返回的cookies
         html = requests.get(url, cookies=cookies_merge_dict, allow_redirects=False)
         # 把返回的cookies合并进去
         cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
         cookies_merge_dict.update(cookies_back_dict)
-        print(u'当前cookies:{}'.format(cookies_merge_dict))
+        # print(u'当前cookies:{}'.format(cookies_merge_dict))
         self.cookies_merge_dict = cookies_merge_dict
 
 
@@ -151,7 +158,7 @@ class QQGroup(object):
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_friend_list', self.cookies_merge_dict, submit_data)
         friend_info = json.loads(html.text)
-        # print(friend_info['result'])
+        # print(friend_info)
         return friend_info['result']
 
 
@@ -175,7 +182,7 @@ class QQGroup(object):
             'Origin': 'http://find.qq.com',
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
             'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-            'Referer':'http://find.qq.com/'
+            'Referer':'http://find.qq.com/',
         }
 
         # 屏蔽https证书警告
@@ -185,7 +192,7 @@ class QQGroup(object):
 
         # 将好友信息解析为python对象
         friend_info = json.loads(html.text)
-        print(friend_info)
+        # print(friend_info)
         return friend_info['result']['buddy']['info_list'][0]
 
 
@@ -195,9 +202,18 @@ class QQGroup(object):
         # 获取指定qq的头像，size的值可为40、100、140，默认为100
         # 屏蔽https证书警告
         requests.packages.urllib3.disable_warnings()
+
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+            'Referer':'http://find.qq.com/'
+        }
+
         # 网页访问,get方式
         # https://q4.qlogo.cn/g?b=qq&nk=10000&s=140
-        html = requests.get('https://q4.qlogo.cn/g?b=qq&nk=' + str(qq_number) + '&s=' + str(size), verify=False)
+        html = requests.get('https://q4.qlogo.cn/g?b=qq&nk=' + str(qq_number) + '&s=' + str(size), headers=header, verify=False)
         return html.content
 
 
@@ -223,8 +239,116 @@ class QQGroup(object):
         # 网页访问,post方式
         html = requests.post('https://huifu.qq.com/cgi-bin/gr_grouplist', data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
 
-        # 将好友信息解析为python对象
-        friend_info = json.loads(html.text)
-        print(friend_info)
+        # 将返回数据解析为python对象
+        result = json.loads(html.text)
+
+        return result
+
+
+    def get_delete_friend_in_360day(self):
+
+        # 获取最近一年删除的好友名单
+        # 需要提交的数据
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict['skey'])
+        qq_number = str(self.qq_number)
+        skey = str(self.cookies_merge_dict['skey'])
+        submit_data = {'skey': str(self.cookies_merge_dict['skey']), 'uin': str(self.cookies_merge_dict['uin'])}
+        url = 'https://proxy.vip.qq.com/cgi-bin/srfentry.fcgi?bkn=' + str(bkn) + '&ts=&g_tk=' + str(bkn) + '&data={"11053":{"iAppId":1,"iKeyType":1,"sClientIp":"","sSessionKey":"' + skey + '","sUin":"' + qq_number + '"}}'
+
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://huifu.qq.com/recovery/index.html?frag=1',
+            'Origin': 'https://huifu.qq.com',
+            'Connection': 'close'
+        }
+
+        # 屏蔽https证书警告
+        requests.packages.urllib3.disable_warnings()
+        # 网页访问,post方式
+        html = requests.get(url, data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
+
+        # 将返回数据解析为python对象
+        result = json.loads(html.text)
+        # print(result)
+
+        # 364天内没有删除的好友
+        delFriendList = result['11053']['data']['delFriendList']
+        if(len(delFriendList) == 0):
+            return {}
+
+        # 364天内有删除的好友
+        qq_number_list = delFriendList['364']['vecUin']
+
+        # 返回364天内的被删除的好友名单
+        return qq_number_list
+
+
+    def is_vip_svip(self):
+        # 判断此次登录的qq是否为vip或者svip
+        # 需要提交的数据
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict['skey'])
+        qq_number = str(self.qq_number)
+        skey = str(self.cookies_merge_dict['skey'])
+        submit_data = {'skey': str(self.cookies_merge_dict['skey']), 'uin': str(self.cookies_merge_dict['uin'])}
+        url = 'https://proxy.vip.qq.com/cgi-bin/srfentry.fcgi?bkn=' + str(bkn) + '&ts=&g_tk=' + str(bkn) + '&data={"11053":{"iAppId":1,"iKeyType":1,"sClientIp":"","sSessionKey":"' + skey + '","sUin":"' + qq_number + '"}}'
+
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://huifu.qq.com/recovery/index.html?frag=1',
+            'Origin': 'https://huifu.qq.com',
+            'Connection': 'close'
+        }
+
+        # 屏蔽https证书警告
+        requests.packages.urllib3.disable_warnings()
+        # 网页访问,post方式
+        html = requests.get(url, data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
+
+        # 将返回数据解析为python对象
+        result = json.loads(html.text)
+        isSvip = result['11053']['data']['isSvip']
+        isVip = result['11053']['data']['isVip']
+        return {'isSvip':isSvip, 'isVip':isVip}
+
+
+    def get_qb(self):
+        #获取该账户的qb值
+        # 需要提交的数据
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict['skey'])
+        qq_number = str(self.qq_number)
+        skey = str(self.cookies_merge_dict['skey'])
+        submit_data = {'skey': str(self.cookies_merge_dict['skey']), 'uin': str(self.cookies_merge_dict['uin'])}
+        url = 'https://api.unipay.qq.com/v1/r/1450000186/wechat_query?cmd=4&pf=vip_m-pay_html5-html5&pfkey=pfkey&from_h5=1&from_https=1&openid=' + qq_number + '&openkey=' + skey + '&session_id=uin&session_type=skey'
+
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': 'application/json, text/javascript, */*; q=0.01',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Accept-Encoding': 'gzip, deflate',
+            'Referer': 'https://my.pay.qq.com/account/index.shtml',
+            'Connection': 'keep-alive'
+        }
+
+        # 屏蔽https证书警告
+        requests.packages.urllib3.disable_warnings()
+        # 网页访问,post方式
+        html = requests.get(url, data=submit_data, cookies=self.cookies_merge_dict, headers=header, verify=False)
+
+        # 将返回数据解析为python对象
+        result = json.loads(html.text)
+
+        qb_value = float(result['qb_balance']) / 100
+        return qb_value
+
+
 
 
