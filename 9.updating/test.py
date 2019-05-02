@@ -4,6 +4,7 @@
 from qq_bot import Bot
 
 
+
 if __name__ == "__main__":
 
     # 经测试，所有接口如果调用过于频繁，将被禁止获取该接口12小时，建议加上延迟time.sleep(1)
