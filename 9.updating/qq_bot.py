@@ -7,12 +7,13 @@ from element_encrypt import get_sck
 from url_request import get_html
 from url_request import post_html
 
+
 # 引用第三方库
 import requests
 import time
 import json
-import re
 from platform import system
+from tkinter import *
 
 # 引入打开文件所用的库
 # Window与Linux和Mac OSX有所不同
@@ -32,6 +33,18 @@ else:
 
 
 
+# 创建一个根窗口，其余的控件都要在这个窗口上面
+root = Tk()
+# 创建一个图像框
+image_label = Label(root)
+# 创建一个容器
+frame = Frame(root)
+# 在这个容器上创建文本框text
+text = Text(frame, height=11)
+# 在这个容器上创建滚动条
+scroll = Scrollbar(frame)
+
+
 class Bot(object):
     """
     QQ机器人对象，用于获取指定QQ号的群信息及群成员信息，
@@ -46,6 +59,12 @@ class Bot(object):
         self.login_id_qq_com()
         self.login_qun_qq_com()
 
+    # 自定义输出数据
+    def custom_print(self, data):
+        print(data)
+        text.insert(END, data + '\n')
+
+
     def login_qun_qq_com(self):
         # 登录qun.qq.com
 
@@ -58,7 +77,7 @@ class Bot(object):
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
 
         # 访问网页，为了获取参数ptqrtoken
-        qrcode_url = 'https://ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=3&d=72&v=4&t=0.39550762134604156'
+        qrcode_url = 'https://ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=5&d=72&v=4&t=0.39550762134604156'
         html = get_html(qrcode_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
         cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
@@ -88,15 +107,15 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    print(u'登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    self.custom_print(u'登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    print(u'登录qun.qq.com中，扫描成功，正在认证中')
+                    self.custom_print(u'登录qun.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    print(u'登录qun.qq.com中，登录成功')
+                    self.custom_print(u'登录qun.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    print(u'登录qun.qq.com中，当前二维码已失效，请重启本软件')
+                    self.custom_print(u'登录qun.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
@@ -137,7 +156,7 @@ class Bot(object):
         self.cookies_merge_dict_in_id_qq_com.update(cookies_back_dict)
 
         # 访问网页，为了获取参数ptqrtoken
-        qrcode_url = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid=1006102&e=2&l=M&s=3&d=72&v=4&t=0.10239549811477189&daid=1&pt_3rd_aid=0'
+        qrcode_url = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid=1006102&e=2&l=M&s=5&d=72&v=4&t=0.10239549811477189&daid=1&pt_3rd_aid=0'
         html = get_html(qrcode_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
         cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
@@ -164,15 +183,15 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    print(u'登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    self.custom_print(u'登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    print(u'登录id.qq.com中，扫描成功，正在认证中')
+                    self.custom_print(u'登录id.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    print(u'登录id.qq.com中，登录成功')
+                    self.custom_print(u'登录id.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    print(u'登录id.qq.com中，当前二维码已失效，请重启本软件')
+                    self.custom_print(u'登录id.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
@@ -215,7 +234,7 @@ class Bot(object):
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_group_list', self.cookies_merge_dict_in_qun_qq_com, submit_data)
         group_info = json.loads(html.text)
-        print(group_info)
+        # print(group_info)
         return group_info['join']
 
 
