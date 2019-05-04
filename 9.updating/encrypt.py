@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 # 引用第三方库
-import execjs
+from execjs import compile
 
 
 # 对qrsig进行基本的加密，该加密函数由抓包获得，需要具备一定抓包知识才能找到该加密函数
@@ -46,7 +46,7 @@ def get_sck(skey):
     md5 = get_md5_js('decrypt/md5.js')
 
     # 加载js脚本引擎
-    ctx = execjs.compile(md5)
+    ctx = compile(md5)
 
     # 调用js脚本中某个函数
     # 第1个参数为函数名，第2到第n个参数为该函数依次所需的参数

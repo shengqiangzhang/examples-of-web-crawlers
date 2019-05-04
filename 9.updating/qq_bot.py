@@ -1,19 +1,26 @@
 # -*- coding:utf-8 -*-
 
 # 引用自定义库
-from element_encrypt import hash33_token
-from element_encrypt import hash33_bkn
-from element_encrypt import get_sck
+from encrypt import hash33_token
+from encrypt import hash33_bkn
+from encrypt import get_sck
 from url_request import get_html
 from url_request import post_html
 
 
 # 引用第三方库
-import requests
+import re
 import time
-import json
+from requests import get
+from requests import post
+from requests.packages import urllib3
+from requests.utils import dict_from_cookiejar
+from json import loads
 from platform import system
 from tkinter import *
+from PIL import Image,ImageTk
+from io import BytesIO
+
 
 # 引入打开文件所用的库
 # Window与Linux和Mac OSX有所不同
@@ -43,6 +50,80 @@ frame = Frame(root)
 text = Text(frame, height=11)
 # 在这个容器上创建滚动条
 scroll = Scrollbar(frame)
+# 用于显示图片的对象
+image = ''
+
+# 自定义输出数据
+def custom_print(data):
+    # 正常调试输出
+    print(data)
+    # 将内容输出到文本框
+    text.insert(END, data + '\n')
+    # 设置文本框当前显示的内容为最底部的内容
+    text.see(END)
+
+
+class gui(object):
+    """
+    tkinter对象，用于绘制基本的gui界面
+    """
+    def __init__(self):
+        self.root = root
+        self.image_label = image_label
+        self.image = image
+        self.frame = frame
+        self.text = text
+        self.scroll = scroll
+
+        # 设置禁止调整窗口大小
+        root.resizable(False, False)
+        # 设置窗口标题
+        root.title('一键生成qq个人数据报告')
+        # 设置窗口大小及其位置
+        self.center_window(800, 190)
+
+        # 设置图像框
+        # qr_code = Image.open('qrcode2.png')
+        # image = ImageTk.PhotoImage(qr_code)
+        # image_label['image'] = image
+        image_label.pack(side=LEFT, anchor=NE)
+
+        # 设置容器
+        frame.pack(side=RIGHT, anchor=NW)
+        # 将滚动条填充
+        # side是滚动条放置的位置，上下左右。fill是将滚动条沿着y轴填充
+        scroll.pack(side=RIGHT, fill=Y)
+        # 将文本框填充进root窗口的左侧
+        text.pack(side=LEFT)
+        # 将滚动条与文本框关联
+        scroll.config(command=text.yview)
+        text.config(yscrollcommand=scroll.set)
+        # 设置文本框内容
+        text.insert(END, '加载中...\n')
+
+        # 让根窗口进入事件循环
+        self.root.mainloop()
+
+
+    # 设置主窗口大小及其位置
+    def center_window(self, w, h):
+        # 获取屏幕 宽、高
+        ws = self.root.winfo_screenwidth()
+        hs = self.root.winfo_screenheight()
+        # 计算 x, y 位置
+        x = (ws / 2) - (w / 2)
+        y = (hs / 2) - (h / 2)
+        self.root.geometry('%dx%d+%d+%d' % (w, h, x, y))
+
+
+
+
+
+
+
+
+
+
 
 
 class Bot(object):
@@ -59,10 +140,17 @@ class Bot(object):
         self.login_id_qq_com()
         self.login_qun_qq_com()
 
-    # 自定义输出数据
-    def custom_print(self, data):
-        print(data)
-        text.insert(END, data + '\n')
+        # 登录成功后，将QQ头像显示到图片框
+        picture = self.get_profile_picture(self.qq_number,140)
+        BytesIOObj = BytesIO()
+        BytesIOObj.write(picture)
+        qr_code = Image.open(BytesIOObj)
+        global image
+        image = ImageTk.PhotoImage(qr_code)
+        image_label['image'] = image
+
+
+
 
 
     def login_qun_qq_com(self):
@@ -72,7 +160,7 @@ class Bot(object):
         login_url = 'http://ui.ptlogin2.qq.com/cgi-bin/login?appid=549000912&s_url=http://qun.qq.com/member.html'
         html = get_html(login_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
-        cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
         pt_login_sig = cookies_back_dict['pt_login_sig']
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
 
@@ -80,17 +168,18 @@ class Bot(object):
         qrcode_url = 'https://ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=5&d=72&v=4&t=0.39550762134604156'
         html = get_html(qrcode_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
-        cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
         qrsig = cookies_back_dict['qrsig']
         ptqrtoken = hash33_token(qrsig)
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
 
-        # 将登录二维码写到本地，并自动打开，让用户扫描
-        with open('qrcode1.png', "wb") as f:
-            f.write(html.content)
-
-        # 调用系统默认打开方式，打开该二维码
-        open_file_by_system('qrcode1.png')
+        # 将二维码显示到图片框
+        BytesIOObj = BytesIO()
+        BytesIOObj.write(html.content)
+        qr_code = Image.open(BytesIOObj)
+        global image
+        image = ImageTk.PhotoImage(qr_code)
+        image_label['image'] = image
 
 
 
@@ -107,22 +196,22 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    self.custom_print(u'登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    custom_print(u'登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    self.custom_print(u'登录qun.qq.com中，扫描成功，正在认证中')
+                    custom_print(u'登录qun.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    self.custom_print(u'登录qun.qq.com中，登录成功')
+                    custom_print(u'登录qun.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    self.custom_print(u'登录qun.qq.com中，当前二维码已失效，请重启本软件')
+                    custom_print(u'登录qun.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
             time.sleep(2)
 
         # 登录成功后，把返回的cookies合并进去
-        cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
         # print(u'当前cookies:{}'.format(cookies_merge_dict))
 
@@ -137,9 +226,9 @@ class Bot(object):
         url = (html.text)[startIndex:endIndex] + 'pt_3rd_aid=0'
 
         # 这里需要注意的是，需要禁止重定向，才能正确获得返回的cookies
-        html = requests.get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, allow_redirects=False)
+        html = get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, allow_redirects=False)
         # 把返回的cookies合并进去
-        cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
 
 
@@ -151,7 +240,7 @@ class Bot(object):
         login_url = 'https://xui.ptlogin2.qq.com/cgi-bin/xlogin?pt_disable_pwd=1&appid=1006102&daid=1&style=23&hide_border=1&proxy_url=https://id.qq.com/login/proxy.html&s_url=https://id.qq.com/index.html'
         html = get_html(login_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
-        cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
         pt_login_sig = cookies_back_dict['pt_login_sig']
         self.cookies_merge_dict_in_id_qq_com.update(cookies_back_dict)
 
@@ -159,17 +248,19 @@ class Bot(object):
         qrcode_url = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid=1006102&e=2&l=M&s=5&d=72&v=4&t=0.10239549811477189&daid=1&pt_3rd_aid=0'
         html = get_html(qrcode_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
-        cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
         qrsig = cookies_back_dict['qrsig']
         ptqrtoken = hash33_token(qrsig)
         self.cookies_merge_dict_in_id_qq_com.update(cookies_back_dict)
 
-        # 将登录二维码写到本地，并自动打开，让用户扫描
-        with open('qrcode2.png', "wb") as f:
-            f.write(html.content)
 
-        # 调用系统默认打开方式，打开该二维码
-        open_file_by_system('qrcode2.png')
+        # 将二维码显示到图片框
+        BytesIOObj = BytesIO()
+        BytesIOObj.write(html.content)
+        qr_code = Image.open(BytesIOObj)
+        global image
+        image = ImageTk.PhotoImage(qr_code)
+        image_label['image'] = image
 
 
         # 实时检测二维码状态
@@ -183,22 +274,22 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    self.custom_print(u'登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    custom_print(u'登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    self.custom_print(u'登录id.qq.com中，扫描成功，正在认证中')
+                    custom_print(u'登录id.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    self.custom_print(u'登录id.qq.com中，登录成功')
+                    custom_print(u'登录id.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    self.custom_print(u'登录id.qq.com中，当前二维码已失效，请重启本软件')
+                    custom_print(u'登录id.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
             time.sleep(2)
 
         # 登录成功后，把返回的cookies合并进去
-        self.cookies_merge_dict_in_id_qq_com = requests.utils.dict_from_cookiejar(html.cookies)
+        self.cookies_merge_dict_in_id_qq_com = dict_from_cookiejar(html.cookies)
         self.cookies_merge_dict_in_id_qq_com.update(cookies_back_dict)
         # print(u'当前cookies:{}'.format(cookies_merge_dict))
 
@@ -213,14 +304,13 @@ class Bot(object):
         url = (html.text)[startIndex:endIndex] + 'pt_3rd_aid=0'
 
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
 
         # 这里需要注意的是，需要禁止重定向，才能正确获得返回的cookies
-        html = requests.get(url, cookies=self.cookies_merge_dict_in_id_qq_com, allow_redirects=False, verify=False)
+        html = get(url, cookies=self.cookies_merge_dict_in_id_qq_com, allow_redirects=False, verify=False)
         # 把返回的cookies合并进去
-        cookies_back_dict = requests.utils.dict_from_cookiejar(html.cookies)
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
         self.cookies_merge_dict_in_id_qq_com.update(cookies_back_dict)
-
 
 
 
@@ -233,7 +323,7 @@ class Bot(object):
         bkn = hash33_bkn(self.cookies_merge_dict_in_qun_qq_com['skey'])
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_group_list', self.cookies_merge_dict_in_qun_qq_com, submit_data)
-        group_info = json.loads(html.text)
+        group_info = loads(html.text)
         # print(group_info)
         return group_info['join']
 
@@ -246,7 +336,7 @@ class Bot(object):
         bkn = hash33_bkn(self.cookies_merge_dict_in_qun_qq_com['skey'])
         url = 'http://qinfo.clt.qq.com/cgi-bin/qun_info/get_members_info_v1?friends=1&name=1&gc=' + str(group_number) + '&bkn=' + str(bkn) + '&src=qinfo_v3'
         html = get_html(url, self.cookies_merge_dict_in_qun_qq_com)
-        group_member = json.loads(html.text)
+        group_member = loads(html.text)
         return group_member
 
 
@@ -259,7 +349,7 @@ class Bot(object):
         bkn = hash33_bkn(self.cookies_merge_dict_in_qun_qq_com['skey'])
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_friend_list', self.cookies_merge_dict_in_qun_qq_com, submit_data)
-        friend_info = json.loads(html.text)
+        friend_info = loads(html.text)
         # print(friend_info)
         return friend_info['result']
 
@@ -288,12 +378,12 @@ class Bot(object):
         }
 
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
         # 网页访问,post方式
-        html = requests.post('http://cgi.find.qq.com/qqfind/buddy/search_v3', data=submit_data, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
+        html = post('http://cgi.find.qq.com/qqfind/buddy/search_v3', data=submit_data, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
 
         # 将好友信息解析为python对象
-        friend_info = json.loads(html.text)
+        friend_info = loads(html.text)
         # print(friend_info)
         return friend_info['result']['buddy']['info_list'][0]
 
@@ -303,7 +393,7 @@ class Bot(object):
     def get_profile_picture(self, qq_number, size=100):
         # 获取指定qq的头像，size的值可为40、100、140，默认为100
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
 
         # 设置请求头,模拟人工
         header = {
@@ -314,8 +404,7 @@ class Bot(object):
         }
 
         # 网页访问,get方式
-        # https://q4.qlogo.cn/g?b=qq&nk=10000&s=140
-        html = requests.get('https://q4.qlogo.cn/g?b=qq&nk=' + str(qq_number) + '&s=' + str(size), headers=header, verify=False)
+        html = get('http://q1.qlogo.cn/g?b=qq&nk=' + str(qq_number) + '&s=' + str(size), headers=header, verify=False)
         return html.content
 
 
@@ -337,12 +426,12 @@ class Bot(object):
         }
 
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
         # 网页访问,post方式
-        html = requests.post('https://huifu.qq.com/cgi-bin/gr_grouplist', data=submit_data, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
+        html = post('https://huifu.qq.com/cgi-bin/gr_grouplist', data=submit_data, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
 
         # 将返回数据解析为python对象
-        result = json.loads(html.text)
+        result = loads(html.text)
 
         return result
 
@@ -368,12 +457,12 @@ class Bot(object):
         }
 
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
         # 网页访问,post方式
-        html = requests.get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
+        html = get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
 
         # 将返回数据解析为python对象
-        result = json.loads(html.text)
+        result = loads(html.text)
         # print(result)
 
         # 364天内没有删除的好友
@@ -408,12 +497,12 @@ class Bot(object):
         }
 
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
         # 网页访问,post方式
-        html = requests.get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
+        html = get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
 
         # 将返回数据解析为python对象
-        result = json.loads(html.text)
+        result = loads(html.text)
         isSvip = result['11053']['data']['isSvip']
         isVip = result['11053']['data']['isVip']
         return {'isSvip':isSvip, 'isVip':isVip}
@@ -436,12 +525,12 @@ class Bot(object):
         }
 
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
         # 网页访问,get方式
-        html = requests.get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
+        html = get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
 
         # 将返回数据解析为python对象
-        result = json.loads(html.text)
+        result = loads(html.text)
 
         qb_value = float(result['qb_balance']) / 100
         return qb_value
@@ -463,16 +552,12 @@ class Bot(object):
         }
 
         # 屏蔽https证书警告
-        requests.packages.urllib3.disable_warnings()
+        urllib3.disable_warnings()
         # 网页访问,get方式
-        html = requests.get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
+        html = get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, headers=header, verify=False)
 
         # 将返回数据解析为python对象
-        result = json.loads(html.text)
+        result = loads(html.text)
         # print(result)
 
         return result['resultinfo']['list']
-
-
-
-

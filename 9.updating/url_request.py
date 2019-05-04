@@ -1,7 +1,10 @@
 # -*- coding:utf-8 -*-
 
 # 引用第三方库
-import requests
+# import requests
+from requests.packages import urllib3
+from requests import get
+from requests import post
 
 
 # get访问网页
@@ -13,10 +16,10 @@ def get_html(url,submit_cookies):
         'Referer' : 'http://ui.ptlogin2.qq.com/cgi-bin/login?appid=549000912&s_url=http://qun.qq.com/member.html'
     }
     # 屏蔽https证书警告
-    requests.packages.urllib3.disable_warnings()
+    urllib3.disable_warnings()
 
     # 网页访问,get方式
-    html = requests.get(url, cookies = submit_cookies, headers=header, verify=False)
+    html = get(url, cookies = submit_cookies, headers=header, verify=False)
 
     return html
 
@@ -30,9 +33,9 @@ def post_html(url,submit_cookies,submit_data):
         'Referer' : 'https://qun.qq.com/member.html'
     }
     # 屏蔽https证书警告
-    requests.packages.urllib3.disable_warnings()
+    urllib3.disable_warnings()
 
     # 网页访问,post方式
-    html = requests.post(url, data=submit_data, cookies = submit_cookies, headers=header, verify=False)
+    html = post(url, data=submit_data, cookies = submit_cookies, headers=header, verify=False)
 
     return html
