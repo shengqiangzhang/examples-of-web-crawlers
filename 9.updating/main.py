@@ -26,6 +26,10 @@ def generate_data():
     # 创建一个群对象
     bot = Bot()
 
+    # 获取该账户的详细资料
+    a = bot.get_detail_information()
+    custom_print(str(a))
+
     # 获取群信息
     custom_print(u'获取该QQ加入的所有群信息...')
     group_list = bot.get_group()

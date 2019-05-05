@@ -6,6 +6,7 @@ from encrypt import hash33_bkn
 from encrypt import get_sck
 from url_request import get_html
 from url_request import post_html
+from encrypt import get_csrf_token
 
 
 # 引用第三方库
@@ -47,7 +48,7 @@ image_label = Label(root)
 # 创建一个容器
 frame = Frame(root)
 # 在这个容器上创建文本框text
-text = Text(frame, height=11)
+text = Text(frame, height=9)
 # 在这个容器上创建滚动条
 scroll = Scrollbar(frame)
 # 用于显示图片的对象
@@ -80,7 +81,7 @@ class gui(object):
         # 设置窗口标题
         root.title('一键生成qq个人数据报告')
         # 设置窗口大小及其位置
-        self.center_window(800, 190)
+        self.center_window(800, 160)
 
         # 设置图像框
         # qr_code = Image.open('qrcode2.png')
@@ -165,7 +166,7 @@ class Bot(object):
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
 
         # 访问网页，为了获取参数ptqrtoken
-        qrcode_url = 'https://ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=5&d=72&v=4&t=0.39550762134604156'
+        qrcode_url = 'https://ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=4&d=72&v=4&t=0.39550762134604156'
         html = get_html(qrcode_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
         cookies_back_dict = dict_from_cookiejar(html.cookies)
@@ -245,7 +246,7 @@ class Bot(object):
         self.cookies_merge_dict_in_id_qq_com.update(cookies_back_dict)
 
         # 访问网页，为了获取参数ptqrtoken
-        qrcode_url = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid=1006102&e=2&l=M&s=5&d=72&v=4&t=0.10239549811477189&daid=1&pt_3rd_aid=0'
+        qrcode_url = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid=1006102&e=2&l=M&s=4&d=72&v=4&t=0.10239549811477189&daid=1&pt_3rd_aid=0'
         html = get_html(qrcode_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
         cookies_back_dict = dict_from_cookiejar(html.cookies)
@@ -561,3 +562,116 @@ class Bot(object):
         # print(result)
 
         return result['resultinfo']['list']
+
+
+
+
+    def get_detail_information(self):
+        # 获取该账户的详细资料
+
+        # 存储返回数据
+        result = {}
+
+        # 获取基本信息
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict_in_id_qq_com['skey'])
+        url = 'https://id.qq.com/cgi-bin/summary?ldw=' + str(bkn)
+
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': '*/*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+            'Referer': 'https://id.qq.com/home/home.html?ver=10049&',
+            'Connection': 'keep-alive'
+        }
+
+        # 屏蔽https证书警告
+        urllib3.disable_warnings()
+        # 网页访问,get方式
+        html = get(url, cookies=self.cookies_merge_dict_in_id_qq_com, headers=header, verify=False)
+        # 指定返回数据编码格式
+        html.encoding = 'utf-8'
+        # 将返回数据解析为python对象，并存入result
+        result.update(loads(html.text))
+
+
+
+
+        # 获取在线天数
+        skey = str(self.cookies_merge_dict_in_id_qq_com['skey'])
+        g_tk = str(get_csrf_token(skey))
+        url = 'https://cgi.vip.qq.com/querygrow/get?r=0.8102122812749504&g_tk=' + g_tk
+        # 设置请求头,模拟人工
+        header = {
+            'Accept': '*/*',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+            'Accept-Encoding': 'gzip, deflate, br',
+            'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+            'Referer': 'https://id.qq.com/level/mylevel.html?ver=10043&',
+            'Connection': 'keep-alive'
+        }
+        # 屏蔽https证书警告
+        urllib3.disable_warnings()
+        # 网页访问,get方式
+        html = get(url, cookies=self.cookies_merge_dict_in_id_qq_com, headers=header, verify=False)
+        # 指定返回数据编码格式
+        html.encoding = 'utf-8'
+        # 将返回数据解析为python对象，并存入result
+        result.update(loads(html.text))
+
+
+
+        # 获取更加详细的资料
+        while(True):
+            url = 'https://id.qq.com/cgi-bin/userinfo?ldw=' + str(bkn)
+            # 设置请求头,模拟人工
+            header = {
+                'Accept': '*/*',
+                'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
+                'Accept-Encoding': 'gzip, deflate, br',
+                'accept-language': 'en-US,en;q=0.9,zh-CN;q=0.8,zh;q=0.7',
+                'Referer': 'https://id.qq.com/myself/myself.html?ver=10045&',
+                'Connection': 'keep-alive'
+            }
+            # 屏蔽https证书警告
+            urllib3.disable_warnings()
+            # 网页访问,get方式
+            html = get(url, cookies=self.cookies_merge_dict_in_id_qq_com, headers=header, verify=False)
+            # 指定返回数据编码格式
+            html.encoding = 'utf-8'
+
+            # 该网站有时候会返回空数据，所以要判断一下，如果是空则重新发包获取
+            if(html.text != ''):
+                # 将返回数据解析为python对象，并存入result
+                result.update(loads(html.text))
+
+                # 跳出循环
+                break
+
+
+        # 数据获取完毕，筛选出我们想返回的结果
+        data = {}
+        data.update({'bind_email':result['bind_email']})
+        data.update({'last_contact_friend_count': result['chat_count']})
+        data.update({'friend_count': result['friend_count']})
+        data.update({'group_count': result['group_count']})
+        data.update({'qq_level': result['level']})
+        data.update({'qq_level_rank': result['level_rank']})
+        data.update({'nickname': result['nick']})
+        data.update({'odd_friend_count': result['odd_count']})
+        data.update({'qq_age': result['qq_age']})
+        data.update({'remark_friend_count': result['remark_count']})
+        data.update({'mobile_qq_online_hour': result['iMobileQQOnlineTime']})
+        data.update({'no_hide_online_hour': result['iNoHideOnlineTime']})
+        data.update({'total_active_day': result['iTotalActiveDay']})
+        data.update({'age': result['age']})
+        data.update({'bir_d': result['bir_d']})
+        data.update({'bir_m': result['bir_m']})
+        data.update({'bir_y': result['bir_y']})
+        qq_signature = result['ln'].replace('&nbsp;',' ')
+        data.update({'qq_signature': qq_signature})
+
+        return data
+

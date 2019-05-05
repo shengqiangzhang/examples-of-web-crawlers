@@ -30,7 +30,7 @@ def hash33_bkn(skey):
 
 
 # 加载js文件
-def get_md5_js(js_name):
+def get_js(js_name):
     with open(js_name, 'r', encoding='UTF-8') as f:
         # 一般js文件不大，不会超出计算机的内存，所以直接一次性读取全部数据
         js_data = f.read()
@@ -43,7 +43,7 @@ def get_md5_js(js_name):
 def get_sck(skey):
 
     # 读取js脚本
-    md5 = get_md5_js('decrypt/md5.js')
+    md5 = get_js('decrypt/md5.js')
 
     # 加载js脚本引擎
     ctx = compile(md5)
@@ -53,3 +53,29 @@ def get_sck(skey):
     result = ctx.call('hex_md5', str(skey))
 
     return str(result)
+
+
+# 获取g_tk值，这里的g_tk值算法由vip.qq.com获取，暂不清楚是否能直接用于其他域名
+def get_csrf_token(skey):
+    # 读取js脚本
+    js = get_js('decrypt/getCSRFToken.js')
+
+    # 加载js脚本引擎
+    ctx = compile(js)
+
+    # 调用js脚本中某个函数
+    # 第1个参数为函数名，第2到第n个参数为该函数依次所需的参数
+    tmp_data = ctx.call('getCSRFToken', str(skey))
+
+
+    # 读取js脚本
+    js = get_js('decrypt/md5.js')
+
+    # 加载js脚本引擎
+    ctx = compile(js)
+
+    # 调用js脚本中某个函数
+    # 第1个参数为函数名，第2到第n个参数为该函数依次所需的参数
+    result = ctx.call('hex_md5', str(tmp_data))
+
+    return result
