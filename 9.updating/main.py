@@ -25,6 +25,26 @@ def init_folders():
             makedirs(dir)
 
 
+# 写入资源文件到本地
+def write_data():
+
+    key_dict = {
+        'qq_icon':qq_icon,
+        'level_star':level_star,
+        'level_moon':level_moon,
+        'level_sun':level_sun,
+        'level_crown':level_crown
+    }
+    for name in ['qq_icon', 'level_star', 'level_moon', 'level_sun', 'level_crown']:
+        # 保存qq_icon图片到本地data目录
+        with open('data/' + name + '.png', 'wb') as file:
+            # 解码图片
+            png = base64.b64decode(key_dict[name])
+            # 将解码得到的数据写入到图片中
+            file.write(png)
+
+
+
 # 获取个人数据
 def generate_data():
 
@@ -34,32 +54,62 @@ def generate_data():
     <font size='6px'>{qq_number}的个人QQ历史报告</font>
     <img src="{qq_icon_png}" align="right" height="60">
 </p>
-<br />
-    '''
-
+'''
 
     # 初始化文件夹
     init_folders()
+    # 写入项目所需资源文件到本地目录
+    write_data()
+
+
 
     # 创建一个自己编写的qq bot对象
     bot = Bot()
-
-    # 保存图片到本地data目录
-    with open('data/qq_icon.png', 'wb') as file:
-        # 解码图片
-        qq_icon_png = base64.b64decode(qq_icon)
-        # 将解码得到的数据写入到图片中
-        file.write(qq_icon_png)
-
+    custom_print(u'登录成功,正在获取数据...')
     # 更新一下欲输出的markdown文本
     markdown_content = markdown_content.replace('{qq_number}',bot.qq_number)
     markdown_content = markdown_content.replace('{qq_icon_png}', 'data/qq_icon.png')
-    print(markdown_content)
+
+
+
+
+
 
     # 获取该登录账户的详细资料
+    custom_print(u'正在获取该登录账户的详细数据...')
     detail_information = bot.get_detail_information()
+    # content为markdown语法文本
+    content = '\n<br/><br/>\n' + '## 我的详细资料\n' + '种类|内容\n:- | :-\n'
+
+    # 将key换成中文文本
+    key_dict = {
+        'bind_email':'绑定邮箱',
+        'last_contact_friend_count': '最近联系人数量',
+        'friend_count': '好友数量',
+        'group_count': '好友分组数量',
+        'qq_level': '账号等级',
+        'qq_level_rank': '等级排名',
+        'nickname': '昵称',
+        'odd_friend_count': '**单向好友数量**',
+        'qq_age': 'Q龄',
+        'remark_friend_count':'已备注的好友数量',
+        'mobile_qq_online_hour': '**手机QQ累计在线时间(小时)**',
+        'no_hide_online_hour': '**未隐身状态下累计在线时间(小时)**',
+        'total_active_day': '**在线活跃时间**',
+        'age': '真实年龄',
+        'birthday': '出生日期',
+        'qq_signature': '个性签名(前20字)',
+    }
+
     for key, value in detail_information.items():
-        custom_print('{}-{}'.format(key,value))
+        content += '{}|{}\n'.format(key_dict[key], value)
+    # 更新一下欲输出的markdown文本
+    markdown_content += content
+    markdown_content += '\n> 注：单向好友表示他/她的列表中有你，而你的列表中没有他/她'
+
+
+
+
 
     # 获取群信息
     custom_print(u'获取该QQ加入的所有群信息...')
@@ -143,7 +193,7 @@ def generate_data():
 
 
     # 输出markdown文件
-    with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w') as file:
+    with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
         file.write(markdown_content)
 
 if __name__ == "__main__":

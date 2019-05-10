@@ -549,24 +549,22 @@ class Bot(object):
         # 数据获取完毕，筛选出我们想返回的结果
         data = {}
         data.update({'bind_email':result['bind_email']})
+        data.update({'nickname': result['nick']})
+        data.update({'age': result['age']})
+        data.update({'birthday': str(result['bir_y']) + '/' + str(result['bir_m']) + '/' + str(result['bir_d'])})
         data.update({'last_contact_friend_count': result['chat_count']})
         data.update({'friend_count': result['friend_count']})
         data.update({'group_count': result['group_count']})
-        data.update({'qq_level': result['level']})
-        data.update({'qq_level_rank': result['level_rank']})
-        data.update({'nickname': result['nick']})
-        data.update({'odd_friend_count': result['odd_count']})
-        data.update({'qq_age': result['qq_age']})
         data.update({'remark_friend_count': result['remark_count']})
+        data.update({'odd_friend_count': result['odd_count']})
+        data.update({'qq_level': result['level']})
+        data.update({'qq_level_rank': str(result['level_rank']) + '/' + str(result['friend_count'])})
+        data.update({'qq_age': result['qq_age']})
         data.update({'mobile_qq_online_hour': result['iMobileQQOnlineTime']})
         data.update({'no_hide_online_hour': result['iNoHideOnlineTime']})
         data.update({'total_active_day': result['iTotalActiveDay']})
-        data.update({'age': result['age']})
-        data.update({'bir_d': result['bir_d']})
-        data.update({'bir_m': result['bir_m']})
-        data.update({'bir_y': result['bir_y']})
         qq_signature = result['ln'].replace('&nbsp;',' ')
-        data.update({'qq_signature': qq_signature})
+        # data.update({'qq_signature': qq_signature})
 
         return data
 
