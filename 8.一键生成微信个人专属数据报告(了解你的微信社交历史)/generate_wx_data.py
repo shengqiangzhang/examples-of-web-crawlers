@@ -85,13 +85,13 @@ def region_distribution():
             key = user.province
             province_dict[key] += 1
 
-    provice = list(province_dict.keys())
+    province = list(province_dict.keys())
     values = list(province_dict.values())
 
 
     # maptype='china' 只显示全国直辖市和省级，数据只能是省名和直辖市的名称
     map = Map("微信好友地区分布")
-    map.add("", provice, values, visual_range=[0, 50], maptype='china', is_visualmap=True, visual_text_color='#000')
+    map.add("", province, values, visual_range=[0, 50], maptype='china', is_visualmap=True, visual_text_color='#000')
     map.render(path="data/好友地区分布.html")
 
 
