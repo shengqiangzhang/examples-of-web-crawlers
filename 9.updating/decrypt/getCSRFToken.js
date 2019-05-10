@@ -1,4 +1,8 @@
 function getCSRFToken(skey){
+	/*
+	该函数由vip.qq.com网站抓包获取并改写而来
+	需具备一定抓包基础知识
+	*/
 	var CSRF_TOKEN_KEY = 'tencentQQVIP123443safde&!%^%1282';
 	var CSRF_TOKEN_SALT = 5381;
 	var param = {};

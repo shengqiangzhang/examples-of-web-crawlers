@@ -1,12 +1,12 @@
 # -*- coding:utf-8 -*-
 
 # 引用自定义库
-from encrypt import hash33_token
-from encrypt import hash33_bkn
-from encrypt import get_sck
+from decrypt import hash33_token
+from decrypt import hash33_bkn
+from decrypt import get_sck
 from url_request import get_html
 from url_request import post_html
-from encrypt import get_csrf_token
+from decrypt import get_csrf_token
 
 
 # 引用第三方库
@@ -17,117 +17,15 @@ from requests import post
 from requests.packages import urllib3
 from requests.utils import dict_from_cookiejar
 from json import loads
-from platform import system
-from tkinter import *
-from PIL import Image,ImageTk
+import PIL.Image
+import PIL.ImageTk
 from io import BytesIO
-
-
-# 引入打开文件所用的库
-# Window与Linux和Mac OSX有所不同
-# lambda用来定义一个匿名函数，可实现类似c语言的define定义
-if('Windows' in system()):
-    # Windows
-    from os import startfile
-    open_file_by_system = lambda x : startfile(x)
-elif('Darwin' in system()):
-    # MacOSX
-    from subprocess import call
-    open_file_by_system = lambda x : call(["open", x])
-else:
-    # Linux
-    from subprocess import call
-    open_file_by_system = lambda x: call(["xdg-open", x])
-
-
-
-# 创建一个根窗口，其余的控件都要在这个窗口上面
-root = Tk()
-# 创建一个图像框
-image_label = Label(root)
-# 创建一个容器
-frame = Frame(root)
-# 在这个容器上创建文本框text
-text = Text(frame, height=9)
-# 在这个容器上创建滚动条
-scroll = Scrollbar(frame)
-# 用于显示图片的对象
-image = ''
-
-# 自定义输出数据
-def custom_print(data):
-    # 正常调试输出
-    print(data)
-    # 将内容输出到文本框
-    text.insert(END, data + '\n')
-    # 设置文本框当前显示的内容为最底部的内容
-    text.see(END)
-
-
-class gui(object):
-    """
-    tkinter对象，用于绘制基本的gui界面
-    """
-    def __init__(self):
-        self.root = root
-        self.image_label = image_label
-        self.image = image
-        self.frame = frame
-        self.text = text
-        self.scroll = scroll
-
-        # 设置禁止调整窗口大小
-        root.resizable(False, False)
-        # 设置窗口标题
-        root.title('一键生成qq个人数据报告')
-        # 设置窗口大小及其位置
-        self.center_window(800, 160)
-
-        # 设置图像框
-        # qr_code = Image.open('qrcode2.png')
-        # image = ImageTk.PhotoImage(qr_code)
-        # image_label['image'] = image
-        image_label.pack(side=LEFT, anchor=NE)
-
-        # 设置容器
-        frame.pack(side=RIGHT, anchor=NW)
-        # 将滚动条填充
-        # side是滚动条放置的位置，上下左右。fill是将滚动条沿着y轴填充
-        scroll.pack(side=RIGHT, fill=Y)
-        # 将文本框填充进root窗口的左侧
-        text.pack(side=LEFT)
-        # 将滚动条与文本框关联
-        scroll.config(command=text.yview)
-        text.config(yscrollcommand=scroll.set)
-        # 设置文本框内容
-        text.insert(END, '加载中...\n')
-
-        # 让根窗口进入事件循环
-        self.root.mainloop()
-
-
-    # 设置主窗口大小及其位置
-    def center_window(self, w, h):
-        # 获取屏幕 宽、高
-        ws = self.root.winfo_screenwidth()
-        hs = self.root.winfo_screenheight()
-        # 计算 x, y 位置
-        x = (ws / 2) - (w / 2)
-        y = (hs / 2) - (h / 2)
-        self.root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-
-
-
-
-
-
-
-
-
+from tkinter_gui import *
 
 
 
 class Bot(object):
+
     """
     QQ机器人对象，用于获取指定QQ号的群信息及群成员信息，
     同时，该接口可获取指定QQ的所有好友分组，但是获取的好友数据仅包含备注名和QQ号
@@ -145,9 +43,8 @@ class Bot(object):
         picture = self.get_profile_picture(self.qq_number,140)
         BytesIOObj = BytesIO()
         BytesIOObj.write(picture)
-        qr_code = Image.open(BytesIOObj)
-        global image
-        image = ImageTk.PhotoImage(qr_code)
+        qr_code = PIL.Image.open(BytesIOObj)
+        image = PIL.ImageTk.PhotoImage(qr_code)
         image_label['image'] = image
 
 
@@ -177,9 +74,8 @@ class Bot(object):
         # 将二维码显示到图片框
         BytesIOObj = BytesIO()
         BytesIOObj.write(html.content)
-        qr_code = Image.open(BytesIOObj)
-        global image
-        image = ImageTk.PhotoImage(qr_code)
+        qr_code = PIL.Image.open(BytesIOObj)
+        image = PIL.ImageTk.PhotoImage(qr_code)
         image_label['image'] = image
 
 
@@ -197,15 +93,15 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    custom_print(u'登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    custom_print(u'(2/2)登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    custom_print(u'登录qun.qq.com中，扫描成功，正在认证中')
+                    custom_print(u'(2/2)登录qun.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    custom_print(u'登录qun.qq.com中，登录成功')
+                    custom_print(u'(2/2)登录qun.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    custom_print(u'登录qun.qq.com中，当前二维码已失效，请重启本软件')
+                    custom_print(u'(2/2)登录qun.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
@@ -258,9 +154,8 @@ class Bot(object):
         # 将二维码显示到图片框
         BytesIOObj = BytesIO()
         BytesIOObj.write(html.content)
-        qr_code = Image.open(BytesIOObj)
-        global image
-        image = ImageTk.PhotoImage(qr_code)
+        qr_code = PIL.Image.open(BytesIOObj)
+        image = PIL.ImageTk.PhotoImage(qr_code)
         image_label['image'] = image
 
 
@@ -275,15 +170,15 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    custom_print(u'登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    custom_print(u'(1/2)登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    custom_print(u'登录id.qq.com中，扫描成功，正在认证中')
+                    custom_print(u'(1/2)登录id.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    custom_print(u'登录id.qq.com中，登录成功')
+                    custom_print(u'(1/2)登录id.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    custom_print(u'登录id.qq.com中，当前二维码已失效，请重启本软件')
+                    custom_print(u'(1/2)登录id.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
