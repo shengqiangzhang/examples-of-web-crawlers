@@ -45,7 +45,7 @@ class gui(object):
         # 设置禁止调整窗口大小
         root.resizable(False, False)
         # 设置窗口标题
-        root.title('一键生成qq个人数据报告')
+        root.title('一键生成qq个人历史报告')
         # 设置窗口大小及其位置
         self.center_window(800, 160)
 

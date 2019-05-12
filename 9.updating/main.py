@@ -10,6 +10,8 @@ from os.path import exists
 from os import makedirs
 from shutil import rmtree
 import base64
+import random
+import time
 
 
 # 初始化所需文件夹
@@ -25,7 +27,7 @@ def init_folders():
             makedirs(dir)
 
 
-# 写入资源文件到本地
+# 写入相关资源文件到本地
 def write_data():
 
     key_dict = {
@@ -44,6 +46,28 @@ def write_data():
             file.write(png)
 
 
+# 根据Q等级绘制等级图标
+def calculate_level(level):
+    level = int(level)
+    star_count = 0
+    moon_count = 0
+    sun_count = 0
+    crown_count = 0
+
+    # //表示向下取整 %表示取余
+    crown_count = level // 64
+    tmp = level % 64
+
+    sun_count = tmp // 16
+    tmp = tmp % 16
+
+    moon_count = tmp // 4
+    tmp = tmp % 4
+
+    star_count = tmp // 1
+
+    return star_count, moon_count, sun_count, crown_count
+
 
 # 获取个人数据
 def generate_data():
@@ -60,6 +84,7 @@ def generate_data():
     init_folders()
     # 写入项目所需资源文件到本地目录
     write_data()
+
 
 
 
@@ -102,7 +127,12 @@ def generate_data():
     }
 
     for key, value in detail_information.items():
-        content += '{}|{}\n'.format(key_dict[key], value)
+        if key == 'qq_level':
+            star_count, moon_count, sun_count, crown_count = calculate_level(value)
+            data = crown_count * '![](data/level_crown.png)' + sun_count * '![](data/level_sun.png)' + moon_count * '![](data/level_moon.png)' + star_count * '![](data/level_star.png)'
+            content += '{}|{}\n'.format(key_dict[key], data)
+        else:
+            content += '{}|{}\n'.format(key_dict[key], value)
     # 更新一下欲输出的markdown文本
     markdown_content += content
     markdown_content += '\n> 注：单向好友表示他/她的列表中有你，而你的列表中没有他/她'
@@ -111,15 +141,111 @@ def generate_data():
 
 
 
-    # 获取群信息
+
+
+    # 获取所有群信息
     custom_print(u'获取该QQ加入的所有群信息...')
     group_list = bot.get_group()
-    custom_print(u'获取该QQ加入的所有群信息完毕')
-
+    # print(group_list)
+    # content为markdown语法文本
+    content = '\n\n<br/><br/>\n' + '## 我加入的群资料\n' + '序号|群名|群号|群主QQ\n:- | :-| :-| :-\n'
     # 获取某个群的群成员信息
-    custom_print(u'获取该该群的成员信息...')
-    bot.get_members_in_group(str(group_list[0]['gc']))
-    custom_print(u'获取该该群的成员信息完毕')
+    for index, group in enumerate(group_list):
+        group_number = group['gc']
+        group_name = group['gn']
+        owner = group['owner']
+        custom_print(u'正在获取群({})的具体信息...'.format(group_number))
+        content += '{}|{}|{}|{}\n'.format(str(index+1), str(group_name), str(group_number), str(owner))
+
+    # 更新一下欲输出的markdown文本
+    markdown_content += content
+
+
+
+    # 获取过去30天内退出的群名单
+    custom_print(u'获取过去30天退出的群...')
+    data = bot.get_quit_of_group()
+    delete_group_count = 0
+    # content为markdown语法文本
+    content = '\n\n<br/><br/>\n' + '## 过去30天内我退出的群\n'
+    if 'ls' in data.keys():
+        delete_group_count = len(data['ls'])
+    content += '过去30天内，我退出的群个数为**{}**个'.format(delete_group_count)
+
+    if(delete_group_count > 0):
+        content += '，它们分别是：\n' + '序号|群名|群号|退出时间\n:- | :-| :-| :-\n'
+        for index, group in enumerate(data['ls']):
+            timeStamp = int(group['t'])
+            timeArray = time.localtime(timeStamp)
+            otherStyleTime = time.strftime("%Y--%m--%d %H:%M:%S", timeArray)
+
+            content += '{}|{}|{}|{}\n'.format(str(index),group['n'],group['gc'],otherStyleTime)
+
+    content += '\n\n'
+    # 更新一下欲输出的markdown文本
+    markdown_content += content
+
+
+    # 获取过去364天内删除的好友名单
+    custom_print(u'获取过去12个月删除的好友名单...')
+    delete_friend_list = bot.get_delete_friend_in_360day()
+    delete_friend_count = len(delete_friend_list)
+    # content为markdown语法文本
+    content = '\n\n<br/><br/>\n' + '## 过去364天内我删除的好友\n'
+    content += '过去364天内，我删除的好友个数为**{}**个'.format(delete_friend_count)
+    if(delete_friend_count > 0):
+        content += '，它们分别是：\n' + '序号|Q号\n:- | :-\n'
+        for index, qq_number in enumerate(delete_friend_list):
+            content += '{}|{}\n'.format(str(index),str(qq_number))
+
+    content += '\n\n'
+    # 更新一下欲输出的markdown文本
+    markdown_content += content
+
+
+    # 判断此次登录的qq是否为vip或者svip
+    # content为markdown语法文本
+    content = '\n\n<br/><br/>\n' + '## 财产分析\n'
+    custom_print(u'判断该QQ是否为高级用户...')
+    data = bot.is_vip_svip()
+    isSvip = data['isSvip']
+    isVip = data['isSvip']
+    if(str(isVip) == '0' and str(isSvip) == '0'):
+        content += '此时此刻，我既不是**QQ VIP**，也不是**QQ SVIP**\n'
+    elif(str(isVip) != '0' and str(isSvip) != '0'):
+        content += '此时此刻，我既是**QQ VIP**，也是**QQ SVIP**\n'
+    elif(str(isVip) == '0' and str(isSvip) != '0'):
+        content += '此时此刻，我不是**QQ VIP**，但我是**QQ SVIP**\n'
+    elif(str(isVip) != '0' and str(isSvip) == '0'):
+        content += '此时此刻，我是**QQ VIP**，但不是**QQ SVIP**\n'
+
+    # 获取qb值
+    custom_print(u'获取账户QB值...')
+    qb_value = bot.get_qb()
+    timeArray = time.localtime()
+    otherStyleTime = time.strftime("%Y--%m--%d %H:%M:%S", timeArray)
+    content += '截止到**{}**，我剩余的Q币个数为：**{}**个\n\n'.format(otherStyleTime,qb_value)
+
+    # 获取代付信息
+    custom_print(u'获取代付信息中...')
+    pay_list = bot.get_pay_for_another()
+    content += '截止到**{}**，我收到的代付信息条数为：**{}**个'.format(otherStyleTime, len(pay_list))
+    if(len(pay_list) > 0):
+        content += '，它们分别是：\n' + '序号|索要者QQ|索要者昵称|留言内容|索要时间\n:- | :-| :-| :-| :-\n'
+        for index, pay_info in enumerate(pay_list):
+            if(str(pay_info['fromuin']) != '0'):
+                nick = pay_info['nick'].replace('&nbsp;',' ')
+                timeArray = time.localtime(int(pay_info['trantime']))
+                otherStyleTime = time.strftime("%Y--%m--%d %H:%M:%S", timeArray)
+                content += '{}|{}|{}|{}|{}\n'.format(str(index),str(pay_info['fromuin']),nick,str(pay_info['content']),otherStyleTime)
+
+    content += '\n\n'
+    # 更新一下欲输出的markdown文本
+    markdown_content += content
+
+
+
+
 
     # 获取所有qq好友的备注名和qq号
     # Bot对象中含有查询指定qq好友详细资料的接口
@@ -129,63 +255,6 @@ def generate_data():
     print('所有qq好友号码和备注名',all_qq_friends)
 
 
-    # 获取过去30天内退出的群名单
-    custom_print(u'获取过去30天退出的群...')
-    print('过去30天内退出的群',bot.get_quit_of_group())
-    custom_print(u'获取过去30天退出的群完毕')
-
-    # 获取过去364天内删除的好友名单
-    custom_print(u'获取过去12个月删除的好友名单...')
-    bot.get_delete_friend_in_360day()
-    custom_print(u'获取过去12个月删除的好友名单完毕')
-
-
-    # 判断此次登录的qq是否为vip或者svip
-    custom_print(u'判断该QQ是否为高级用户...')
-    bot.is_vip_svip()
-    custom_print(u'判断完毕')
-
-
-
-
-
-
-
-    # # 获取指定qq的头像
-    #
-    # # 初始化存放头像文件夹
-    # init_folders()
-    # # 生成qq-备注名字典
-    # qq_name_dict = {}
-    # for group in all_qq_friends.keys():
-    #     for info in all_qq_friends[group]['mems']:
-    #         qq_name_dict.update({info['uin']:info['name']})
-    # # 开始下载qq头像
-    # for index,qq_number in enumerate(qq_name_dict.keys()):
-    #     image = bot.get_profile_picture(qq_number)
-    #     with open('image/' + str(qq_number) + '.jpg', 'wb') as f:
-    #         f.write(image)
-    #     print('{}/{}'.format(index + 1, len(qq_name_dict)))
-
-
-
-    # 获取qb值
-    custom_print(u'获取账户QB值...')
-    bot.get_qb()
-    custom_print(u'获取账户QB值完毕')
-
-
-    # 获取代付信息
-    custom_print(u'获取代付信息中...')
-    bot.get_pay_for_another()
-    custom_print(u'获取代付信息完毕')
-
-
-
-    # qq音乐以前空间上传的歌单
-
-
-    # qq个人中心https://id.qq.com/index.html#index
     # 亲密度排行榜 https://rc.qzone.qq.com/myhome/friends
     # 近期加你好友的人 https://rc.qzone.qq.com/myhome/friends/center
     # 成为QQ好友的天数https://user.qzone.qq.com/981469881/friendship?via=ic
@@ -198,11 +267,10 @@ def generate_data():
 
 if __name__ == "__main__":
 
+
     # 启动获取数据线程
     t = Thread(target=generate_data, name='generate_data')
     t.start()
 
     # 启动tkinter gui
     gui()
-
-

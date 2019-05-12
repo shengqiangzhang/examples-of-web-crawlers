@@ -220,7 +220,7 @@ class Bot(object):
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_group_list', self.cookies_merge_dict_in_qun_qq_com, submit_data)
         group_info = loads(html.text)
-        # print(group_info)
+        print(group_info)
         return group_info['join']
 
 
@@ -364,7 +364,7 @@ class Bot(object):
         # 364天内没有删除的好友
         delFriendList = result['11053']['data']['delFriendList']
         if(len(delFriendList) == 0):
-            return {}
+            return []
 
         # 364天内有删除的好友
         qq_number_list = delFriendList['364']['vecUin']
@@ -417,7 +417,8 @@ class Bot(object):
             'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/70.0.3538.102 Safari/537.36',
             'Accept-Encoding': 'gzip, deflate',
             'Referer': 'https://my.pay.qq.com/account/index.shtml',
-            'Connection': 'keep-alive'
+            'Origin': 'https://my.pay.qq.com',
+            'Connection': 'close'
         }
 
         # 屏蔽https证书警告
@@ -428,7 +429,7 @@ class Bot(object):
         # 将返回数据解析为python对象
         result = loads(html.text)
 
-        qb_value = float(result['qb_balance']) / 100
+        qb_value = float(result['qb_balance']) / 10
         return qb_value
 
 
