@@ -10,14 +10,14 @@ from os.path import exists
 from os import makedirs
 from shutil import rmtree
 import base64
-import random
 import time
+from pyecharts import Bar
 
 
 # 初始化所需文件夹
 def init_folders():
 
-    for dir in ['image', 'data']:
+    for dir in ['data']:
         if(not (exists(dir))):
             # 目录不存在时则创建
             makedirs(dir)
@@ -98,8 +98,6 @@ def generate_data():
 
 
 
-
-
     # 获取该登录账户的详细资料
     custom_print(u'正在获取该登录账户的详细数据...')
     detail_information = bot.get_detail_information()
@@ -143,10 +141,42 @@ def generate_data():
 
 
 
+
+    # 获取所有qq好友的备注名和qq号
+    all_qq_friends = bot.get_all_friends_in_qq()
+    custom_print(u'所有qq好友号码和备注名中...')
+    qq_number_length = {}
+    qq_number_list = []
+    for key, friend_group in all_qq_friends.items():
+        for info in friend_group['mems']:
+            length = len(str(info['uin']))
+            qq_number_list.append(info['uin'])
+            if length not in qq_number_length.keys():
+                qq_number_length.update({length:0})
+            else:
+                count = qq_number_length[length] + 1
+                qq_number_length.update({length: count})
+
+    # pyechart绘图
+    bar = Bar()
+    bar.add(name='', x_axis=[str(x)+'位数' for x in qq_number_length.keys()], y_axis=[qq_number_length[x] for x in qq_number_length.keys()])
+    bar.render('data/qq_number_count.html')
+
+    # content为markdown语法文本
+    content = '\n\n<br/><br/>\n' + '## QQ好友位数\n'
+    content += '<iframe height=450 width=999 src="data/qq_number_count.html" frameborder=0 allowfullscreen> </iframe>'
+    # 更新一下欲输出的markdown文本
+    markdown_content += content
+
+
+
+
+
+
     # 获取所有群信息
     custom_print(u'获取该QQ加入的所有群信息...')
     group_list = bot.get_group()
-    # print(group_list)
+    print(group_list)
     # content为markdown语法文本
     content = '\n\n<br/><br/>\n' + '## 我加入的群资料\n' + '序号|群名|群号|群主QQ\n:- | :-| :-| :-\n'
     # 获取某个群的群成员信息
@@ -154,11 +184,12 @@ def generate_data():
         group_number = group['gc']
         group_name = group['gn']
         owner = group['owner']
-        custom_print(u'正在获取群({})的具体信息...'.format(group_number))
         content += '{}|{}|{}|{}\n'.format(str(index+1), str(group_name), str(group_number), str(owner))
 
     # 更新一下欲输出的markdown文本
     markdown_content += content
+
+
 
 
 
@@ -186,6 +217,10 @@ def generate_data():
     markdown_content += content
 
 
+
+
+
+
     # 获取过去364天内删除的好友名单
     custom_print(u'获取过去12个月删除的好友名单...')
     delete_friend_list = bot.get_delete_friend_in_360day()
@@ -201,6 +236,12 @@ def generate_data():
     content += '\n\n'
     # 更新一下欲输出的markdown文本
     markdown_content += content
+
+
+
+
+
+
 
 
     # 判断此次登录的qq是否为vip或者svip
@@ -247,23 +288,23 @@ def generate_data():
 
 
 
-    # 获取所有qq好友的备注名和qq号
-    # Bot对象中含有查询指定qq好友详细资料的接口
-    # 但是由于该接口限制十分严格，频繁获取超过10个以上会封该QQ号码12小时
-    # 所以放弃对每个好友详细资料的分析
-    all_qq_friends = bot.get_all_friends_in_qq()
-    print('所有qq好友号码和备注名',all_qq_friends)
+    # 亲密度排行榜 谁在意我
+    bot.who_care_about_me()
+    bot.i_care_about_who()
 
+    # 获取成为好友天数以及共同好友和共同群
+    print(qq_number_list)
+    for i in qq_number_list:
+        bot.qzone_friendship(i)
 
-    # 亲密度排行榜 https://rc.qzone.qq.com/myhome/friends
-    # 近期加你好友的人 https://rc.qzone.qq.com/myhome/friends/center
-    # 成为QQ好友的天数https://user.qzone.qq.com/981469881/friendship?via=ic
-    # 成为qq好友的天数https://user.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/friendship/cgi_friendship?activeuin=3257179914&passiveuin=928255652&situation=1&isCalendar=1&g_tk=138378367&qzonetoken=8b160efd39b85efd4ffeba1a4f8501c063e6ff850976285b9f5f6d20cafc8163b55db14b65ce4f2edb5c&g_tk=138378367
 
 
     # 输出markdown文件
     with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
         file.write(markdown_content)
+
+
+    custom_print(u'所有数据获取完毕, 并生成了一份报告文件:[{}的个人QQ历史报告.md], 该文件为markdown格式文件, 请下载typora软件以便查看该格式文件, 下载地址为https://typora.io/#windows'.format(bot.qq_number))
 
 if __name__ == "__main__":
 

@@ -35,9 +35,12 @@ class Bot(object):
         self.is_login = False
         self.cookies_merge_dict_in_id_qq_com = {}
         self.cookies_merge_dict_in_qun_qq_com = {}
+        self.cookies_merge_dict_in_qzone_qq_com = {}
         self.qq_number = ''
+
         self.login_id_qq_com()
         self.login_qun_qq_com()
+        self.login_qzone_qq_com()
 
         # 登录成功后，将QQ头像显示到图片框
         picture = self.get_profile_picture(self.qq_number,140)
@@ -46,7 +49,6 @@ class Bot(object):
         qr_code = PIL.Image.open(BytesIOObj)
         image = PIL.ImageTk.PhotoImage(qr_code)
         image_label['image'] = image
-
 
 
 
@@ -93,15 +95,15 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    custom_print(u'(2/2)登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    custom_print(u'(2/3)登录qun.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    custom_print(u'(2/2)登录qun.qq.com中，扫描成功，正在认证中')
+                    custom_print(u'(2/3)登录qun.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    custom_print(u'(2/2)登录qun.qq.com中，登录成功')
+                    custom_print(u'(2/3)登录qun.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    custom_print(u'(2/2)登录qun.qq.com中，当前二维码已失效，请重启本软件')
+                    custom_print(u'(2/3)登录qun.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
@@ -127,6 +129,90 @@ class Bot(object):
         # 把返回的cookies合并进去
         cookies_back_dict = dict_from_cookiejar(html.cookies)
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
+
+
+
+
+
+    def login_qzone_qq_com(self):
+        # 登录qzone.qq.com
+        # 访问网页，为了获取参数pt_login_sig
+        login_url = 'https://xui.ptlogin2.qq.com/cgi-bin/xlogin?proxy_url=https://qzs.qq.com/qzone/v6/portal/proxy.html&daid=5&&hide_title_bar=1&low_login=0&qlogin_auto_login=1&no_verifyimg=1&link_target=blank&appid=549000912&style=22&target=self&s_url=https://qzs.qq.com/qzone/v5/loginsucc.html?para=izone&pt_qr_app=手机QQ空间&pt_qr_link=https://z.qzone.com/download.html&self_regurl=https://qzs.qq.com/qzone/v6/reg/index.html&pt_qr_help_link=https://z.qzone.com/download.html&pt_no_auth=0'
+        html = get_html(login_url, '')
+        # 对返回的cookies进行转化为dict类型，方便处理
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
+        pt_login_sig = cookies_back_dict['pt_login_sig']
+        self.cookies_merge_dict_in_qzone_qq_com.update(cookies_back_dict)
+
+        # 访问网页，为了获取参数ptqrtoken
+        qrcode_url = 'https://ssl.ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=4&d=72&v=4&t=0.0010498811219192827&daid=5&pt_3rd_aid=0'
+        html = get_html(qrcode_url, '')
+        # 对返回的cookies进行转化为dict类型，方便处理
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
+        qrsig = cookies_back_dict['qrsig']
+        ptqrtoken = hash33_token(qrsig)
+        self.cookies_merge_dict_in_qzone_qq_com.update(cookies_back_dict)
+
+
+        # 将二维码显示到图片框
+        BytesIOObj = BytesIO()
+        BytesIOObj.write(html.content)
+        qr_code = PIL.Image.open(BytesIOObj)
+        image = PIL.ImageTk.PhotoImage(qr_code)
+        image_label['image'] = image
+
+
+        # 实时检测二维码状态
+        while (True):
+            # 目标网址
+            target_url = 'https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https://qzs.qq.com/qzone/v5/loginsucc.html?para=izone&ptqrtoken=' + str(ptqrtoken) + '&ptredirect=0&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1558286321351&js_ver=19042519&js_type=1&login_sig=' + str(pt_login_sig) + '&pt_uistyle=40&aid=549000912&daid=5&'
+
+
+            # 登录，需要带上访问cookies
+            html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+
+            # 返回的响应码为200说明二维码没过期
+            if (html.status_code):
+                if ('二维码未失效' in html.text):
+                    custom_print(u'(3/3)登录qzone.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                elif ('二维码认证' in html.text):
+                    custom_print(u'(3/3)登录qzone.qq.com中，扫描成功，正在认证中')
+                elif ('登录成功' in html.text):
+                    self.is_login = True
+                    custom_print(u'(3/3)登录qzone.qq.com中，登录成功')
+                    break
+                if ('二维码已经失效' in html.text):
+                    custom_print(u'(3/3)登录qzone.qq.com中，当前二维码已失效，请重启本软件')
+                    exit()
+
+            # 延时
+            time.sleep(2)
+
+        # 登录成功后，把返回的cookies合并进去
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
+        self.cookies_merge_dict_in_qzone_qq_com.update(cookies_back_dict)
+
+
+        # 获取此次登录的qq号码
+        qq_list = re.findall(r'&uin=(.+?)&service', html.text)
+        self.qq_number = qq_list[0]
+
+        # 登录成功后，会返回一个地址，需要对该地址进行访问以便获取新的返回cookies
+        startIndex = (html.text).find('http')
+        endIndex = (html.text).find('pt_3rd_aid=0')
+        url = (html.text)[startIndex:endIndex] + 'pt_3rd_aid=0'
+
+        # 屏蔽https证书警告
+        urllib3.disable_warnings()
+
+        # 这里需要注意的是，需要禁止重定向，才能正确获得返回的cookies
+        html = get(url, cookies=self.cookies_merge_dict_in_qzone_qq_com, allow_redirects=False, verify=False)
+        # 把返回的cookies合并进去
+        cookies_back_dict = dict_from_cookiejar(html.cookies)
+        self.cookies_merge_dict_in_qzone_qq_com.update(cookies_back_dict)
+
+
+
 
 
 
@@ -170,15 +256,15 @@ class Bot(object):
             # 返回的响应码为200说明二维码没过期
             if (html.status_code):
                 if ('二维码未失效' in html.text):
-                    custom_print(u'(1/2)登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
+                    custom_print(u'(1/3)登录id.qq.com中，当前二维码未失效，请你扫描二维码进行登录')
                 elif ('二维码认证' in html.text):
-                    custom_print(u'(1/2)登录id.qq.com中，扫描成功，正在认证中')
+                    custom_print(u'(1/3)登录id.qq.com中，扫描成功，正在认证中')
                 elif ('登录成功' in html.text):
                     self.is_login = True
-                    custom_print(u'(1/2)登录id.qq.com中，登录成功')
+                    custom_print(u'(1/3)登录id.qq.com中，登录成功')
                     break
                 if ('二维码已经失效' in html.text):
-                    custom_print(u'(1/2)登录id.qq.com中，当前二维码已失效，请重启本软件')
+                    custom_print(u'(1/3)登录id.qq.com中，当前二维码已失效，请重启本软件')
                     exit()
 
             # 延时
@@ -568,4 +654,93 @@ class Bot(object):
         # data.update({'qq_signature': qq_signature})
 
         return data
+
+
+    def who_care_about_me(self):
+        # qq空间亲密度 谁在意我
+
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict_in_qzone_qq_com['p_skey'])
+
+        # 获取参数qzonetoken
+        urllib3.disable_warnings()
+        target_url = 'https://user.qzone.qq.com/' + self.qq_number
+        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+        qzonetoken = re.findall(r'{ try{return "(.+?)";', html.text)
+        qzonetoken = qzonetoken[0]
+
+
+        # 获取谁在意我数据
+        target_url = 'https://rc.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin=' + self.qq_number + '&do=2&rd=0.32313768189269365&fupdate=1&clean=0&g_tk=' + str(bkn) + '&qzonetoken=' + str(qzonetoken) + '&g_tk=' + str(bkn)
+        urllib3.disable_warnings()
+        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+
+        # 处理返回数据
+        result_data = (html.text).replace('_Callback(','')
+        result_data = result_data[:len(result_data)-2]
+        # 将返回数据转化为python对象
+        result_data = loads(result_data)
+        result_data = result_data['data']['items_list']
+
+
+        print(result_data)
+
+
+
+    def i_care_about_who(self):
+        # qq空间亲密度 我在意谁
+
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict_in_qzone_qq_com['p_skey'])
+
+        # 获取参数qzonetoken
+        urllib3.disable_warnings()
+        target_url = 'https://user.qzone.qq.com/' + self.qq_number
+        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+        qzonetoken = re.findall(r'{ try{return "(.+?)";', html.text)
+        qzonetoken = qzonetoken[0]
+
+
+        # 获取我在意谁数据
+        target_url = 'https://rc.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin=' + self.qq_number + '&do=1&rd=0.9680629025032721&fupdate=1&clean=1&g_tk=' + str(bkn) + '&qzonetoken=' + str(qzonetoken) + '&g_tk=' + str(bkn)
+        urllib3.disable_warnings()
+        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+
+        # 处理返回数据
+        result_data = (html.text).replace('_Callback(','')
+        result_data = result_data[:len(result_data)-2]
+        # 将返回数据转化为python对象
+        result_data = loads(result_data)
+        result_data = result_data['data']['items_list']
+
+
+        print(result_data)
+
+
+
+    def qzone_friendship(self, number):
+        # 获取成为好友的天数，以及与这个好友共同的好友个数和群聊个数
+        # bkn由参数skey通过另一个加密函数得到
+        bkn = hash33_bkn(self.cookies_merge_dict_in_qzone_qq_com['p_skey'])
+
+        # 获取参数qzonetoken
+        urllib3.disable_warnings()
+        target_url = 'https://user.qzone.qq.com/' + self.qq_number
+        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+        qzonetoken = re.findall(r'{ try{return "(.+?)";', html.text)
+        qzonetoken = qzonetoken[0]
+
+
+        # 获取我在意谁数据
+        target_url = 'https://user.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/friendship/cgi_friendship?activeuin=' + self.qq_number +'&passiveuin=' + str(number) + '&situation=1&isCalendar=1&g_tk=' + str(bkn) + '&qzonetoken=' + str(qzonetoken) + '&g_tk=' + str(bkn)
+        urllib3.disable_warnings()
+        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+
+        # 处理返回数据
+        result_data = (html.text).replace('_Callback(','')
+        result_data = result_data[:len(result_data)-2]
+        # 将返回数据转化为python对象
+        result_data = loads(result_data)
+
+        print(result_data)
 

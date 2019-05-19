@@ -8,7 +8,6 @@ from execjs import compile
 # 根据javascript版的加密函数，将其改写成python版本
 def hash33_token(t):
     e, n = 0, len(t)
-
     for i in range(0,n):
         e += (e << 5) + ord(t[i])
 
