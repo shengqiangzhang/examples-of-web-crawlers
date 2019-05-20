@@ -9,9 +9,8 @@ from threading import Thread
 from os.path import exists
 from os import makedirs
 from shutil import rmtree
-import base64
+from base64 import b64decode
 import time
-from pyecharts import Bar
 
 
 # 初始化所需文件夹
@@ -41,7 +40,7 @@ def write_data():
         # 保存qq_icon图片到本地data目录
         with open('data/' + name + '.png', 'wb') as file:
             # 解码图片
-            png = base64.b64decode(key_dict[name])
+            png = b64decode(key_dict[name])
             # 将解码得到的数据写入到图片中
             file.write(png)
 
@@ -134,6 +133,9 @@ def generate_data():
     # 更新一下欲输出的markdown文本
     markdown_content += content
     markdown_content += '\n> 注：单向好友表示他/她的列表中有你，而你的列表中没有他/她'
+    # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
+    with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
+        file.write(markdown_content)
 
 
 
@@ -145,30 +147,10 @@ def generate_data():
     # 获取所有qq好友的备注名和qq号
     all_qq_friends = bot.get_all_friends_in_qq()
     custom_print(u'所有qq好友号码和备注名中...')
-    qq_number_length = {}
     qq_number_list = []
     for key, friend_group in all_qq_friends.items():
         for info in friend_group['mems']:
-            length = len(str(info['uin']))
             qq_number_list.append(info['uin'])
-            if length not in qq_number_length.keys():
-                qq_number_length.update({length:0})
-            else:
-                count = qq_number_length[length] + 1
-                qq_number_length.update({length: count})
-
-    # pyechart绘图
-    bar = Bar()
-    bar.add(name='', x_axis=[str(x)+'位数' for x in qq_number_length.keys()], y_axis=[qq_number_length[x] for x in qq_number_length.keys()])
-    bar.render('data/qq_number_count.html')
-
-    # content为markdown语法文本
-    content = '\n\n<br/><br/>\n' + '## QQ好友位数\n'
-    content += '<iframe height=450 width=999 src="data/qq_number_count.html" frameborder=0 allowfullscreen> </iframe>'
-    # 更新一下欲输出的markdown文本
-    markdown_content += content
-
-
 
 
 
@@ -188,6 +170,9 @@ def generate_data():
 
     # 更新一下欲输出的markdown文本
     markdown_content += content
+    # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
+    with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
+        file.write(markdown_content)
 
 
 
@@ -215,6 +200,9 @@ def generate_data():
     content += '\n\n'
     # 更新一下欲输出的markdown文本
     markdown_content += content
+    # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
+    with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
+        file.write(markdown_content)
 
 
 
@@ -236,6 +224,9 @@ def generate_data():
     content += '\n\n'
     # 更新一下欲输出的markdown文本
     markdown_content += content
+    # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
+    with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
+        file.write(markdown_content)
 
 
 
@@ -283,27 +274,74 @@ def generate_data():
     content += '\n\n'
     # 更新一下欲输出的markdown文本
     markdown_content += content
+    # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
+    with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
+        file.write(markdown_content)
 
 
 
 
 
     # 亲密度排行榜 谁在意我
-    bot.who_care_about_me()
-    bot.i_care_about_who()
+    custom_print(u'分析好友亲密度数据-谁在意我...')
+    # content为markdown语法文本
+    content = '\n\n<br/><br/>\n' + '## 谁在意我\n'
+    data_list = bot.who_care_about_me()
+    n = 10
+    if(len(data_list) < 10):
+        n = len(data_list)
 
-    # 获取成为好友天数以及共同好友和共同群
-    print(qq_number_list)
-    for i in qq_number_list:
-        bot.qzone_friendship(i)
+    if (len(data_list) > 0):
+        content += '序号|头像|QQ|亲密度\n:- | :-| :-| :-\n'
+        for index, sub_data in enumerate(data_list[:n]):
+            uin = sub_data['uin']
+            score = sub_data['score']
+            profile = bot.get_profile_picture(uin, size=40)
+            with open('data/' + str(uin) + '.jpg', 'wb') as f:
+                f.write(profile)
+            content += '{}|![](data/{}.jpg)|{}|{}\n'.format(index, uin, uin, score)
+
+        # 更新一下欲输出的markdown文本
+        markdown_content += content
+        # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
+        with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
+            file.write(markdown_content)
 
 
 
-    # 输出markdown文件
+
+
+    # 亲密度排行榜 我在意谁
+    custom_print(u'分析好友亲密度数据-我在意谁...')
+    # content为markdown语法文本
+    content = '\n\n<br/><br/>\n' + '## 我在意谁\n'
+    data_list = bot.i_care_about_who()
+    n = 10
+    if(len(data_list) < 10):
+        n = len(data_list)
+
+    if (len(data_list) > 0):
+        content += '序号|头像|QQ|亲密度\n:- | :-| :-| :-\n'
+        for index, sub_data in enumerate(data_list[:n]):
+            uin = sub_data['uin']
+            score = sub_data['score']
+            profile = bot.get_profile_picture(uin, size=40)
+            with open('data/' + str(uin) + '.jpg', 'wb') as f:
+                f.write(profile)
+            content += '{}|![](data/{}.jpg)|{}|{}\n'.format(index, uin, uin, score)
+
+        # 更新一下欲输出的markdown文本
+        markdown_content += content
+        # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
+        with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
+            file.write(markdown_content)
+
+
+
+
+    # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
     with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
         file.write(markdown_content)
-
-
     custom_print(u'所有数据获取完毕, 并生成了一份报告文件:[{}的个人QQ历史报告.md], 该文件为markdown格式文件, 请下载typora软件以便查看该格式文件, 下载地址为https://typora.io/#windows'.format(bot.qq_number))
 
 if __name__ == "__main__":

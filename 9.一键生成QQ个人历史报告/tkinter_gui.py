@@ -1,6 +1,11 @@
 # -*- coding:utf-8 -*-
 
-from tkinter import *
+from tkinter import Tk
+from tkinter import Label
+from tkinter import Frame
+from tkinter import Text
+from tkinter import Scrollbar
+from tkinter.constants import *
 
 # 创建一个根窗口，其余的控件都要在这个窗口上面
 root = Tk()

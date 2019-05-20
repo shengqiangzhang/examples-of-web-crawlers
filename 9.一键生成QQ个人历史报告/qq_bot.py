@@ -682,8 +682,7 @@ class Bot(object):
         result_data = loads(result_data)
         result_data = result_data['data']['items_list']
 
-
-        print(result_data)
+        return result_data
 
 
 
@@ -713,8 +712,7 @@ class Bot(object):
         result_data = loads(result_data)
         result_data = result_data['data']['items_list']
 
-
-        print(result_data)
+        return result_data
 
 
 
