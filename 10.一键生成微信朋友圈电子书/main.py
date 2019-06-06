@@ -3,30 +3,61 @@ from selenium import webdriver
 import selenium.webdriver.support.expected_conditions as EC
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.common.keys import Keys
+from os.path import exists
+from os import makedirs
+from shutil import rmtree
 import time
+
+# 初始化所需文件夹
+def init_folders():
+
+    for dir in ['img_data']:
+        if(not exists(dir)):
+            # 目录不存在时则创建
+            makedirs(dir)
+        else:
+            # 目录存在时则先删除递归删除该目录再重新创建
+            rmtree(dir)
+            makedirs(dir)
 
 
 if __name__ == '__main__':
 
-    # 屏蔽chrome提示
+    # chromedriver驱动文件的位置，可输入绝对路径或者相对路径，./表示当前目录下
+    # './chromedriver_win32.exe'表示当前目录下的chromedriver_win32.exe文件
+    # 不同系统和不同chrome版本需要下载不同的chromedriver，请下载合适自己的版本
+    # 下载地址http://chromedriver.chromium.org/downloads
+    chromedriver_path = './chromedriver_mac64_74'
+
+    # 你的微信朋友圈数据地址，注意不要泄露给其他人
+    target_url = 'https://chushu.la/book/chushula-918509291'
+
+
+
+
+
+
+    # 初始化相关目录
+    init_folders()
+
+
+    # 屏蔽chrome的提示
     option = webdriver.ChromeOptions()
     option.add_argument('disable-infobars')
 
-    # 不同系统和不同chrome版本下载不同的chromedriver，请下载合适的版本
-    # 下载地址http://chromedriver.chromium.org/downloads
-    driver = webdriver.Chrome(executable_path='./chromedriver_mac64_74', options=option)
+    # 绑定Chrome和chromedriver，不同Chrome版本对应的chromedriver是不同的，请注意
+    driver = webdriver.Chrome(executable_path=chromedriver_path, options=option)
 
-    # 将浏览器最大化显示
+    # 将浏览器最大化显示，使得截图效果更好
     driver.maximize_window()
-    # 延迟2秒
+    # 延迟2秒，给最大化过程一点时间
     time.sleep(2)
 
-    # 浏览网页
-    driver.get('https://chushu.la/book/chushula-918509291')
+    # 模拟浏览指定网页
+    driver.get(target_url)
 
 
-    # 无限翻页，直到最后翻到一页
+    # 开始无限翻页，直到最后翻到一页
     for i in range(0, 10000):
 
         # 等待 下一月控件 出现
@@ -79,11 +110,11 @@ if __name__ == '__main__':
         # 开始截图朋友圈数据元素，分为左右页
         for index, element in enumerate(element_left_list):
             if(element.is_displayed() == True):
-                element.screenshot('{}-{}-left.png'.format(i, index))
+                element.screenshot('img_data/' + '{}-{}-0.png'.format(i, index))
 
         for index, element in enumerate(element_right_list):
             if(element.is_displayed() == True):
-                element.screenshot('{}-{}-right.png'.format(i, index))
+                element.screenshot('img_data/' + '{}-{}-1.png'.format(i, index))
 
 
         # 判断当下一月控件的class name 是否为next-month disable，如果是，则说明翻到最后一页了，可以跳出循环了，否则模拟点击下一月控件
