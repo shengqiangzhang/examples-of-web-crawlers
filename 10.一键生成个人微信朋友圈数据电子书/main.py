@@ -31,8 +31,7 @@ if __name__ == '__main__':
     # chromedriver驱动文件的位置，可输入绝对路径或者相对路径，./表示当前目录下
     # './chromedriver_win32.exe'表示当前目录下的chromedriver_win32.exe文件
     # 不同系统和不同chrome版本需要下载不同的chromedriver，请下载合适自己的版本
-    # chromedriver下载地址http://chromedriver.chromium.org/downloads
-    # 默认的chromedriver支持的Chrome版本为74
+    # 下载地址http://chromedriver.chromium.org/downloads
     chromedriver_path = './chromedriver_win32_74.0.3729.6.exe'
 
     # 你的微信朋友圈数据地址，注意不要泄露给其他人
@@ -50,7 +49,8 @@ if __name__ == '__main__':
         "recentDestinations": [
             {
                 "id": "Save as PDF",
-                "origin": "local"
+                "origin": "local",
+                "account":""
             }
         ],
         # 选择保存为pdf选项
@@ -61,6 +61,7 @@ if __name__ == '__main__':
         "isHeaderFooterEnabled": False
     }
 
+    
     profile = {
         # 打印前置参数
         'printing.print_preview_sticky_settings.appState': json.dumps(appState),
