@@ -5,8 +5,10 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from os.path import exists
 from os import makedirs
+from os import listdir
 from shutil import rmtree
 import time
+from PIL import Image
 
 # 初始化所需文件夹
 def init_folders():
@@ -19,6 +21,30 @@ def init_folders():
             # 目录存在时则先删除递归删除该目录再重新创建
             rmtree(dir)
             makedirs(dir)
+
+
+# 拼接所有图片成一张长图
+def merge_picture():
+
+    # 获取img_dat目录下所有Png图像
+    ims = [Image.open('img_data/' + fn) for fn in listdir('img_data') if fn.endswith('.png')]
+
+    # 获取单张图片的尺寸
+    width, height = ims[0].size
+
+    # 创建一个空白的长图
+    result = Image.new(ims[0].mode, (width, height * len(ims)))
+
+    # 拼接图片
+    for i, im in enumerate(ims):
+        print(u'({}/{})正在拼接朋友圈数据中，请耐心等待……'.format(i+1, len(ims)))
+        result.paste(im, box=(0, i * height))
+
+    # 保存长图
+    print(u'拼接完成，正在保存到本地文件中，请耐心等待……')
+    result.save('朋友圈数据.png')
+    print(u'保存成功，文件名为[朋友圈数据.png]，存放于当前目录下')
+
 
 
 if __name__ == '__main__':
@@ -39,7 +65,6 @@ if __name__ == '__main__':
 
     # 初始化相关目录
     init_folders()
-
 
     # 屏蔽chrome的提示
     option = webdriver.ChromeOptions()
@@ -135,6 +160,12 @@ if __name__ == '__main__':
 
     # 延时1秒
     time.sleep(1)
+
+    # 拼接所有图片成一张长图
+    merge_picture()
+
+    # 提示
+    print(u'拼接完毕')
 
     # 关闭浏览器
     driver.quit()
