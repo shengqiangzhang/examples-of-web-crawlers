@@ -7,6 +7,7 @@ from platform import system
 import time
 import json
 import os
+import random
 
 # 引入打开文件所用的库
 # Window与Linux和Mac OSX有所不同
@@ -25,6 +26,67 @@ else:
     open_pdf_file = lambda x: call(["xdg-open", x])
 
 
+# 以网页输入文本框形式提示用户输入url地址
+def input_url():
+
+    while(True):
+
+        # js脚本
+        random_id = [str(random.randint(0, 9)) for i in range(0,10)]
+        random_id = "".join(random_id)
+        random_id = 'id_input_target_url_' + random_id
+        js = """
+            // 弹出文本输入框，输入微信书的完整链接地址
+            target_url = prompt("请输入微信书的完整链接地址","https://");
+            
+            // 动态创建一个input元素
+            input_target_url = document.createElement("input");
+            // 为其设置id，以便在程序中能够获取到它的值
+            input_target_url.id = "id_input_target_url";
+            
+            // 插入到当前网页中
+            document.getElementsByTagName("body")[0].appendChild(input_target_url);
+            
+            // 设置不可见
+            document.getElementById("id_input_target_url").style.display = 'none';
+            
+            // 设置value为target_url的值
+            document.getElementById("id_input_target_url").value = target_url
+        """
+        js = js.replace('id_input_target_url', random_id)
+
+
+        # 执行以上js脚本
+        driver.execute_script(js)
+
+        # 判断弹出框是否存在
+        while(True):
+            try:
+                # 检测是否存在弹出框
+                alert = driver.switch_to.alert
+                time.sleep(0.5)
+            except:
+                # 如果抛异常，说明当前页面不存在弹出框，即用户点击了取消或者确定
+                break
+
+
+        # 获取用户输入的链接地址
+        target_url = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, random_id)))
+        value = target_url.get_attribute('value')
+        # 删除空格
+        value = value.strip()
+
+
+        # 判断输入的链接地址是否正确
+        if( value != '' and 'https://chushu.la' in value):
+            break
+
+
+    return value
+
+
+
+
 if __name__ == '__main__':
 
 
@@ -33,12 +95,10 @@ if __name__ == '__main__':
     # 不同系统和不同chrome版本需要下载不同的chromedriver，请下载合适自己的版本
     # chromedriver下载地址http://chromedriver.chromium.org/downloads
     # 默认的chromedriver支持的Chrome版本为74
-    chromedriver_path = './chromedriver_win32_74.0.3729.6.exe'
+    # chromedriver_path = './chromedriver_win32_74.0.3729.6.exe'
+    chromedriver_path = './chromedriver_mac_74.0.3729.6'
 
-    # 你的微信朋友圈数据地址，注意不要泄露给其他人
-    # 在调试过程中，可以直接给target_url赋值
-    target_url = input(u'请输入你的微信书完整地址:')
-    # target_url = 'https://chushu.la/book/chushula-918509291'
+
 
 
     option = webdriver.ChromeOptions()
@@ -84,6 +144,12 @@ if __name__ == '__main__':
 
     # 延迟2秒，给最大化过程一点时间
     time.sleep(2)
+
+
+
+    # 你的微信朋友圈数据地址，注意不要泄露给其他人
+    # 在调试过程中，可以直接给target_url赋值
+    target_url = input_url()
 
     # 模拟浏览指定网页
     driver.get(target_url)
