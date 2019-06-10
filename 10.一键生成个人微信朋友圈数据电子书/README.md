@@ -24,7 +24,7 @@
 ![](image/page1.png)
 ![](image/page2.png)
 
-### 纸质书效果
+### 纸质书效果(图片引用自[心书](https://weixinshu.com/library/unboxing))
 ![](image/page3.jpeg)
 
 
