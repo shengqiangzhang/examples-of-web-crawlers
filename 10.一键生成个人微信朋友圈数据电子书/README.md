@@ -201,6 +201,8 @@ while(True):
 
 其中，`document.getElementsByClassName("lazy-img")[0]`指的是`document.getElementsByClassName("lazy-img")`的第一个元素，`scrollIntoView()`指的是滚动到该元素的位置
 
+有时候测试比较长的朋友圈页面，最后几页的图片仍然会出现处于加载状态的情况。
+这时候可以在打印代码前增加一个input()函数暂停，用手工翻页的方法确保全部页面都加载成功，最后再输入任意字符打印。
 
 #### 打印电子书
 
