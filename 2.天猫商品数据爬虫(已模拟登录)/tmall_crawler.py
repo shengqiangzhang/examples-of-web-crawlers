@@ -123,7 +123,23 @@ class taobao_infos:
 
         # 对天猫商品数据进行爬虫
         self.browser.get("https://list.tmall.com/search_product.htm?q=羽毛球")
+        err1 = self.browser.find_element_by_xpath("//*[@id='content']/div/div[2]").text
+        err1 = err1[:5]
+        if(err1 == "喵~没找到"):
+            print("找不到您要的")
+            return
+        try:
+            self.browser.find_element_by_xpath("//*[@id='J_ComboRec']/div[1]")
+            err2 = self.browser.find_element_by_xpath("//*[@id='J_ComboRec']/div[1]").text
+            #print(err2)
+            
+            err2 = err2[:5]
 
+            if(err2 == "我们还为您"):
+                print("您要查询的商品书目太少了")
+                return
+        except:
+            print("可以爬取这些信息")
         # 获取天猫商品总共的页数
         page_total = self.search_toal_page()
         print("总共页数" + page_total)
