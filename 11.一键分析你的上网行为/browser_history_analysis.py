@@ -13,7 +13,7 @@ from platform import system
 import os
 import shutil
 import sqlite3
-HOME = os.environ['HOME']
+
 
 
 
@@ -28,16 +28,19 @@ def get_history_file_path():
     file_path = ""
 
     if('Windows' in sys_str):
-        print('Windows')
+        # print('Windows')
+        home = os.environ['HOMEPATH']
         file_path = ""
     elif('Darwin' in sys_str):
-        print('macOSX')
-        file_path = HOME + "/Library/Application Support/Google/Chrome/Default/History"
+        # print('macOSX')
+        home = os.environ['HOME']
+        file_path = home + "/Library/Application Support/Google/Chrome/Default/History"
     elif('Linux' in sys_str):
-        print('Linux')
+        # print('Linux')
+        home = os.environ['HOME']
         file_path = ""
     else:
-        print('unknown')
+        # print('unknown')
         file_path = ""
 
     print(file_path)
