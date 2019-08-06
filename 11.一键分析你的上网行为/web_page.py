@@ -59,8 +59,14 @@ app.layout = html.Div([
         ]
     ),
 
-
+    # 顶层菜单
     html.Div(
+
+    ),
+
+    # 页面访问次数排名
+    html.Div(
+        style={'margin-bottom':'150px'},
         children=[
             html.Div(
                 style={'border-top-style':'solid', 'border-bottom-style':'solid'},
@@ -77,9 +83,46 @@ app.layout = html.Div([
                     dcc.Input(
                         id='input_website_count_rank',
                         type='text',
-                        value=20,
+                        value=10,
                         style={'margin-top':'10px', 'margin-bottom':'10px'}
                     ),
+                ]
+            ),
+
+
+            html.Div(
+                style={'position': 'relative', 'margin': '0 auto', 'width': '100%', 'padding-bottom': '50%', },
+                children=[
+                    dcc.Loading(
+                        children=[
+                            dcc.Graph(
+                                id='graph_website_count_rank',
+                                style={'position': 'absolute', 'width': '100%', 'height': '100%', 'top': '0',
+                                       'left': '0', 'bottom': '0', 'right': '0'},
+                                config={'displayModeBar': False},
+                            ),
+                        ],
+                        type='dot',
+                        style={'position': 'absolute', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%,-50%)'}
+                    ),
+                ],
+            )
+        ]
+    ),
+
+
+    # 每日访问次数连接图
+    html.Div(
+        style={'margin-bottom':'150px'},
+        children=[
+            html.Div(
+                style={'border-top-style': 'solid', 'border-bottom-style': 'solid'},
+                className='row',
+                children=[
+                    html.Span(
+                        children='每日访问次数',
+                        style={'font-weight': 'bold', 'color': 'red'}
+                    )
                 ]
             ),
 
@@ -89,7 +132,7 @@ app.layout = html.Div([
                     dcc.Loading(
                         children=[
                             dcc.Graph(
-                                id='graph_website_count_rank',
+                                id='graph_day_count_rank',
                                 style={'position': 'absolute', 'width': '100%', 'height': '100%', 'top': '0',
                                        'left': '0', 'bottom': '0', 'right': '0'},
                                 config={'displayModeBar': False},
@@ -143,6 +186,15 @@ def get_top_k_from_dict(origin_dict, k):
 
     return new_dict
 
+
+# 对时间字典进行升序排序
+def sort_time_dict(origin_dict):
+    new_data = sorted(origin_dict.items(), key=lambda item: time.mktime(time.strptime(item[0], "%Y-%m-%d")), reverse=False)
+    new_dict = {}
+    for l in new_data:
+        new_dict[l[0]] = l[1]
+
+    return new_dict
 
 
 # 转化为数字
@@ -216,6 +268,59 @@ def plot_bar_website_count_rank(value):
 
 
 
+# 绘制 每日访问次数 散点图
+def plot_scatter_website_count_rank():
+    global history_data
+
+    # 频率字典
+    dict_data = {}
+
+    # 对历史记录文件进行遍历
+    for data in history_data:
+        date_time = data[5]
+
+        # 由于Chrome浏览器在sqlite中存储的时间是以1601-01-01 00:00:00 为起始时间点的微妙计数
+        # 与Unix时间戳存在时间间隔，所以需要转换
+        unix_time_samp = (date_time / 1000000) - 11644473600
+        key = time.strftime("%Y-%m-%d", time.gmtime(unix_time_samp))
+
+
+        if (key in dict_data.keys()):
+            dict_data[key] += 1
+        else:
+            dict_data[key] = 0
+
+    # 对字典按key进行时间排序
+    dict_sort_data = sort_time_dict(dict_data)
+    # print(dict_sort_data)
+    max_value_dict = max([i for i in dict_sort_data.values()])
+
+    figure = go.Figure(
+        data=[
+            go.Scatter(
+                x=[i for i in dict_sort_data.keys()],
+                y=[i for i in dict_sort_data.values()],
+                name='lines+markers',
+                mode='lines+markers',
+                marker_color='rgba(55, 83, 109, .8)',
+                marker=dict(size=[(i/max_value_dict)*30 for i in dict_sort_data.values()])
+            )
+        ],
+
+        layout=go.Layout(
+            showlegend=False,
+            margin=go.layout.Margin(l=40, r=0, t=40, b=30),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            xaxis=dict(title='时间'),
+            yaxis=dict(title='次数')
+        )
+    )
+
+    return figure
+
+
+
 
 
 
@@ -249,6 +354,31 @@ def update(value, auto_find_text_flag):
 
 
 
+
+# 每日访问次数
+@app.callback(
+    dash.dependencies.Output('graph_day_count_rank', 'figure'),
+    [
+        dash.dependencies.Input('auto_find_text_flag', 'value')
+    ]
+)
+def update(auto_find_text_flag):
+
+    global history_data
+    # 正确获取到历史记录文件
+    if (history_data != 'error' and auto_find_text_flag == 1):
+        figure = plot_scatter_website_count_rank()
+        return figure
+    else:
+        # 取消更新页面数据
+        raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
+
+
+
+
 # 判断是否自动寻找到历史记录文件
 @app.callback(
     dash.dependencies.Output('auto_find_text_flag', 'value'),
@@ -263,8 +393,8 @@ def update(value):
         # 获取历史记录数据
         global history_data
         history_data = get_history_data()
-        for i in history_data:
-            print(i)
+        # for i in history_data:
+        #     print(i)
 
         if(history_data != 'error'):
             # 找到
@@ -276,12 +406,16 @@ def update(value):
         return 0
 
 
+
+
+
+
+
+
 # 开始运行web服务器
 if __name__ == '__main__':
 
-    time_c = 13209575098047540 / 1000000 - 11644473600
-    print(time_c)
-    print(time.strftime("%Y-%m-%d %X", time.gmtime(time_c)))
+
 
     # 初始化历史记录文件，默认为error状态，即未找到状态
     # 在web页面刷新时，自动触发回调，更新history_data的值
