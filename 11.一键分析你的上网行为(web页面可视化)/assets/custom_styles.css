@@ -1,0 +1,11 @@
+/* Removes Undo Button
+–––––––––––––––––––––––––––––––––––––––––––––––––– */
+
+
+._dash-undo-redo {
+	display: none;
+}
+
+html {
+	overflow-y: scroll;
+}
