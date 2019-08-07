@@ -4,7 +4,6 @@
 - **注意说明**: `%USERNAME%`为你的用户名
 
 <br />
-<br />
 
 ## Windows XP
 
@@ -12,7 +11,6 @@
 
 - **注意说明**: `%USERNAME%`为你的用户名
 
-<br />
 <br />
 
 ## Mac OS X
@@ -23,7 +21,6 @@
 
 - **注意说明**: `Application Support`中的空格需要转义，所以改为`Application\ Support`
 
-<br />
 <br />
 
 ## Linux/Unix
