@@ -9,6 +9,7 @@
 ## Windows XP
 
 历史记录文件位置: `C:\Documents and Settings\%USERNAME%\Local Settings\Application Data\Google\Chrome\User Data\Default\History`
+
 **注意说明**: `%USERNAME%`为你的用户名
 
 <br />
