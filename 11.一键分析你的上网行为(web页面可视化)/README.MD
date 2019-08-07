@@ -23,7 +23,7 @@
 
 <br />
 
-## Linux/Unix
+## Linux/ Unix
 - 历史记录文件位置:  `~/.config/google-chrome/Default/History`
 
 - 拷贝历史记录文件到桌面: `cp ~/.config/google-chrome/Default/History ~/Desktop/History`
