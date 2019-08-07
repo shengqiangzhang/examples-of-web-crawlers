@@ -3,7 +3,7 @@
 
 """
 @project: PyCharm
-@file: web_page.py
+@file: app.py
 @author: Shengqiang Zhang
 @time: 2019/8/6 02:53
 @mail: sqzhang77@gmail.com
@@ -14,9 +14,10 @@ import dash
 import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
-from dash.dependencies import Input, Output, State
+import dash_table
+
 import time
-from datetime import datetime
+
 
 # dash是一款基于python的web轻量级框架，无需js即可轻松运行
 # 适合用于比较简单的web页面的快速部署，如数据可视化，图表展示等
@@ -32,6 +33,7 @@ app.title = 'Browser History Analysis'
 # 加载本地css和js文件
 app.css.config.serve_locally = True
 app.scripts.config.serve_locally = True
+
 
 
 # html元素布局
@@ -111,7 +113,7 @@ app.layout = html.Div([
     ),
 
 
-    # 每日访问次数连接图
+    # 每日访问次数散点图
     html.Div(
         style={'margin-bottom':'150px'},
         children=[
@@ -146,6 +148,61 @@ app.layout = html.Div([
         ]
     ),
 
+    # 访问次数最多的10个URL
+    html.Div(
+        style={'margin-bottom': '150px'},
+        children=[
+            html.Div(
+                style={'border-top-style': 'solid', 'border-bottom-style': 'solid'},
+                className='row',
+                children=[
+                    html.Span(
+                        children='访问次数最多的100个URL',
+                        style={'font-weight': 'bold', 'color': 'red'}
+                    )
+                ]
+            ),
+
+            html.Div(
+                style={"overflowY": "scroll"},
+                children=[
+                    dash_table.DataTable(
+                        id='table_url_count_rank',
+                        columns=[
+                            {'name': '编号', 'id': 'id'},
+                            {'name': '网页地址', 'id': 'url'},
+                            {'name': '网页标题', 'id': 'title'},
+                            {'name': '访问次数', 'id': 'count'}
+                        ],
+                        data=[
+                            {'id': '0', 'url': '初始化', 'title': '初始化', 'count': '初始化'}
+                        ],
+                        style_header={
+                            'fontWeight': 'bold',
+                            'backgroundColor': 'white',
+                            'borderBottom': '1px solid black',
+                        },
+                        style_cell={
+                            'textAlign': 'left',
+                            'fontSize': '15px',
+                            'border': '1px solid grey'
+                        },
+                        style_table={
+                            'minHeight': '1px',
+                            'maxHeight': '400px',
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(248, 248, 248)'
+                            }
+                        ]
+
+                    )
+                ],
+            )
+        ]
+    ),
 
 ])
 
@@ -169,7 +226,7 @@ def url_simplification(url):
         return tmp_url
 
 
-# 获取字典的前k个最大的子集合
+# 获取字典的前k个最大的子集合，按value
 def get_top_k_from_dict(origin_dict, k):
     origin_dict_len = len(origin_dict)
     n = k
@@ -178,6 +235,24 @@ def get_top_k_from_dict(origin_dict, k):
         n = origin_dict_len
 
     new_data = sorted(origin_dict.items(), key=lambda item: item[1], reverse=True)
+    new_data = new_data[:n]
+
+    new_dict = {}
+    for l in new_data:
+        new_dict[l[0]] = l[1]
+
+    return new_dict
+
+
+# 获取字典的前k个最大的子集合，按value中的第1个值
+def get_top_k_from_dict_value_1(origin_dict, k):
+    origin_dict_len = len(origin_dict)
+    n = k
+
+    if(n > origin_dict_len):
+        n = origin_dict_len
+
+    new_data = sorted(origin_dict.items(), key=lambda item: item[1][0], reverse=True)
     new_data = new_data[:n]
 
     new_dict = {}
@@ -322,7 +397,43 @@ def plot_scatter_website_count_rank():
 
 
 
+# 返回 访问次数最多的URL 的数据
+def table_data_url_count_rank():
+    global history_data
 
+    # 频率字典
+    dict_data = {}
+
+    # 对历史记录文件进行遍历
+    for data in history_data:
+        url_id = data[0]
+        key = url_id
+
+        if (key in dict_data.keys()):
+            # 存储url访问次数
+            dict_data[key][0] += 1
+            # 存储url地址
+            dict_data[key][1] = data[1]
+            # 存储url标题
+            dict_data[key][2] = data[2]
+
+        else:
+            dict_data[key] = [0, '', '']
+
+
+
+    # 筛选出前k=10个频率最高的数据
+    top_k_dict = get_top_k_from_dict_value_1(dict_data, 100)
+    # print(top_k_dict)
+
+    # 返回的table data数据
+    table_data = []
+
+    for index, item in enumerate(top_k_dict.items()):
+        table_data.append({'id': index+1, 'url': item[1][1], 'title': item[1][2], 'count': item[1][0]})
+
+
+    return table_data
 
 
 
@@ -378,6 +489,27 @@ def update(auto_find_text_flag):
 
 
 
+# 访问次数最多的URL
+@app.callback(
+    dash.dependencies.Output('table_url_count_rank', 'data'),
+    [
+        dash.dependencies.Input('auto_find_text_flag', 'value')
+    ]
+)
+def update(auto_find_text_flag):
+
+    global history_data
+    # 正确获取到历史记录文件
+    if (history_data != 'error' and auto_find_text_flag == 1):
+        table_data = table_data_url_count_rank()
+        return table_data
+    else:
+        # 取消更新页面数据
+        raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
+
 
 # 判断是否自动寻找到历史记录文件
 @app.callback(
@@ -393,8 +525,8 @@ def update(value):
         # 获取历史记录数据
         global history_data
         history_data = get_history_data()
-        # for i in history_data:
-        #     print(i)
+        for i in history_data:
+            print(i)
 
         if(history_data != 'error'):
             # 找到
