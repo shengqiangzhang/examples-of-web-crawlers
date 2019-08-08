@@ -65,6 +65,8 @@ app.layout = html.Div([
 
     # fork me on github 挂件
     html.Div(
+        # 设置这个div位于最顶层，防止被其他DIV覆盖
+        style={'z-index': 9999},
         children=[
             html.A(
                 href='https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/11.%E4%B8%80%E9%94%AE%E5%88%86%E6%9E%90%E4%BD%A0%E7%9A%84%E4%B8%8A%E7%BD%91%E8%A1%8C%E4%B8%BA(web%E9%A1%B5%E9%9D%A2%E5%8F%AF%E8%A7%86%E5%8C%96)',
@@ -223,6 +225,50 @@ app.layout = html.Div([
             )
         ]
     ),
+
+
+
+    # 某日不同时刻访问次数散点图
+    html.Div(
+        style={'margin-bottom': '150px'},
+        children=[
+            html.Div(
+                style={'border-top-style': 'solid', 'border-bottom-style': 'solid'},
+                className='row',
+                children=[
+                    html.Span(
+                        children='某日不同时刻访问次数, 选择时刻: ',
+                        style={'font-weight': 'bold', 'color': 'red'}
+                    ),
+
+                    dcc.Dropdown(
+                        id = 'dropdown_time_1'
+                    )
+                ]
+            ),
+
+            html.Div(
+                style={'position': 'relative', 'margin': '0 auto', 'width': '100%', 'padding-bottom': '50%', },
+                children=[
+                    dcc.Loading(
+                        children=[
+                            dcc.Graph(
+                                id='graph_day_diff_time_count',
+                                style={'position': 'absolute', 'width': '100%', 'height': '100%', 'top': '0',
+                                       'left': '0', 'bottom': '0', 'right': '0'},
+                                config={'displayModeBar': False},
+                            ),
+                        ],
+                        type='dot',
+                        style={'position': 'absolute', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%,-50%)'}
+                    ),
+                ],
+            )
+        ]
+    ),
+
+
+
 
     # 访问次数最多的10个URL
     html.Div(
