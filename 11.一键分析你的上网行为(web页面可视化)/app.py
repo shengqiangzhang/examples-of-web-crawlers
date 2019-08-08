@@ -15,6 +15,7 @@ import dash_core_components as dcc
 import dash_html_components as html
 import plotly.graph_objs as go
 import dash_table
+from dash_table.Format import Format, Scheme, Sign, Symbol
 
 import time
 
@@ -61,10 +62,24 @@ app.layout = html.Div([
         ]
     ),
 
-    # 顶层菜单
-    html.Div(
 
+    # fork me on github 挂件
+    html.Div(
+        children=[
+            html.A(
+                href='https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/11.%E4%B8%80%E9%94%AE%E5%88%86%E6%9E%90%E4%BD%A0%E7%9A%84%E4%B8%8A%E7%BD%91%E8%A1%8C%E4%B8%BA(web%E9%A1%B5%E9%9D%A2%E5%8F%AF%E8%A7%86%E5%8C%96)',
+                target='_blank',
+                children=[
+                    html.Img(
+                        src='https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67',
+                        alt='Fork me on GitHub',
+                        style={'position': 'absolute', 'top': 0, 'right': 0, 'border': 0}
+                    )
+                ]
+            )
+        ]
     ),
+
 
     # 页面访问次数排名
     html.Div(
@@ -113,7 +128,68 @@ app.layout = html.Div([
     ),
 
 
-    # 每日访问次数散点图
+    # 页面访问停留时间排名
+    html.Div(
+        style={'margin-bottom': '150px'},
+        children=[
+            html.Div(
+                style={'border-top-style': 'solid', 'border-bottom-style': 'solid'},
+                className='row',
+                children=[
+                    html.Span(
+                        children='页面访问停留时间排名',
+                        style={'font-weight': 'bold', 'color': 'red'}
+                    )
+                ]
+            ),
+
+            html.Div(
+                style={"overflowY": "scroll"},
+                children=[
+                    dash_table.DataTable(
+                        id='table_url_time_rank',
+                        columns=[
+                            {'name': '编号', 'id': 'id'},
+                            {'name': '停留时间', 'id': 'count', 'type': 'numeric', 'format': Format(nully='N/A', precision=2, scheme=Scheme.decimal, sign=Sign.parantheses, symbol=Symbol.yes, symbol_suffix=u'小时')},
+                            {'name': '网页地址', 'id': 'url'},
+                            {'name': '网页标题', 'id': 'title'}
+
+                        ],
+                        data=[
+                            {'id': '0', 'url': '初始化', 'title': '初始化', 'count': '初始化'}
+                        ],
+                        style_header={
+                            'fontWeight': 'bold',
+                            'backgroundColor': 'white',
+                            'borderBottom': '1px solid black',
+                        },
+                        style_cell={
+                            'textAlign': 'left',
+                            'fontSize': '15px',
+                            'border': '1px solid grey'
+                        },
+                        style_table={
+                            'minHeight': '1px',
+                            'maxHeight': '400px',
+                        },
+                        style_data_conditional=[
+                            {
+                                'if': {'row_index': 'odd'},
+                                'backgroundColor': 'rgb(248, 248, 248)'
+                            }
+                        ]
+
+                    )
+                ],
+            )
+        ]
+    ),
+
+
+
+
+
+    # 每日页面访问次数散点图
     html.Div(
         style={'margin-bottom':'150px'},
         children=[
@@ -122,7 +198,7 @@ app.layout = html.Div([
                 className='row',
                 children=[
                     html.Span(
-                        children='每日访问次数',
+                        children='每日页面访问次数',
                         style={'font-weight': 'bold', 'color': 'red'}
                     )
                 ]
@@ -170,9 +246,9 @@ app.layout = html.Div([
                         id='table_url_count_rank',
                         columns=[
                             {'name': '编号', 'id': 'id'},
+                            {'name': '访问次数', 'id': 'count'},
                             {'name': '网页地址', 'id': 'url'},
-                            {'name': '网页标题', 'id': 'title'},
-                            {'name': '访问次数', 'id': 'count'}
+                            {'name': '网页标题', 'id': 'title'}
                         ],
                         data=[
                             {'id': '0', 'url': '初始化', 'title': '初始化', 'count': '初始化'}
@@ -437,6 +513,44 @@ def table_data_url_count_rank():
 
 
 
+# 返回 页面访问总时间的URL的数据
+def table_data_url_time_rank():
+    global history_data
+
+    # 频率字典
+    dict_data = {}
+
+    # 对历史记录文件进行遍历
+    for data in history_data:
+        url_id = data[0]
+        key = url_id
+
+        if (key in dict_data.keys()):
+            # 存储url访问时间(小时)，精确到小数点后两位
+            dict_data[key][0] += round(data[8]/1000000/3600, 2)
+            # 存储url地址
+            dict_data[key][1] = data[1]
+            # 存储url标题
+            dict_data[key][2] = data[2]
+
+        else:
+            dict_data[key] = [0.0, '', '']
+
+
+
+    # 筛选出前k=10个频率最高的数据
+    top_k_dict = get_top_k_from_dict_value_1(dict_data, 100)
+    print(top_k_dict)
+
+    # 返回的table data数据
+    table_data = []
+
+    for index, item in enumerate(top_k_dict.items()):
+        table_data.append({'id': index+1, 'url': item[1][1], 'title': item[1][2], 'count': item[1][0]})
+
+
+    return table_data
+
 
 
 
@@ -511,6 +625,27 @@ def update(auto_find_text_flag):
 
 
 
+# 页面访问停留时间排名
+@app.callback(
+    dash.dependencies.Output('table_url_time_rank', 'data'),
+    [
+        dash.dependencies.Input('auto_find_text_flag', 'value')
+    ]
+)
+def update(auto_find_text_flag):
+
+    global history_data
+    # 正确获取到历史记录文件
+    if (history_data != 'error' and auto_find_text_flag == 1):
+        table_data = table_data_url_time_rank()
+        return table_data
+    else:
+        # 取消更新页面数据
+        raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
+
 # 判断是否自动寻找到历史记录文件
 @app.callback(
     dash.dependencies.Output('auto_find_text_flag', 'value'),
@@ -554,7 +689,7 @@ if __name__ == '__main__':
     history_data = 'error'
 
     # 是否是在本地运行(测试)
-    app_local = True
+    app_local = False
 
 
     # 127.0.0.1表示本机可浏览

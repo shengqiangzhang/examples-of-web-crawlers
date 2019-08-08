@@ -30,7 +30,7 @@ def get_history_file_path():
     if('Windows' in sys_str):
         # print('Windows')
         home = os.environ['HOMEPATH']
-        file_path = ""
+        file_path = home + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\History"
     elif('Darwin' in sys_str):
         # print('macOSX')
         home = os.environ['HOME']
