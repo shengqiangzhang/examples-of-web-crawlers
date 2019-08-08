@@ -9,10 +9,10 @@ from shutil import rmtree
 from queue import Queue
 from threading import Thread
 from time import sleep
-from pyecharts import Pie
-from pyecharts import Map
-from pyecharts import WordCloud
-from pyecharts import Bar
+from pyecharts.charts import Pie
+from pyecharts.charts import Map
+from pyecharts.charts import WordCloud
+from pyecharts.charts import Bar
 from requests import post
 import PIL.Image as Image
 import re
