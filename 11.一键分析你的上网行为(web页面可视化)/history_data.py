@@ -3,7 +3,7 @@
 
 """
 @project: PyCharm
-@file: browser_history_analysis.py
+@file: history_data.py
 @author: Shengqiang Zhang
 @time: 2019/8/5 21:44
 @mail: sqzhang77@gmail.com
@@ -43,7 +43,7 @@ def get_history_file_path():
         # print('unknown')
         file_path = ""
 
-    print(file_path)
+    print('历史记录文件路径为: {}'.format(file_path))
     return file_path
 
 
