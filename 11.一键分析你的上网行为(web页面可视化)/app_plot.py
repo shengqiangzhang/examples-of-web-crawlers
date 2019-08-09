@@ -163,6 +163,10 @@ def plot_scatter_website_count_rank():
         # 由于Chrome浏览器在sqlite中存储的时间是以1601-01-01 00:00:00 为起始时间点的微妙计数
         # 与Unix时间戳存在时间间隔，所以需要转换
         unix_time_samp = (date_time / 1000000) - 11644473600
+
+        # 中国以北京时间为准，北京时间为UTC+8小时，8小时=28800秒
+        unix_time_samp += 28800
+
         key = time.strftime("%Y-%m-%d", time.gmtime(unix_time_samp))
 
 
@@ -302,6 +306,9 @@ def get_history_date_time():
         # 与Unix时间戳存在时间间隔，所以需要转换
         unix_time_samp = (date_time / 1000000) - 11644473600
 
+        # 中国以北京时间为准，北京时间为UTC+8小时，8小时=28800秒
+        unix_time_samp += 28800
+
         # 放入list_date_time列表
         list_date_time.append(unix_time_samp)
 
@@ -325,12 +332,21 @@ def get_history_date_time():
 
 
 # 绘制 某日不同时刻访问次数 散点图
-def plot_scatter_website_diff_time():
+def plot_scatter_website_diff_time(date_time_value):
+
+    # 非法输入日期
+    if date_time_value is None:
+        return {}
+
+    # print(date_time_value)
+
     # 跨文件全局变量
     history_data = global_var.get_value('history_data')
 
     # 频率字典
     dict_data = {}
+    for i in range(0, 24):
+        dict_data[i] = 0
 
     # 对历史记录文件进行遍历
     for data in history_data:
@@ -339,28 +355,39 @@ def plot_scatter_website_diff_time():
         # 由于Chrome浏览器在sqlite中存储的时间是以1601-01-01 00:00:00 为起始时间点的微妙计数
         # 与Unix时间戳存在时间间隔，所以需要转换
         unix_time_samp = (date_time / 1000000) - 11644473600
-        key = time.strftime("%Y-%m-%d", time.gmtime(unix_time_samp))
 
+        # 中国以北京时间为准，北京时间为UTC+8小时，8小时=28800秒
+        unix_time_samp += 28800
 
-        if (key in dict_data.keys()):
-            dict_data[key] += 1
-        else:
-            dict_data[key] = 0
+        # 获取今天日期
+        current_day = time.strftime("%Y-%m-%d", time.gmtime(unix_time_samp))
 
-    # 对字典按key进行时间排序
-    dict_sort_data = sort_time_dict(dict_data)
-    # print(dict_sort_data)
-    max_value_dict = max([i for i in dict_sort_data.values()])
+        # 判断是否是今天
+        if(date_time_value == current_day):
+
+            key = time.strftime("%H", time.gmtime(unix_time_samp))
+            key = int(key)
+
+            if key in dict_data.keys():
+                dict_data[key] += 1
+
+    # print(dict_data)
+
+    max_value_dict = max([i for i in dict_data.values()])
+    # max_value_dict说明没有任何元素，直接返回空数据
+    if max_value_dict == 0:
+        return {}
+
 
     figure = go.Figure(
         data=[
             go.Scatter(
-                x=[i for i in dict_sort_data.keys()],
-                y=[i for i in dict_sort_data.values()],
+                x=[i for i in dict_data.keys()],
+                y=[i for i in dict_data.values()],
                 name='lines+markers',
                 mode='lines+markers',
                 marker_color='rgba(55, 83, 109, .8)',
-                marker=dict(size=[(i/max_value_dict)*30 for i in dict_sort_data.values()])
+                marker=dict(size=[(i/max_value_dict)*30 for i in dict_data.values()])
             )
         ],
 
@@ -369,7 +396,7 @@ def plot_scatter_website_diff_time():
             margin=go.layout.Margin(l=40, r=0, t=40, b=30),
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0)',
-            xaxis=dict(title='时间'),
+            xaxis=dict(title='时刻(24小时制)'),
             yaxis=dict(title='次数')
         )
     )

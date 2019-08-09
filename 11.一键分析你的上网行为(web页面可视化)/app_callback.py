@@ -19,7 +19,10 @@ import global_var
 
 
 
+# 回调，用于更新web页面数据
+# dash框架是前后端不分离的，所以仅仅适用于简单页面部署，复杂页面不推荐使用dash
 def app_callback_function():
+
     # 页面访问频率排名
     @app.callback(
         dash.dependencies.Output('graph_website_count_rank', 'figure'),
@@ -41,6 +44,9 @@ def app_callback_function():
             # 取消更新页面数据
             raise dash.exceptions.PreventUpdate("cancel the callback")
 
+
+
+
     # 每日访问次数
     @app.callback(
         dash.dependencies.Output('graph_day_count_rank', 'figure'),
@@ -60,6 +66,10 @@ def app_callback_function():
         else:
             # 取消更新页面数据
             raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
+
 
     # 访问次数最多的URL
     @app.callback(
@@ -81,6 +91,10 @@ def app_callback_function():
             # 取消更新页面数据
             raise dash.exceptions.PreventUpdate("cancel the callback")
 
+
+
+
+
     # 页面访问停留时间排名
     @app.callback(
         dash.dependencies.Output('table_url_time_rank', 'data'),
@@ -100,6 +114,10 @@ def app_callback_function():
         else:
             # 取消更新页面数据
             raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
+
 
     # 某日不同时刻访问次数
     @app.callback(
@@ -126,6 +144,11 @@ def app_callback_function():
             # 取消更新页面数据
             raise dash.exceptions.PreventUpdate("cancel the callback")
 
+
+
+
+
+
     # 自动选择dropdown的第一个选option
     @app.callback(
         dash.dependencies.Output('dropdown_time_1', 'value'),
@@ -133,9 +156,36 @@ def app_callback_function():
             dash.dependencies.Input('dropdown_time_1', 'options')
         ]
     )
-    def update_player_statistics_value(available_options):
+    def update(available_options):
         # print(available_options)
-        return available_options[0]['value']
+        if(available_options):
+            return available_options[0]['value']
+        else:
+            # 取消更新页面数据
+            raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
+
+
+
+    # dropdown_time_1的value发生改变时的回调
+    @app.callback(
+        dash.dependencies.Output('graph_day_diff_time_count', 'figure'),
+        [
+            dash.dependencies.Input('dropdown_time_1', 'value')
+        ]
+    )
+    def update(date_time_value):
+        if(date_time_value):
+            figure = plot_scatter_website_diff_time(date_time_value)
+            return figure
+        else:
+            # 取消更新页面数据
+            raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
 
 
 
