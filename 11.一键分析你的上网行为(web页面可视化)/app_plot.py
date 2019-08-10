@@ -148,6 +148,91 @@ def plot_bar_website_count_rank(value):
 
 
 
+
+
+
+
+# 绘制 搜索关键词排名柱状图 和 搜索引擎使用情况饼图
+def plot_bar_search_word_count_rank():
+
+    # 跨文件全局变量
+    search_word = global_var.get_value('search_word')
+
+    # 频率字典
+    dict_data = {}
+
+    # 对搜索关键词数据进行遍历
+    for data in search_word:
+        search_item = data[1]
+        key = search_item
+
+        if (key in dict_data.keys()):
+            dict_data[key][0] += 1
+        else:
+            url_link = data[2]
+            url_visit_time = data[3]
+            dict_data[key] = [1, url_link, url_visit_time]
+
+
+    # 筛选出前10个频率最高的数据
+    top_10_dict = get_top_k_from_dict_value_1(dict_data, 10)
+    # print(top_10_dict)
+
+    # 绘制搜索关键词柱状图
+    figure_1 = go.Figure(
+        data=[
+            go.Bar(
+                x=[key for key in top_10_dict.keys()],
+                y=[value[0] for value in top_10_dict.values()],
+                name='bar',
+                marker=go.bar.Marker(
+                    color='rgb(55, 83, 109)'
+                )
+            )
+        ],
+        layout=go.Layout(
+            showlegend=False,
+            margin=go.layout.Margin(l=40, r=0, t=40, b=30),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+            xaxis=dict(title='关键词'),
+            yaxis=dict(title='次数')
+        )
+    )
+
+
+
+
+
+
+    search_engine_list = ['google.com', 'www.bing.com', 'www.yahoo.com', 'www.baidu.com', 'www.sogou.com', 'www.so.com']
+    search_engine_value = [0, 0, 0, 0, 0, 0]
+    for key, value in dict_data.items():
+        for i in range(len(search_engine_list)):
+            if search_engine_list[i] in value[1]:
+                search_engine_value[i] += 1
+                break
+
+
+
+    # 绘制搜索引擎使用情况饼图
+    figure_2 = go.Figure(
+        data=[
+            go.Pie(
+                labels=search_engine_list,
+                values=search_engine_value,
+                hole=.3
+            )
+        ]
+    )
+
+
+    return figure_1, figure_2
+
+
+
+
+
 # 绘制 每日访问次数 散点图
 def plot_scatter_website_count_rank():
     # 跨文件全局变量
@@ -188,7 +273,8 @@ def plot_scatter_website_count_rank():
                 name='lines+markers',
                 mode='lines+markers',
                 marker_color='rgba(55, 83, 109, .8)',
-                marker=dict(size=[(i/max_value_dict)*30 for i in dict_sort_data.values()])
+                marker=dict(size=[(i/max_value_dict)*30 for i in dict_sort_data.values()]),
+                fill='tozeroy'
             )
         ],
 
@@ -387,7 +473,8 @@ def plot_scatter_website_diff_time(date_time_value):
                 name='lines+markers',
                 mode='lines+markers',
                 marker_color='rgba(55, 83, 109, .8)',
-                marker=dict(size=[(i/max_value_dict)*30 for i in dict_data.values()])
+                marker=dict(size=[(i/max_value_dict)*30 for i in dict_data.values()]),
+                fill='tozeroy'
             )
         ],
 
@@ -401,8 +488,5 @@ def plot_scatter_website_diff_time(date_time_value):
         )
     )
 
+
     return figure
-
-
-
-

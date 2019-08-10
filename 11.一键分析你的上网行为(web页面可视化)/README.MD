@@ -1,3 +1,5 @@
+## 一键分析你的上网行为, 看看你平时上网都在干嘛?
+
 ## Windows Vista, Windows 7,  Windows 8, Windows 10
 - 历史记录文件位置: `C:\Users\%USERNAME%\AppData\Local\Google\Chrome\User Data\Default\History`
 

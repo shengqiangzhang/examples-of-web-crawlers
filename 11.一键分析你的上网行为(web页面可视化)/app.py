@@ -42,10 +42,6 @@ app_callback_function()
 # 开始运行web服务器
 if __name__ == '__main__':
 
-
-    a = "123-456-789".split('-')
-    print(len(a))
-
     # 初始化历史记录文件，默认为error状态，即未找到状态
     # 在web页面刷新时，自动触发回调，更新history_data的值
     # 采用跨文件全局变量，此时这些变量的值可以在其他文件之间获取和修改

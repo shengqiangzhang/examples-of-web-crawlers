@@ -109,7 +109,7 @@ app_layout = html.Div([
     ),
 
 
-    # 页面访问停留时间排名
+    # 页面访问停留总时间排名
     html.Div(
         style={'margin-bottom': '150px'},
         children=[
@@ -118,7 +118,7 @@ app_layout = html.Div([
                 className='row',
                 children=[
                     html.Span(
-                        children='页面访问停留时间排名',
+                        children='页面访问停留总时间排名',
                         style={'font-weight': 'bold', 'color': 'red'}
                     )
                 ]
@@ -306,6 +306,79 @@ app_layout = html.Div([
                         ]
 
                     )
+                ],
+            )
+        ]
+    ),
+
+
+    # 搜索关键词排名
+    html.Div(
+        style={'margin-bottom': '150px'},
+        children=[
+            html.Div(
+                style={'border-top-style': 'solid', 'border-bottom-style': 'solid'},
+                className='row',
+                children=[
+                    html.Span(
+                        children='搜索关键词排名',
+                        style={'font-weight': 'bold', 'color': 'red'}
+                    )
+                ]
+            ),
+
+            html.Div(
+                style={'position': 'relative', 'margin': '0 auto', 'width': '100%', 'padding-bottom': '50%', },
+                children=[
+                    dcc.Loading(
+                        children=[
+                            dcc.Graph(
+                                id='graph_search_word_count_rank',
+                                style={'position': 'absolute', 'width': '100%', 'height': '100%', 'top': '0',
+                                       'left': '0', 'bottom': '0', 'right': '0'},
+                                config={'displayModeBar': False},
+                            ),
+                        ],
+                        type='dot',
+                        style={'position': 'absolute', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%,-50%)'}
+                    ),
+                ],
+            )
+        ]
+    ),
+
+
+
+    # 搜索引擎使用情况
+    html.Div(
+        style={'margin-bottom': '150px'},
+        children=[
+            html.Div(
+                style={'border-top-style': 'solid', 'border-bottom-style': 'solid'},
+                className='row',
+                children=[
+                    html.Span(
+                        children='搜索引擎使用情况',
+                        style={'font-weight': 'bold', 'color': 'red'}
+                    )
+                ]
+            ),
+
+            html.Div(
+                style={'position': 'relative', 'margin': '0 auto', 'width': '100%', 'padding-bottom': '50%', },
+                children=[
+                    dcc.Loading(
+                        children=[
+                            dcc.Graph(
+                                id='graph_search_engine_count_rank',
+                                style={'position': 'absolute', 'width': '100%', 'height': '100%', 'top': '0',
+                                       'left': '0', 'bottom': '0', 'right': '0'},
+                                config={'displayModeBar': False},
+                            ),
+                        ],
+                        type='dot',
+                        style={'position': 'absolute', 'top': '50%', 'left': '50%', 'transform': 'translate(-50%,-50%)'}
+                    ),
                 ],
             )
         ]

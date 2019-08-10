@@ -189,6 +189,38 @@ def app_callback_function():
 
 
 
+
+
+    # 搜索关键词排名
+    @app.callback(
+        [
+            dash.dependencies.Output('graph_search_word_count_rank', 'figure'),
+            dash.dependencies.Output('graph_search_engine_count_rank', 'figure')
+        ],
+
+        [
+            dash.dependencies.Input('auto_find_text_flag', 'value')
+        ]
+    )
+    def update(auto_find_text_flag):
+
+        # 跨文件全局变量
+        search_word = global_var.get_value('search_word')
+
+        # 正确获取到历史记录文件
+        if (search_word != 'error' and auto_find_text_flag == 1):
+            figure_1, figure_2 = plot_bar_search_word_count_rank()
+            return figure_1, figure_2
+        else:
+            # 取消更新页面数据
+            raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+
+
+
+
+
     # 判断是否自动寻找到历史记录文件
     @app.callback(
         dash.dependencies.Output('auto_find_text_flag', 'value'),
@@ -202,10 +234,17 @@ def app_callback_function():
         if (value is not None):
 
             # 获取历史记录数据，跨文件全局变量
-            data = get_history_data()
-            history_data = global_var.set_value('history_data', data)
+            history_data = get_history_data()
+            global_var.set_value('history_data', history_data)
             # for i in history_data:
             #     print(i)
+
+            # 获取搜索关键词数据，跨文件全局变量
+            search_word = get_search_word()
+            global_var.set_value('search_word', search_word)
+            # for i in search_word:
+            #     print(i)
+
 
             if (history_data != 'error'):
                 # 找到
