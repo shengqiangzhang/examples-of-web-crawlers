@@ -219,12 +219,8 @@ def app_callback_function():
 
     # 上传文件回调
     @app.callback(
-        [
-            dash.dependencies.Output('auto_find_text_flag', 'value'),
-            dash.dependencies.Output('store_memory_history_data', 'data')
 
-        ],
-
+        dash.dependencies.Output('store_memory_history_data', 'data'),
         [
             dash.dependencies.Input('dcc_upload_file', 'contents')
         ]
@@ -278,13 +274,13 @@ def app_callback_function():
                 date_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 print('新接收到一条客户端的数据, 数据正确, 时间:{}'.format(date_time))
                 store_data = {'history_data': history_data, 'search_word': search_word}
-                return 1, store_data
+                return store_data
             else:
                 # 没找到
                 date_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 print('新接收到一条客户端的数据, 数据错误, 时间:{}'.format(date_time))
-                return 0, None
+                return  None
 
-        return 0, None
+        return None
 
 

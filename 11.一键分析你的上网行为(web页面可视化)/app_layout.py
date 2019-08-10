@@ -25,18 +25,12 @@ app_layout = html.Div([
     html.Div(
         className = 'row',
         children=[
-            dcc.Input(
-                id='first_load_web_page',
-                type = 'number',
-                value=0,
-                style={'display': 'none'}
-            ),
 
             dcc.Input(
-                id = 'auto_find_text_flag',
-                type = 'number',
-                value = 0,
-                style = {'display':'none'}
+                id='upload_file_success_flag',
+                type='number',
+                value=1,
+                style={'display': 'none'}
             ),
 
             # 在浏览器中存储数据，每次刷新页面或者载入页面都会被清空
@@ -56,6 +50,7 @@ app_layout = html.Div([
                         id='dcc_upload_file',
                         children=html.Div([
                             html.A(
+                                id='upload_link',
                                 children='点击上传Chrome历史记录文件',
                                 style={'cursor': 'pointer'}
                             )

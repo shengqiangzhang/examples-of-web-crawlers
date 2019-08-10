@@ -1,0 +1,53 @@
+._dash-loading-callback {
+  font-family: sans-serif;
+  padding-top: 50px;
+  color: rgb(90, 90, 90);
+
+  -webkit-animation: fadein 0.5s ease-in 7s forwards; /* Safari, Chrome and Opera > 12.1 */
+     -moz-animation: fadein 0.5s; /* Firefox < 16 */
+      -ms-animation: fadein 0.5s; /* Internet Explorer */
+       -o-animation: fadein 0.5s; /* Opera < 12.1 */
+          animation: fadein 0.5s ease-in 7s forwards;  
+
+
+  
+  /* The banner */
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+  cursor: progress;
+}
+
+
+@keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Firefox < 16 */
+@-moz-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Safari, Chrome and Opera > 12.1 */
+@-webkit-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Internet Explorer */
+@-ms-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+/* Opera < 12.1 */
+@-o-keyframes fadein {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
