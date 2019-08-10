@@ -45,7 +45,6 @@ app_layout = html.Div([
     # fork me on github 挂件
     html.Div(
         # 设置这个div位于最顶层，防止被其他DIV覆盖
-        style={'z-index': 9999},
         children=[
             html.A(
                 href='https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/11.%E4%B8%80%E9%94%AE%E5%88%86%E6%9E%90%E4%BD%A0%E7%9A%84%E4%B8%8A%E7%BD%91%E8%A1%8C%E4%B8%BA(web%E9%A1%B5%E9%9D%A2%E5%8F%AF%E8%A7%86%E5%8C%96)',
@@ -54,7 +53,7 @@ app_layout = html.Div([
                     html.Img(
                         src='https://camo.githubusercontent.com/652c5b9acfaddf3a9c326fa6bde407b87f7be0f4/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6f72616e67655f6666373630302e706e67',
                         alt='Fork me on GitHub',
-                        style={'position': 'absolute', 'top': 0, 'right': 0, 'border': 0}
+                        style={'position': 'absolute', 'top': 0, 'right': 0, 'border': 0, 'z-index': '99999'}
                     )
                 ]
             )
@@ -383,5 +382,23 @@ app_layout = html.Div([
             )
         ]
     ),
+
+    # 底部
+    html.Div(
+        style={'text-align':'center'},
+        children=[
+            html.A(
+                children=[
+                    html.Img(
+                        src="assets/image/GitHub-Mark-Light.png",
+                        style={'margin': '0 auto', 'width':'50px'}
+                    )
+                ],
+                href='https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/11.%E4%B8%80%E9%94%AE%E5%88%86%E6%9E%90%E4%BD%A0%E7%9A%84%E4%B8%8A%E7%BD%91%E8%A1%8C%E4%B8%BA(web%E9%A1%B5%E9%9D%A2%E5%8F%AF%E8%A7%86%E5%8C%96)',
+                target='_blank'
+            ),
+
+        ]
+    )
 
 ])
