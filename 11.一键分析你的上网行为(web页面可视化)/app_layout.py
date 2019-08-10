@@ -419,7 +419,7 @@ app_layout = html.Div([
 
     # 搜索引擎使用情况
     html.Div(
-        style={'margin-bottom': '150px'},
+        # style={'margin-bottom': '150px'},
         children=[
             html.Div(
                 style={'border-top-style': 'solid', 'border-bottom-style': 'solid'},
