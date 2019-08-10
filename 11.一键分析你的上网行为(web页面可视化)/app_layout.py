@@ -42,6 +42,75 @@ app_layout = html.Div([
     ),
 
 
+    # 上传历史记录文件
+    html.Div(
+        className='row',
+        children=[
+            html.Div(
+                className='five columns',
+                children=[
+                    dcc.Upload(
+                        id='dcc_upload_file',
+                        children=html.Div([
+                            html.A(
+                                children='点击上传Chrome历史记录文件',
+                                style={'cursor': 'pointer'}
+                            )
+                        ]),
+                        style={
+                            'width': '100%',
+                            'height': '60px',
+                            'lineHeight': '60px',
+                            'borderWidth': '1px',
+                            'borderStyle': 'dashed',
+                            'borderRadius': '5px',
+                            'textAlign': 'center',
+                            'margin-top': '10px',
+                            'margin-bottom': '20px'
+                        },
+
+                        # Allow multiple files to be uploaded
+                        multiple=False
+                    ),
+                ]
+            ),
+
+
+            html.Div(
+                className='five columns',
+                children=[
+                    html.Div(
+                        style={'margin-top':'10px'},
+                        className='row',
+                        children=[
+                            html.A(
+                                children='问题1: 如何获取Chrome历史记录文件?',
+                                href='assets/static/help.html',
+                                target='_blank',
+                                style={'cursor': 'pointer', 'color':'red'}
+                            ),
+                        ]
+                    ),
+
+                    html.Div(
+                        style={'margin-top':'10px'},
+                        className='row',
+                        children=[
+                            html.A(
+                                children='问题2: 是否存在窃取隐私问题?',
+                                href='assets/static/help.html#privacy',
+                                target='_blank',
+                                style={'cursor': 'pointer', 'color':'red'}
+                            ),
+                        ]
+                    ),
+                ]
+            )
+        ]
+    ),
+
+
+
     # fork me on github 挂件
     html.Div(
         # 设置这个div位于最顶层，防止被其他DIV覆盖

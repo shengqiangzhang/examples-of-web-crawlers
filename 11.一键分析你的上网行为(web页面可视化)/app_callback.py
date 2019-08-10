@@ -220,37 +220,37 @@ def app_callback_function():
 
 
 
-
-    # 判断是否自动寻找到历史记录文件
-    @app.callback(
-        dash.dependencies.Output('auto_find_text_flag', 'value'),
-        [
-            dash.dependencies.Input('first_load_web_page', 'value')
-        ]
-    )
-    def update(value):
-
-        # value对象不为null
-        if (value is not None):
-
-            # 获取历史记录数据，跨文件全局变量
-            history_data = get_history_data()
-            global_var.set_value('history_data', history_data)
-            # for i in history_data:
-            #     print(i)
-
-            # 获取搜索关键词数据，跨文件全局变量
-            search_word = get_search_word()
-            global_var.set_value('search_word', search_word)
-            # for i in search_word:
-            #     print(i)
-
-
-            if (history_data != 'error'):
-                # 找到
-                return 1
-            else:
-                # 没找到
-                return 0
-        else:
-            return 0
+    #
+    # # 判断是否自动寻找到历史记录文件
+    # @app.callback(
+    #     dash.dependencies.Output('auto_find_text_flag', 'value'),
+    #     [
+    #         dash.dependencies.Input('first_load_web_page', 'value')
+    #     ]
+    # )
+    # def update(value):
+    #
+    #     # value对象不为null
+    #     if (value is not None):
+    #
+    #         # 获取历史记录数据，跨文件全局变量
+    #         history_data = get_history_data()
+    #         global_var.set_value('history_data', history_data)
+    #         # for i in history_data:
+    #         #     print(i)
+    #
+    #         # 获取搜索关键词数据，跨文件全局变量
+    #         search_word = get_search_word()
+    #         global_var.set_value('search_word', search_word)
+    #         # for i in search_word:
+    #         #     print(i)
+    #
+    #
+    #         if (history_data != 'error'):
+    #             # 找到
+    #             return 1
+    #         else:
+    #             # 没找到
+    #             return 0
+    #     else:
+    #         return 0
