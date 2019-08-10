@@ -9,44 +9,7 @@
 @mail: sqzhang77@gmail.com
 """
 
-from platform import system
-import os
-import shutil
 import sqlite3
-
-
-
-
-
-# 获取历史记录文件所在的路径
-def get_history_file_path():
-
-    # 获取操作系统信息
-    sys_str = system()
-
-    # 历史记录文件所在的路径
-    file_path = ""
-
-    if('Windows' in sys_str):
-        # print('Windows')
-        home = os.environ['HOMEPATH']
-        file_path = home + "\\AppData\\Local\\Google\\Chrome\\User Data\\Default\\History"
-    elif('Darwin' in sys_str):
-        # print('macOSX')
-        home = os.environ['HOME']
-        file_path = home + "/Library/Application Support/Google/Chrome/Default/History"
-    elif('Linux' in sys_str):
-        # print('Linux')
-        home = os.environ['HOME']
-        file_path = ""
-    else:
-        # print('unknown')
-        file_path = ""
-
-    print('历史记录文件路径为: {}'.format(file_path))
-    return file_path
-
-
 
 
 # 查询数据库内容
@@ -77,28 +40,14 @@ def query_sqlite_db(history_db, query):
 
 
 # 获取排序后的历史数据
-def get_history_data():
-    # 获取历史记录文件所在的路径
-    # 根据不同操作系统自动获取对应的历史记录文件
-    history_file_path = get_history_file_path()
+def get_history_data(history_file_path):
 
-    # 判断该历史文件是否存在
-    # 若不存在，则需要手动将历史记录文件复制到当前目录下
-    if not os.path.exists(history_file_path):
-        print('历史记录文件不存在!')
-        return 'error'
-
-
-    # 复制(拷贝)历史记录文件到当前目录下
-    # 因为历史记录其实是一个sqlite数据库文件，sqlite是单线程，浏览器在运行时，数据库是默认锁住的
-    # 注意，History是一个文件，没有后缀名。它不是一个目录。
     try:
-        shutil.copyfile(history_file_path, './History')
 
         # 获取数据库内容
         # 数据格式为元组(tuple)
         select_statement = "SELECT urls.id, urls.url, urls.title, urls.last_visit_time, urls.visit_count, visits.visit_time, visits.from_visit, visits.transition, visits.visit_duration FROM urls, visits WHERE urls.id = visits.url;"
-        result = query_sqlite_db('./History', select_statement)
+        result = query_sqlite_db(history_file_path, select_statement)
 
         # 将结果按第1个元素进行排序
         # sort和sorted内建函数会优先排序第1个元素，然后再排序第2个元素，依此类推
@@ -107,34 +56,20 @@ def get_history_data():
         # 返回排序后的数据
         return result_sort
     except:
-        print('复制历史文件出错!')
+        # print('读取出错!')
         return 'error'
 
 
 
 # 获取 搜索关键词 数据
-def get_search_word():
-    # 获取历史记录文件所在的路径
-    # 根据不同操作系统自动获取对应的历史记录文件
-    history_file_path = get_history_file_path()
+def get_search_word(history_file_path):
 
-    # 判断该历史文件是否存在
-    # 若不存在，则需要手动将历史记录文件复制到当前目录下
-    if not os.path.exists(history_file_path):
-        print('历史记录文件不存在!')
-        return 'error'
-
-
-    # 复制(拷贝)历史记录文件到当前目录下
-    # 因为历史记录其实是一个sqlite数据库文件，sqlite是单线程，浏览器在运行时，数据库是默认锁住的
-    # 注意，History是一个文件，没有后缀名。它不是一个目录。
     try:
-        shutil.copyfile(history_file_path, './History_Search')
 
         # 获取数据库内容
         # 数据格式为元组(tuple)
         select_statement = "SELECT keyword_search_terms.url_id, keyword_search_terms.term, urls.url, urls.last_visit_time from keyword_search_terms LEFT JOIN urls on keyword_search_terms.url_id=urls.id;"
-        result = query_sqlite_db('./History_Search', select_statement)
+        result = query_sqlite_db(history_file_path, select_statement)
 
         # 将结果按第1个元素(下标为0)进行升序排序
         result_sort = sorted(result, key=lambda x: (x[0]))
@@ -142,5 +77,5 @@ def get_search_word():
         # 返回排序后的数据
         return result_sort
     except:
-        print('复制历史文件出错!')
+        # print('读取出错!')
         return 'error'

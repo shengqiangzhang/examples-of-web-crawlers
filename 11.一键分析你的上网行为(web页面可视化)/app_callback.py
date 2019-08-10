@@ -15,6 +15,11 @@ from app_configuration import app
 from app_plot import *
 
 from history_data import *
+import random
+import base64
+import time
+from os.path import exists
+from os import makedirs
 import global_var
 
 
@@ -217,40 +222,69 @@ def app_callback_function():
 
 
 
+    # 上传文件回调
+    @app.callback(
+        dash.dependencies.Output('auto_find_text_flag', 'value'),
+        [
+            dash.dependencies.Input('dcc_upload_file', 'contents')
+        ]
+    )
+    def update(contents):
+
+        if contents is not None:
+
+            # 接收base64编码的数据
+            content_type, content_string = contents.split(',')
+
+            # 将客户端上传的文件进行base64解码
+            decoded = base64.b64decode(content_string)
+
+            # 为客户端上传的文件添加后缀，防止文件重复覆盖
+            # 以下方式确保文件名不重复
+            suffix = [str(random.randint(0,100)) for i in range(10)]
+            suffix = "".join(suffix)
+            suffix = suffix + str(int(time.time()))
+
+            # 最终的文件名
+            file_name = 'History_' + suffix
+            # print(file_name)
+
+            # 创建存放文件的目录
+            if (not (exists('data'))):
+                makedirs('data')
+
+            # 欲写入的文件路径
+            path = 'data' + '/' + file_name
+
+            # 写入本地磁盘文件
+            with open(file=path, mode='wb+') as f:
+                f.write(decoded)
 
 
+            # 使用sqlite读取本地磁盘文件
+            # 获取历史记录数据，跨文件全局变量
+            history_data = get_history_data(path)
+            global_var.set_value('history_data', history_data)
+            # for i in history_data:
+            #     print(i)
 
-    #
-    # # 判断是否自动寻找到历史记录文件
-    # @app.callback(
-    #     dash.dependencies.Output('auto_find_text_flag', 'value'),
-    #     [
-    #         dash.dependencies.Input('first_load_web_page', 'value')
-    #     ]
-    # )
-    # def update(value):
-    #
-    #     # value对象不为null
-    #     if (value is not None):
-    #
-    #         # 获取历史记录数据，跨文件全局变量
-    #         history_data = get_history_data()
-    #         global_var.set_value('history_data', history_data)
-    #         # for i in history_data:
-    #         #     print(i)
-    #
-    #         # 获取搜索关键词数据，跨文件全局变量
-    #         search_word = get_search_word()
-    #         global_var.set_value('search_word', search_word)
-    #         # for i in search_word:
-    #         #     print(i)
-    #
-    #
-    #         if (history_data != 'error'):
-    #             # 找到
-    #             return 1
-    #         else:
-    #             # 没找到
-    #             return 0
-    #     else:
-    #         return 0
+            # 获取搜索关键词数据，跨文件全局变量
+            search_word = get_search_word(path)
+            global_var.set_value('search_word', search_word)
+            # for i in search_word:
+            #     print(i)
+
+            # 判断读取到的数据是否正确
+            if (history_data != 'error'):
+                # 找到
+                date_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                print('新接收到一条客户端的数据, 数据正确, 时间:{}'.format(date_time))
+                return 1
+            else:
+                # 没找到
+                date_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
+                print('新接收到一条客户端的数据, 数据错误, 时间:{}'.format(date_time))
+                return 0
+
+        return 0
+
