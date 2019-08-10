@@ -38,6 +38,9 @@ app_layout = html.Div([
                 value = 0,
                 style = {'display':'none'}
             ),
+
+            # 在浏览器中存储数据，每次刷新页面或者载入页面都会被清空
+            dcc.Store(id='store_memory_history_data')
         ]
     ),
 

@@ -20,7 +20,6 @@ import base64
 import time
 from os.path import exists
 from os import makedirs
-import global_var
 
 
 
@@ -33,17 +32,15 @@ def app_callback_function():
         dash.dependencies.Output('graph_website_count_rank', 'figure'),
         [
             dash.dependencies.Input('input_website_count_rank', 'value'),
-            dash.dependencies.Input('auto_find_text_flag', 'value')
+            dash.dependencies.Input('store_memory_history_data', 'data')
         ]
     )
-    def update(value, auto_find_text_flag):
-
-        # 跨文件全局变量
-        history_data = global_var.get_value('history_data')
+    def update(value, store_memory_history_data):
 
         # 正确获取到历史记录文件
-        if (history_data != 'error' and auto_find_text_flag == 1):
-            figure = plot_bar_website_count_rank(value)
+        if store_memory_history_data:
+            history_data = store_memory_history_data['history_data']
+            figure = plot_bar_website_count_rank(value, history_data)
             return figure
         else:
             # 取消更新页面数据
@@ -56,17 +53,16 @@ def app_callback_function():
     @app.callback(
         dash.dependencies.Output('graph_day_count_rank', 'figure'),
         [
-            dash.dependencies.Input('auto_find_text_flag', 'value')
+            dash.dependencies.Input('store_memory_history_data', 'data')
         ]
     )
-    def update(auto_find_text_flag):
+    def update(store_memory_history_data):
 
-        # 跨文件全局变量
-        history_data = global_var.get_value('history_data')
 
         # 正确获取到历史记录文件
-        if (history_data != 'error' and auto_find_text_flag == 1):
-            figure = plot_scatter_website_count_rank()
+        if store_memory_history_data:
+            history_data = store_memory_history_data['history_data']
+            figure = plot_scatter_website_count_rank(history_data)
             return figure
         else:
             # 取消更新页面数据
@@ -80,17 +76,15 @@ def app_callback_function():
     @app.callback(
         dash.dependencies.Output('table_url_count_rank', 'data'),
         [
-            dash.dependencies.Input('auto_find_text_flag', 'value')
+            dash.dependencies.Input('store_memory_history_data', 'data')
         ]
     )
-    def update(auto_find_text_flag):
-
-        # 跨文件全局变量
-        history_data = global_var.get_value('history_data')
+    def update(store_memory_history_data):
 
         # 正确获取到历史记录文件
-        if (history_data != 'error' and auto_find_text_flag == 1):
-            table_data = table_data_url_count_rank()
+        if store_memory_history_data:
+            history_data = store_memory_history_data['history_data']
+            table_data = table_data_url_count_rank(history_data)
             return table_data
         else:
             # 取消更新页面数据
@@ -104,17 +98,15 @@ def app_callback_function():
     @app.callback(
         dash.dependencies.Output('table_url_time_rank', 'data'),
         [
-            dash.dependencies.Input('auto_find_text_flag', 'value')
+            dash.dependencies.Input('store_memory_history_data', 'data')
         ]
     )
-    def update(auto_find_text_flag):
-
-        # 跨文件全局变量
-        history_data = global_var.get_value('history_data')
+    def update(store_memory_history_data):
 
         # 正确获取到历史记录文件
-        if (history_data != 'error' and auto_find_text_flag == 1):
-            table_data = table_data_url_time_rank()
+        if store_memory_history_data:
+            history_data = store_memory_history_data['history_data']
+            table_data = table_data_url_time_rank(history_data)
             return table_data
         else:
             # 取消更新页面数据
@@ -128,17 +120,15 @@ def app_callback_function():
     @app.callback(
         dash.dependencies.Output('dropdown_time_1', 'options'),
         [
-            dash.dependencies.Input('auto_find_text_flag', 'value')
+            dash.dependencies.Input('store_memory_history_data', 'data')
         ]
     )
-    def update(auto_find_text_flag):
-
-        # 跨文件全局变量
-        history_data = global_var.get_value('history_data')
+    def update(store_memory_history_data):
 
         # 正确获取到历史记录文件
-        if (history_data != 'error' and auto_find_text_flag == 1):
-            result_ist = get_history_date_time()
+        if store_memory_history_data:
+            history_data = store_memory_history_data['history_data']
+            result_ist = get_history_date_time(history_data)
             result_options = []
 
             for data in result_ist:
@@ -178,16 +168,23 @@ def app_callback_function():
     @app.callback(
         dash.dependencies.Output('graph_day_diff_time_count', 'figure'),
         [
-            dash.dependencies.Input('dropdown_time_1', 'value')
+            dash.dependencies.Input('dropdown_time_1', 'value'),
+            dash.dependencies.Input('store_memory_history_data', 'data')
         ]
     )
-    def update(date_time_value):
+    def update(date_time_value, store_memory_history_data):
         if(date_time_value):
-            figure = plot_scatter_website_diff_time(date_time_value)
-            return figure
+            if store_memory_history_data:
+                history_data = store_memory_history_data['history_data']
+                figure = plot_scatter_website_diff_time(date_time_value, history_data)
+                return figure
         else:
             # 取消更新页面数据
             raise dash.exceptions.PreventUpdate("cancel the callback")
+
+
+        # 取消更新页面数据
+        raise dash.exceptions.PreventUpdate("cancel the callback")
 
 
 
@@ -204,17 +201,15 @@ def app_callback_function():
         ],
 
         [
-            dash.dependencies.Input('auto_find_text_flag', 'value')
+            dash.dependencies.Input('store_memory_history_data', 'data')
         ]
     )
-    def update(auto_find_text_flag):
-
-        # 跨文件全局变量
-        search_word = global_var.get_value('search_word')
+    def update(store_memory_history_data):
 
         # 正确获取到历史记录文件
-        if (search_word != 'error' and auto_find_text_flag == 1):
-            figure_1, figure_2 = plot_bar_search_word_count_rank()
+        if (store_memory_history_data is not None):
+            search_word = store_memory_history_data['search_word']
+            figure_1, figure_2 = plot_bar_search_word_count_rank(search_word)
             return figure_1, figure_2
         else:
             # 取消更新页面数据
@@ -224,7 +219,12 @@ def app_callback_function():
 
     # 上传文件回调
     @app.callback(
-        dash.dependencies.Output('auto_find_text_flag', 'value'),
+        [
+            dash.dependencies.Output('auto_find_text_flag', 'value'),
+            dash.dependencies.Output('store_memory_history_data', 'data')
+
+        ],
+
         [
             dash.dependencies.Input('dcc_upload_file', 'contents')
         ]
@@ -262,15 +262,13 @@ def app_callback_function():
 
 
             # 使用sqlite读取本地磁盘文件
-            # 获取历史记录数据，跨文件全局变量
+            # 获取历史记录数据
             history_data = get_history_data(path)
-            global_var.set_value('history_data', history_data)
             # for i in history_data:
             #     print(i)
 
-            # 获取搜索关键词数据，跨文件全局变量
+            # 获取搜索关键词数据
             search_word = get_search_word(path)
-            global_var.set_value('search_word', search_word)
             # for i in search_word:
             #     print(i)
 
@@ -279,12 +277,14 @@ def app_callback_function():
                 # 找到
                 date_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 print('新接收到一条客户端的数据, 数据正确, 时间:{}'.format(date_time))
-                return 1
+                store_data = {'history_data': history_data, 'search_word': search_word}
+                return 1, store_data
             else:
                 # 没找到
                 date_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(time.time()))
                 print('新接收到一条客户端的数据, 数据错误, 时间:{}'.format(date_time))
-                return 0
+                return 0, None
 
-        return 0
+        return 0, None
+
 

@@ -9,7 +9,6 @@
 @mail: sqzhang77@gmail.com
 """
 
-import global_var
 
 import plotly.graph_objs as go
 import time
@@ -98,10 +97,7 @@ def convert_to_number(value):
 
 
 # 绘制 页面访问频率排名 柱状图
-def plot_bar_website_count_rank(value):
-
-    # 跨文件全局变量
-    history_data = global_var.get_value('history_data')
+def plot_bar_website_count_rank(value, history_data):
 
     # 频率字典
     dict_data = {}
@@ -153,10 +149,8 @@ def plot_bar_website_count_rank(value):
 
 
 # 绘制 搜索关键词排名柱状图 和 搜索引擎使用情况饼图
-def plot_bar_search_word_count_rank():
+def plot_bar_search_word_count_rank(search_word):
 
-    # 跨文件全局变量
-    search_word = global_var.get_value('search_word')
 
     # 频率字典
     dict_data = {}
@@ -205,7 +199,7 @@ def plot_bar_search_word_count_rank():
 
 
 
-    search_engine_list = ['google.com', 'www.bing.com', 'www.yahoo.com', 'www.baidu.com', 'www.sogou.com', 'www.so.com']
+    search_engine_list = ['www.google.com', 'www.bing.com', 'www.yahoo.com', 'www.baidu.com', 'www.sogou.com', 'www.so.com']
     search_engine_value = [0, 0, 0, 0, 0, 0]
     for key, value in dict_data.items():
         for i in range(len(search_engine_list)):
@@ -234,9 +228,7 @@ def plot_bar_search_word_count_rank():
 
 
 # 绘制 每日访问次数 散点图
-def plot_scatter_website_count_rank():
-    # 跨文件全局变量
-    history_data = global_var.get_value('history_data')
+def plot_scatter_website_count_rank(history_data):
 
     # 频率字典
     dict_data = {}
@@ -294,9 +286,7 @@ def plot_scatter_website_count_rank():
 
 
 # 返回 访问次数最多的URL 的数据
-def table_data_url_count_rank():
-    # 跨文件全局变量
-    history_data = global_var.get_value('history_data')
+def table_data_url_count_rank(history_data):
 
     # 频率字典
     dict_data = {}
@@ -335,9 +325,7 @@ def table_data_url_count_rank():
 
 
 # 返回 页面访问总时间的URL的数据
-def table_data_url_time_rank():
-    # 跨文件全局变量
-    history_data = global_var.get_value('history_data')
+def table_data_url_time_rank(history_data):
 
     # 频率字典
     dict_data = {}
@@ -378,9 +366,7 @@ def table_data_url_time_rank():
 
 
 # 获取历史记录文件中的日期集合
-def get_history_date_time():
-    # 跨文件全局变量
-    history_data = global_var.get_value('history_data')
+def get_history_date_time(history_data):
 
     list_date_time = []
 
@@ -418,7 +404,7 @@ def get_history_date_time():
 
 
 # 绘制 某日不同时刻访问次数 散点图
-def plot_scatter_website_diff_time(date_time_value):
+def plot_scatter_website_diff_time(date_time_value, history_data):
 
     # 非法输入日期
     if date_time_value is None:
@@ -426,8 +412,6 @@ def plot_scatter_website_diff_time(date_time_value):
 
     # print(date_time_value)
 
-    # 跨文件全局变量
-    history_data = global_var.get_value('history_data')
 
     # 频率字典
     dict_data = {}
