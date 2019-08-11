@@ -399,6 +399,58 @@ python main.py
 
 
 
+
+## [10.一键生成个人微信朋友圈数据电子书][generate_friend_group_data]
+
+
+### 简介
+
+微信朋友圈保留着你的数据，它留住了美好的回忆，记录了我们成长的点点滴滴。发朋友圈从某种意义上来讲是在记录生活，感受生活，并从中看到了每个人每一步的成长。
+
+这么一份珍贵的记忆，何不将它保存下来呢？只需一杯咖啡的时间，即可一键打印你的朋友圈。它可以是纸质书，也可以是电子书，可以长久保存，比洗照片好，又有时间足迹记忆。
+
+- 这本书，可以用来：
+- 送给孩子的生日礼物
+- 送给伴侣的生日礼物
+- 送给未来的自己
+- ……
+
+现在，你可以选择打印电子书或者纸质书。打印纸质书的话，可以找第三方机构花钱购买；**打印电子书的话，我们完全可以自己动手生成，这可以省下一笔不小的开支**。
+
+
+
+### 功能截图
+
+在开始写代码思路之前，我们先看看最终生成的效果。
+
+### 电子书效果(图片引用自[出书啦](https://chushu.la/))
+![](10.一键生成个人微信朋友圈数据电子书/image/page1.png)
+![](10.一键生成个人微信朋友圈数据电子书/image/page2.png)
+
+### 纸质书效果(图片引用自[心书](https://weixinshu.com/library/unboxing))
+![](10.一键生成个人微信朋友圈数据电子书/image/page3.jpeg)
+
+
+### 如何运行
+```bash
+# 跳转到当前目录
+cd 目录名
+# 先卸载依赖库
+pip uninstall -y -r requirement.txt
+# 再重新安装依赖库
+pip install -r requirement.txt
+# 开始运行
+python main.py
+```
+
+
+
+
+
+
+
+
+
 <br />
 <br />
 
@@ -434,6 +486,8 @@ python main.py
 [generate_wx_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/8.%E4%B8%80%E9%94%AE%E7%94%9F%E6%88%90%E5%BE%AE%E4%BF%A1%E4%B8%AA%E4%BA%BA%E4%B8%93%E5%B1%9E%E6%95%B0%E6%8D%AE%E6%8A%A5%E5%91%8A(%E4%BA%86%E8%A7%A3%E4%BD%A0%E7%9A%84%E5%BE%AE%E4%BF%A1%E7%A4%BE%E4%BA%A4%E5%8E%86%E5%8F%B2)
 
 [generate_qq_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/9.%E4%B8%80%E9%94%AE%E7%94%9F%E6%88%90QQ%E4%B8%AA%E4%BA%BA%E5%8E%86%E5%8F%B2%E6%8A%A5%E5%91%8A
+
+[generate_friend_group_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/10.%E4%B8%80%E9%94%AE%E7%94%9F%E6%88%90%E4%B8%AA%E4%BA%BA%E5%BE%AE%E4%BF%A1%E6%9C%8B%E5%8F%8B%E5%9C%88%E6%95%B0%E6%8D%AE%E7%94%B5%E5%AD%90%E4%B9%A6
 
 [1]:https://www.google.com/chrome/
 [2]:http://chromedriver.storage.googleapis.com/index.html
