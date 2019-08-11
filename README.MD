@@ -397,6 +397,8 @@ python main.py
 ```
 
 
+<br />
+<br />
 
 
 
@@ -444,10 +446,49 @@ python main.py
 ```
 
 
+<br />
+<br />
 
 
 
 
+## [11.一键分析你的上网行为(web页面可视化)][chrome_history_data]
+
+
+### 简介
+
+**想看看你最近一年都在干嘛？看看你平时上网是在摸鱼还是认真工作？想写年度汇报总结，但是苦于没有数据？现在，它来了。**
+
+这是一个能让你了解自己的浏览历史的Chrome浏览历史记录分析程序，当然了，他仅适用于Chrome浏览器或者以Chrome为内核的浏览器。
+
+在该页面中你将可以查看有关自己在过去的时间里所访问浏览的域名、URL以及忙碌天数的前十排名以及相关的数据图表。
+
+
+### 功能截图
+
+在开始写代码思路之前，我们先看看最终生成的效果。
+
+![](11.一键分析你的上网行为(web页面可视化)/demo.gif)
+
+
+### 如何运行
+
+在线演示程序:[http://39.106.118.77:8090](http://39.106.118.77:8090)(普通服务器，勿测压)
+
+运行本程序十分简单，只需要按照以下命令即可运行：
+
+```bash
+# 跳转到当前目录
+cd 目录名
+# 先卸载依赖库
+pip uninstall -y -r requirement.txt
+# 再重新安装依赖库
+pip install -r requirement.txt
+# 开始运行
+python app.py
+
+# 运行成功后，通过浏览器打开http://localhost:8090
+```
 
 
 
@@ -488,6 +529,9 @@ python main.py
 [generate_qq_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/9.%E4%B8%80%E9%94%AE%E7%94%9F%E6%88%90QQ%E4%B8%AA%E4%BA%BA%E5%8E%86%E5%8F%B2%E6%8A%A5%E5%91%8A
 
 [generate_friend_group_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/10.%E4%B8%80%E9%94%AE%E7%94%9F%E6%88%90%E4%B8%AA%E4%BA%BA%E5%BE%AE%E4%BF%A1%E6%9C%8B%E5%8F%8B%E5%9C%88%E6%95%B0%E6%8D%AE%E7%94%B5%E5%AD%90%E4%B9%A6
+
+[chrome_history_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/11.%E4%B8%80%E9%94%AE%E5%88%86%E6%9E%90%E4%BD%A0%E7%9A%84%E4%B8%8A%E7%BD%91%E8%A1%8C%E4%B8%BA(web%E9%A1%B5%E9%9D%A2%E5%8F%AF%E8%A7%86%E5%8C%96)
+
 
 [1]:https://www.google.com/chrome/
 [2]:http://chromedriver.storage.googleapis.com/index.html
