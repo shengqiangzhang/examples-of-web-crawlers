@@ -375,6 +375,115 @@ def update(contents):
 <br />
 <br />
 
+接下来，就是我们数据提取最核心的部分了，即从Chrome历史记录文件中提取出我们想要的数据。由于Chrome历史记录文件是一个sqlite数据库，所以我们需要使用数据库语法提取出我们想要的内容。
+
+```python
+# 获取排序后的历史数据
+def get_history_data(history_file_path):
+
+    try:
+
+        # 获取数据库内容
+        # 数据格式为元组(tuple)
+        select_statement = "SELECT urls.id, urls.url, urls.title, urls.last_visit_time, urls.visit_count, visits.visit_time, visits.from_visit, visits.transition, visits.visit_duration FROM urls, visits WHERE urls.id = visits.url;"
+        result = query_sqlite_db(history_file_path, select_statement)
+
+        # 将结果按第1个元素进行排序
+        # sort和sorted内建函数会优先排序第1个元素，然后再排序第2个元素，依此类推
+        result_sort = sorted(result, key=lambda x: (x[0], x[1], x[2], x[3], x[4], x[5], x[6], x[7], x[8]))
+
+        # 返回排序后的数据
+        return result_sort
+    except:
+        # print('读取出错!')
+        return 'error'
+
+```
+
+上面`select_statement`指的是查询数据库的规则，规则如下：
+1. 从(FROM)表`urls`中选择(SELECT)出以下字段`urls.id`, `urls.url`, `urls.title`, `urls.last_visit_time`, `urls.visit_count`，依次代表`URL的ID`，`URL的地址`，`URL的标题`，`URL最后的访问时间`，`URL的访问次数`。
+
+2. 接着，从(FROM)表`visits`中选择(SELECT)出以下字段`visits.visit_time`, `visits.from_visit`, `visits.transition`, `visits.visit_duration`，分别代表的是`访问时间`，`从哪个链接跳转过来的`，`访问跳转`，`访问停留的时间`。
+
+3. 对`步骤1`和`步骤2`的结果进行连接，形成一个表格。然后从中(WHERE)筛选出符合`urls.id = visits.url`的行。在`urls`中，`id`代表的是URL的`id`，在`visits`中，`url`代表的也是URL的`id`，所以只有当两者相等，才能连接一起，才能保留，否则就要去除这一行。
+
+4. 使用排序函数`sorted`，这个函数依次是以`x[0]`，`x[1]`，`x[2]`，`x[3]`，`x[4]`，`x[5]`，`x[6]`，`x[7]`，`x[8]`进行排序，也就是指的是`urls.id`, `urls.url`, `urls.title`, `urls.last_visit_time`, `urls.visit_count`, `visits.visit_time`, `visits.from_visit`, `visits.transition`, `visits.visit_duration`。
+
+5. 返回一个排序好的数据
+
+这里我们列出每个字段代表的意思：
+| 字段名                | 代表               |
+| ----                 | ----              |
+| urls.id              | url的编号          |
+| urls.url             | url的地址          |
+| urls.title           | url的标题          |
+| urls.last_visit_time | url的最后访问时间    |
+| urls.visit_count     | url的访问次数       |
+| urls.visit_time      | url的访问时间       |
+| urls.from_visit      | 从哪里访问到这个url  |
+| urls.transition      | url的跳转           |
+| urls.visit_duration  | url的停留时间       |
+
+<br />
+<br />
+
+
+#### 6. 如何获取Chrome历史记录文件
+##### Windows Vista, Windows 7,  Windows 8, Windows 10
+- 历史记录文件位置: `C:\Users\%USERNAME%\AppData\Local\Google\Chrome\User Data\Default\History`
+
+- 拷贝历史记录文件到桌面: 
+```bash
+# 打开命令行cmd,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
+copy "C:\Users\%USERNAME%\AppData\Local\Google\Chrome\User Data\Default\History" "C:\Users\%USERNAME%\Desktop\History"
+```
+
+- **注意说明**: `%USERNAME%`为你的用户名, 如果执行命令出现错误, 请手动找到该历史记录文件。
+
+<br />
+
+##### Windows XP
+
+- 历史记录文件位置: `C:\Documents and Settings\%USERNAME%\Local Settings\Application Data\Google\Chrome\User Data\Default\History`
+
+- 拷贝历史记录文件到桌面: 
+```bash
+# 打开命令行cmd,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
+copy "C:\Documents and Settings\%USERNAME%\Local Settings\Application Data\Google\Chrome\User Data\Default\History" "C:\Documents and Settings\%USERNAME%\Desktop\History"
+```
+
+- **注意说明**: `%USERNAME%`为你的用户名, 如果执行命令出现错误, 请手动找到该历史记录文件。
+
+<br />
+
+##### Mac OS X
+
+- 历史记录文件位置: `~/Library/Application Support/Google/Chrome/Default/History`
+
+- 拷贝历史记录文件到桌面:
+```bash
+# 打开terminal,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
+cp ~/Library/Application\ Support/Google/Chrome/Default/History ~/Desktop/History
+```
+
+- **注意说明**: `Application Support`中的空格需要转义，所以改为`Application\ Support`
+
+<br />
+
+##### Linux/ Unix
+- 历史记录文件位置:  `~/.config/google-chrome/Default/History`
+
+- 拷贝历史记录文件到桌面: 
+```bash
+# 打开terminal,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
+cp ~/.config/google-chrome/Default/History ~/Desktop/History
+```
+
+- **注意说明**: `如果提示路径不存在, 请自行获取History文件`
+
+<br />
+<br />
+<br />
 ### 如何运行
 在线演示程序:[http://39.106.118.77:8090](http://39.106.118.77:8090)(普通服务器，勿测压)
 
