@@ -412,8 +412,9 @@ def get_history_data(history_file_path):
 5. 返回一个排序好的数据
 
 这里我们列出每个字段代表的意思：
-| 字段名                | 代表               |
-| ----                 | ----              |
+
+| 字段名                | 含义               |
+|  :----  | :----  |
 | urls.id              | url的编号          |
 | urls.url             | url的地址          |
 | urls.title           | url的标题          |
