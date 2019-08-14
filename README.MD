@@ -1,4 +1,4 @@
-# <p align="center">一些python爬虫例子,对新手比较友好</p>
+# <p align="center">一些有趣的python爬虫例子,对新手比较友好</p>
 
 
 <p align="center">
