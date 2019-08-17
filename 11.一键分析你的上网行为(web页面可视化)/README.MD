@@ -6,7 +6,7 @@
 
 **想看看你最近一年都在干嘛？看看你平时上网是在摸鱼还是认真工作？想写年度汇报总结，但是苦于没有数据？现在，它来了。**
 
-这是一个能让你了解自己的浏览历史的Chrome浏览历史记录分析程序，当然了，他仅适用于Chrome浏览器或者以Chrome为内核的浏览器。
+这是一个能让你了解自己的浏览历史的Chrome浏览历史记录分析程序，**他适用于Chrome浏览器或者以Chromium为内核的浏览器。目前国内大部分浏览器均是以Chromium为内核的浏览器，所以基本上都可以使用。但是不支持以下浏览器：IE浏览器、Firefox浏览器、Safari浏览器。**
 
 在该页面中你将可以查看有关自己在过去的时间里所访问浏览的域名、URL以及忙碌天数的前十排名以及相关的数据图表。
 
@@ -430,57 +430,14 @@ def get_history_data(history_file_path):
 
 
 #### 6. 如何获取Chrome历史记录文件
-##### Windows Vista, Windows 7,  Windows 8, Windows 10
-- 历史记录文件位置: `C:\Users\%USERNAME%\AppData\Local\Google\Chrome\User Data\Default\History`
 
-- 拷贝历史记录文件到桌面: 
-```bash
-# 打开命令行cmd,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
-copy "C:\Users\%USERNAME%\AppData\Local\Google\Chrome\User Data\Default\History" "C:\Users\%USERNAME%\Desktop\History"
-```
+1. 首先，打开浏览器，输入`chrome://version/`，其中，`个人资料路径`即为存放历史文件所在的目录。
 
-- **注意说明**: `%USERNAME%`为你的用户名, 如果执行命令出现错误, 请手动找到该历史记录文件。
+![](assets/image/location.png)
 
-<br />
+2. 跳转到`个人资料路径`，比如`/Users/xxx/Library/Application Support/Google/Chrome/Default`，找到一个叫`History`的文件，这个文件即为历史记录文件。
 
-##### Windows XP
-
-- 历史记录文件位置: `C:\Documents and Settings\%USERNAME%\Local Settings\Application Data\Google\Chrome\User Data\Default\History`
-
-- 拷贝历史记录文件到桌面: 
-```bash
-# 打开命令行cmd,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
-copy "C:\Documents and Settings\%USERNAME%\Local Settings\Application Data\Google\Chrome\User Data\Default\History" "C:\Documents and Settings\%USERNAME%\Desktop\History"
-```
-
-- **注意说明**: `%USERNAME%`为你的用户名, 如果执行命令出现错误, 请手动找到该历史记录文件。
-
-<br />
-
-##### Mac OS X
-
-- 历史记录文件位置: `~/Library/Application Support/Google/Chrome/Default/History`
-
-- 拷贝历史记录文件到桌面:
-```bash
-# 打开terminal,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
-cp ~/Library/Application\ Support/Google/Chrome/Default/History ~/Desktop/History
-```
-
-- **注意说明**: `Application Support`中的空格需要转义，所以改为`Application\ Support`
-
-<br />
-
-##### Linux/ Unix
-- 历史记录文件位置:  `~/.config/google-chrome/Default/History`
-
-- 拷贝历史记录文件到桌面: 
-```bash
-# 打开terminal,输入以下命令, 自动将History文件复制到桌面, 文件名为History, 没有后缀名
-cp ~/.config/google-chrome/Default/History ~/Desktop/History
-```
-
-- **注意说明**: `如果提示路径不存在, 请自行获取History文件`
+![](assets/image/history.png)
 
 <br />
 <br />
