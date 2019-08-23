@@ -1,16 +1,18 @@
-# <p align="center">一些有趣的python爬虫例子,对新手比较友好</p>
+# <p align="center">一些非常有趣的python爬虫例子,对新手比较友好</p>
 
 
 <p align="center">
     <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/badge/status-updating-brightgreen.svg"></a>
     <a href="https://github.com/python/cpython"><img src="https://img.shields.io/badge/Python-3.7-FF1493.svg"></a>
-    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/badge/platform-Windows%7CLinux%7CmacOS-660066.svg"></a>
     <a href="https://opensource.org/licenses/mit-license.php"><img src="https://badges.frapsoft.com/os/mit/mit.svg"></a>
+    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/github/repo-size/shengqiangzhang/examples-of-web-crawlers"></a>
+    <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/graphs/contributors"><img src="https://img.shields.io/github/contributors/shengqiangzhang/examples-of-web-crawlers?color=blue"></a>
     <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/stargazers"><img src="https://img.shields.io/github/stars/shengqiangzhang/examples-of-web-crawlers.svg?logo=github"></a>
     <a href="https://github.com/shengqiangzhang/examples-of-web-crawlers/network/members"><img src="https://img.shields.io/github/forks/shengqiangzhang/examples-of-web-crawlers.svg?color=blue&logo=github"></a>
     <a href="https://www.python.org/"><img src="https://upload.wikimedia.org/wikipedia/commons/c/c3/Python-logo-notext.svg" align="right" height="48" width="48" ></a>
 </p>
 <br />
+
 
 ## 简介
 一些常见的网站爬虫例子，代码通用性较高，时效性较久。**项目代码对新手比较友好**，尽量用简单的python代码，并配有大量注释。
@@ -489,6 +491,21 @@ python app.py
 
 # 运行成功后，通过浏览器打开http://localhost:8090
 ```
+
+
+
+<br />
+<br />
+
+## 如何下载
+
+本仓库大小为<a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/github/repo-size/shengqiangzhang/examples-of-web-crawlers"></a>, 为提高下载速度, 建议使用代理服务器下载。
+
+<br />
+
+没有或不懂如何设置代理服务器的<img src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Flag_of_the_People%27s_Republic_of_China.svg/320px-Flag_of_the_People%27s_Republic_of_China.svg.png" width="30px" />**中国用户**, 请跳转至本仓库同步镜像[码云Gitee](https://gitee.com/shengqiangzhang/examples-of-web-crawlers)进行下载。
+
+
 
 
 
