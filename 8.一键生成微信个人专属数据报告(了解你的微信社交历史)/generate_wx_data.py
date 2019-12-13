@@ -13,6 +13,7 @@ from pyecharts.charts import Pie
 from pyecharts.charts import Map
 from pyecharts.charts import WordCloud
 from pyecharts.charts import Bar
+from pyecharts import options as opts
 from requests import post
 import PIL.Image as Image
 import re
@@ -59,11 +60,11 @@ def sex_ratio():
     name_list = ['男性', '女性', '未设置']
     num_list = [male, female, other]
 
-    pie = Pie("微信好友性别比例")
-    pie.add("", name_list, num_list, is_label_show=True)
+    pie = Pie()
+    pie.add("微信好友性别比例", [list(z) for z in zip(name_list, num_list)])
+    pie.set_global_opts(title_opts=opts.TitleOpts(title="微信好友性别比例"))
+    pie.set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
     pie.render('data/好友性别比例.html')
-
-
 
 
 # 分析好友地区分布
@@ -90,9 +91,14 @@ def region_distribution():
 
 
     # maptype='china' 只显示全国直辖市和省级，数据只能是省名和直辖市的名称
-    map = Map("微信好友地区分布")
-    map.add("", province, values, visual_range=[0, 50], maptype='china', is_visualmap=True, visual_text_color='#000')
+    map = Map()
+    map.add("微信好友地区分布", [list(z) for z in zip(province, values)], "china")
+    map.set_global_opts(
+            title_opts=opts.TitleOpts(title="微信好友地区分布"),
+            visualmap_opts=opts.VisualMapOpts(),
+        )
     map.render(path="data/好友地区分布.html")
+
 
 
     # 对好友数最多的省份进行一进步分析
@@ -113,11 +119,10 @@ def region_distribution():
             else:
                 city_dict[user.city] = 1
 
-    bar = Bar(max_count_province + '中,好友地区分布')
-    bar.add(name='地区分布', x_axis=[x for x in city_dict.keys()], y_axis=[x for x in city_dict.values()])
+    bar = Bar()
+    bar.add_xaxis([x for x in city_dict.keys()])
+    bar.add_yaxis("地区分布", [x for x in city_dict.values()])
     bar.render('data/某省好友地区分布.html')
-
-
 
 
 # 统计认识的好友的比例
@@ -141,8 +146,10 @@ def statistics_friends():
     name_list = ['未设置备注的好友', '设置备注的男性好友', '设置备注的女性好友', '设置备注的其他好友']
     num_list = [unknown, known_male, known_female, known_other]
 
-    pie = Pie("你认识的好友比例", title_pos='center')
-    pie.add("", name_list, num_list, is_label_show=True, legend_orient="vertical", legend_pos="left")
+    pie = Pie()
+    pie.add("你认识的好友比例", [list(z) for z in zip(name_list, num_list)])
+    pie.set_global_opts(title_opts=opts.TitleOpts(title="你认识的好友比例"))
+    pie.set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
     pie.render('data/你认识的好友比例.html')
 
 
@@ -164,8 +171,10 @@ def analyze_remark_name():
     name_list = ['最重要的她', '最重要的他', '爸爸', '妈妈', '死党']
     num_list = [x for x in close_partner_dict.values()]
 
-    pie = Pie("可能是你最亲密的人")
-    pie.add("", name_list, num_list, is_label_show=True, is_legend_show=False)
+    pie = Pie()
+    pie.add("可能是你最亲密的人", [list(z) for z in zip(name_list, num_list)])
+    pie.set_global_opts(title_opts=opts.TitleOpts(title="可能是你最亲密的人"))
+    pie.set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
     pie.render('data/你最亲密的人.html')
 
 
@@ -225,8 +234,8 @@ def analyze_signature():
     # 开始绘制词云
     name = [x for x in signature_dict.keys()]
     value = [x for x in signature_dict.values()]
-    wordcloud = WordCloud('微信好友个性签名词云图')
-    wordcloud.add("", name, value, shape='star', word_size_range=[1,100])
+    wordcloud = WordCloud()
+    wordcloud.add('微信好友个性签名词云图', [list(z) for z in zip(name, value)], word_size_range=[1,100], shape='star')
     wordcloud.render('data/好友个性签名词云.html')
 
 
@@ -467,8 +476,9 @@ def analyze_special_friends():
             stranger_friends += 1
 
 
-    bar = Bar('特殊好友分析')
-    bar.add(name='', x_axis=['星标', '不让他看我朋友圈', '不看他朋友圈', '消息置顶', '陌生人'], y_axis=[star_friends, hide_my_post_friends, hide_his_post_friends, sticky_on_top_friends, stranger_friends], legend_orient="vertical", legend_pos="left")
+    bar = Bar()
+    bar.add_xaxis(['星标', '不让他看我朋友圈', '不看他朋友圈', '消息置顶', '陌生人'])
+    bar.add_yaxis('特殊好友分析', [star_friends, hide_my_post_friends, hide_his_post_friends, sticky_on_top_friends, stranger_friends])
     bar.render('data/特殊好友分析.html')
 
 
@@ -522,9 +532,9 @@ def group_common_in():
     # 取出前n大的值
     sort_list = sort_list[:n]
 
-
-    bar = Bar('共同所在群聊分析')
-    bar.add(name='', x_axis=[x[0] for x in sort_list], y_axis=[x[1] for x in sort_list], legend_orient="vertical", legend_pos="left")
+    bar = Bar()
+    bar.add_xaxis([x[0] for x in sort_list])
+    bar.add_yaxis("共同所在群聊分析", [x[1] for x in sort_list])
     bar.render('data/共同所在群聊分析.html')
 
 
