@@ -161,12 +161,11 @@ if __name__=='__main__':
         book_name = book[1]
         notes = get_bookmarklist(book[0], HEADERS)
 
-        with open(note_dir + book_name + '.txt', 'w') as f:
+        with open(note_dir + book_name + '.txt', 'w', encoding='utf-8') as f:
             f.write(notes)
 
 
         print('导出笔记 {} ({}/{})'.format(note_dir + book_name + '.txt', index+1, len(books_finish_read)))
-
 
 
 

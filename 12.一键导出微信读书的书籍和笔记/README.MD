@@ -295,7 +295,7 @@ cd 目录名
 # 先卸载依赖库
 pip uninstall -y -r requirement.txt
 # 再重新安装依赖库
-pip install -r requirement.txt
+pip install -r requirement.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
 # 开始运行
 python pyqt_gui.py
 ```
