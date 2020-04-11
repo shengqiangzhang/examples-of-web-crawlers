@@ -10,6 +10,7 @@
 """
 
 from wereader import *
+from excel import *
 import sys
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QApplication
@@ -127,6 +128,23 @@ if __name__=='__main__':
 
 
 
-    print(get_bookshelf(USER_VID, HEADERS))
-    print(get_bookmarklist(29845865, HEADERS))
-    #29845865
+    books = get_bookshelf(USER_VID, HEADERS) # 获取书架上的书籍
+    books_finish_read = books['finishReadBooks']
+    #books_finish_read =
+    print(books_finish_read)
+    exit()
+    books_recent_read = books['recentBooks']
+    books_all = books['allBooks']
+
+
+    write_excel_xls('我的书架.xls', ['已读完的书籍', '最近阅读的书籍', '所有的书籍'], value_title) # 写入excel文件
+    write_excel_xls_append('我的书架.xls', '已读完的书籍', '') # 追加写入excel文件
+
+    for type_books in books.keys():
+        for book in books[type_books]:
+            print(book)
+            # print(get_bookmarklist(book.bookId, HEADERS))
+
+        print('\n\n')
+        #29845865
+

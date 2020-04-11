@@ -9,6 +9,12 @@
 @mail: sqzhang77@gmail.com
 """
 
+"""
+@origin: https://github.com/arry-lee/wereader
+@author: arry-lee
+@annotation: modified from arry-lee
+"""
+
 from collections import namedtuple, defaultdict
 from operator import itemgetter
 from itertools import chain
@@ -20,8 +26,10 @@ import urllib3
 # 禁用安全警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# 书籍信息
+Book = namedtuple('Book', ['bookId', 'title', 'author', 'cover', 'intro', 'category'])
 
-Book = namedtuple('Book', ['bookId', 'title', 'author', 'cover', 'category'])
+
 
 def get_bookmarklist(bookId, headers):
     """获取某本书的笔记返回md文本"""
@@ -136,16 +144,34 @@ def get_bookshelf(userVid, headers):
         data = r.json()
     else:
         raise Exception(r.text)
-    books = set()
-    for book in chain(data['finishReadBooks'], data['recentBooks']):
+
+    books_finish_read = set() # 已读完的书籍
+    books_recent_read = set() # 最近阅读的书籍
+    books_all = set() # 书架上的所有书籍
+
+
+    for book in data['finishReadBooks']:
         if not book['bookId'].isdigit(): # 过滤公众号
             continue
-        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['category'])
-        books.add(b)
-    books = list(books)
-    books.sort(key=itemgetter(-1))
+        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['intro'], book['category'])
+        books_finish_read.add(b)
+    books_finish_read = list(books_finish_read)
+    books_finish_read.sort(key=itemgetter(-1)) # operator.itemgetter(-1)指的是获取对象的最后一个域的值，即以category进行排序
 
-    return books
+
+
+    for book in data['recentBooks']:
+        if not book['bookId'].isdigit(): # 过滤公众号
+            continue
+        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['intro'], book['category'])
+        books_recent_read.add(b)
+    books_recent_read = list(books_recent_read)
+    books_recent_read.sort(key=itemgetter(-1)) # operator.itemgetter(-1)指的是获取对象的最后一个域的值，即以category进行排序
+
+
+    books_all = books_finish_read + books_recent_read
+
+    return dict(finishReadBooks=books_finish_read, recentBooks=books_recent_read, allBooks=books_all)
 
 
 def get_notebooklist(headers):
@@ -160,8 +186,7 @@ def get_notebooklist(headers):
     books = []
     for b in data['books']:
         book = b['book']
-        b = Book(book['bookId'], book['title'], book['author'],
-                 book['cover'], book['category'])
+        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['intro'], book['category'])
         books.append(b)
     books.sort(key=itemgetter(-1))
     return books
