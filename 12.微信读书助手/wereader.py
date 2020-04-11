@@ -14,6 +14,8 @@ from operator import itemgetter
 from itertools import chain
 
 import requests
+import json
+import clipboard
 import urllib3
 # 禁用安全警告
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
@@ -43,7 +45,7 @@ def get_bookmarklist(bookId, headers):
         start = int(item['range'].split('-')[0])
         contents[chapter].append((start, text))
 
-    chapters_map = {title: level for level, title in get_chapters(int(bookId))}
+    chapters_map = {title: level for level, title in get_chapters(int(bookId), headers)}
     res = ''
     for c in sorted(chapters.keys()):
         title = chapters[c]
@@ -136,10 +138,9 @@ def get_bookshelf(userVid, headers):
         raise Exception(r.text)
     books = set()
     for book in chain(data['finishReadBooks'], data['recentBooks']):
-        if not book['bookId'].isdigit():    # 过滤公众号
+        if not book['bookId'].isdigit(): # 过滤公众号
             continue
-        b = Book(book['bookId'], book['title'], book['author'],
-                 book['cover'], book['category'])
+        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['category'])
         books.add(b)
     books = list(books)
     books.sort(key=itemgetter(-1))

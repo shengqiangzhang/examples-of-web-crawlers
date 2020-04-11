@@ -80,6 +80,7 @@ class MainWindow(QMainWindow):
             # 获取用户user_vid
             if 'wr_vid' in self.DomainCookies.keys():
                 USER_VID = self.DomainCookies['wr_vid']
+                print('用户id:{}'.format(USER_VID))
 
             # 关闭整个qt窗口
             QCoreApplication.instance().quit()
@@ -127,3 +128,5 @@ if __name__=='__main__':
 
 
     print(get_bookshelf(USER_VID, HEADERS))
+    print(get_bookmarklist(29845865, HEADERS))
+    #29845865
