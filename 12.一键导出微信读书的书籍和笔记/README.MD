@@ -111,6 +111,7 @@ class MainWindow(QMainWindow):
 5. 加载网页
 
 <br />
+<br />
 
 ```python
     # 网页加载完毕事件
@@ -149,6 +150,7 @@ class MainWindow(QMainWindow):
 
 
 <br />
+<br />
 
 ```python
     # 添加cookies事件
@@ -165,6 +167,7 @@ class MainWindow(QMainWindow):
 1. 保存微信读书网址的cookies，以便后续操作
 
 
+<br />
 <br />
 
 ```python
@@ -234,6 +237,7 @@ def get_bookshelf(userVid, headers):
 2. 过滤公众号部分
 2. 将书籍数据保存为字典格式
 
+<br />
 <br />
 
 ```python
