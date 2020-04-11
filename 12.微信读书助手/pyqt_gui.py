@@ -3,56 +3,20 @@
 
 """
 @project: PyCharm
-@file: main.py
+@file: pyqt_gui.py
 @author: Shengqiang Zhang
 @time: 2020/4/11 02:32
 @mail: sqzhang77@gmail.com
 """
 
-
-from PyQt5.QtGui import *
-from PyQt5.QtCore import *
-from PyQt5 import QtCore
-from PyQt5.QtWidgets import *
-from PyQt5 import QtWidgets
-from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile,QWebEngineSettings,QWebEnginePage
+from wereader import *
 import sys
-import json
-import requests
-import time
-
-
-def get_notebooklist(headers):
-    """获取笔记书单"""
-    url = "https://i.weread.qq.com/user/notebooks"
-    r = requests.get(url,headers=headers,verify=False)
-
-    if r.ok:
-        data = r.json()
-        print(data)
-    else:
-        data = r.json()
-        print(data)
-        # raise Exception(r.text)
-    # books = []
-    # for b in data['books']:
-    #     book = b['book']
-    #     b = Book(book['bookId'],book['title'],book['author'],book['cover'],book['category'])
-    #     books.append(b)
-    # books.sort(key=itemgetter(-1))
-    # return books
-
-
-def login_success(headers):
-    """判断是否登录成功"""
-    url = "https://i.weread.qq.com/user/notebooks"
-    r = requests.get(url,headers=headers,verify=False)
-
-    if r.ok:
-        return True
-    else:
-        return False
-
+from PyQt5.QtWidgets import QMainWindow
+from PyQt5.QtWidgets import QApplication
+from PyQt5.QtCore import QUrl
+from PyQt5.QtCore import Qt
+from PyQt5.QtCore import QCoreApplication
+from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile
 
 
 class MainWindow(QMainWindow):
@@ -64,7 +28,7 @@ class MainWindow(QMainWindow):
 
         self.setWindowTitle('微信读书助手') # 设置窗口标题
         self.resize(900, 600) # 设置窗口大小
-        self.setWindowFlags(QtCore.Qt.WindowMinimizeButtonHint) # 禁止最大化按钮
+        self.setWindowFlags(Qt.WindowMinimizeButtonHint) # 禁止最大化按钮
         self.setFixedSize(self.width(), self.height()) # 禁止调整窗口大小
 
         url = 'https://weread.qq.com/#login' # 目标地址
@@ -77,6 +41,8 @@ class MainWindow(QMainWindow):
 
         self.browser.load(QUrl(url)) # 加载网页
         self.setCentralWidget(self.browser) # 设置中心窗口
+
+
 
 
 
@@ -105,9 +71,12 @@ class MainWindow(QMainWindow):
         # 判断是否成功登录微信读书
         if login_success(headers):
             print('登录微信读书成功!')
-            exit()
+            # 关闭整个qt窗口
+            QCoreApplication.instance().quit()
         else:
             print('请扫描二维码登录微信读书...')
+
+
 
 
     # 添加cookies事件
@@ -117,6 +86,8 @@ class MainWindow(QMainWindow):
             value = cookie.value().data().decode('utf-8')
             if name not in self.DomainCookies:
                 self.DomainCookies.update({name: value})
+
+
 
 
     # 窗口关闭事件
@@ -137,12 +108,11 @@ class MainWindow(QMainWindow):
 
 
 if __name__=='__main__':
+    app = QApplication(sys.argv) # 创建应用
+    window = MainWindow() # 创建主窗口
+    window.show() # 显示窗口
+    app.exec_() # 运行应用，并监听事件
 
-    # 创建应用
-    app = QApplication(sys.argv)
-    # 创建主窗口
-    window = MainWindow()
-    # 显示窗口
-    window.show()
-    # 运行应用，并监听事件
-    app.exec_()
+
+
+    print('11111111')
