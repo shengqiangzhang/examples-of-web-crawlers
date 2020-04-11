@@ -5,7 +5,7 @@
 @project: PyCharm
 @file: pyqt_gui.py
 @author: Shengqiang Zhang
-@time: 2020/4/11 02:32
+@time: 2020/4/11 21:14
 @mail: sqzhang77@gmail.com
 """
 
@@ -131,8 +131,12 @@ if __name__=='__main__':
 
     # 创建目录
     data_dir = './导出资料/'
+    note_dir = data_dir + '我的笔记/'
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
+
+    if not os.path.exists(note_dir):
+        os.makedirs(note_dir)
 
 
 
@@ -157,11 +161,11 @@ if __name__=='__main__':
         book_name = book[1]
         notes = get_bookmarklist(book[0], HEADERS)
 
-        with open(data_dir + book_name + '.txt', 'w') as f:
+        with open(note_dir + book_name + '.txt', 'w') as f:
             f.write(notes)
 
 
-        print('导出笔记 {} ({}/{})'.format(data_dir + book_name + '.txt', index+1, len(books_finish_read)))
+        print('导出笔记 {} ({}/{})'.format(note_dir + book_name + '.txt', index+1, len(books_finish_read)))
 
 
 
