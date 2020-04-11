@@ -18,6 +18,21 @@ from PyQt5.QtCore import Qt
 from PyQt5.QtCore import QCoreApplication
 from PyQt5.QtWebEngineWidgets import QWebEngineView, QWebEngineProfile
 
+# 设置header
+HEADERS = {
+    'Host': 'i.weread.qq.com',
+    'Connection': 'keep-alive',
+    'Upgrade-Insecure-Requests': '1',
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36',
+    'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
+    'Accept-Encoding': 'gzip, deflate, br',
+    'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
+}
+
+# 微信读书用户id
+USER_VID = 0
+
+
 
 class MainWindow(QMainWindow):
 
@@ -49,30 +64,26 @@ class MainWindow(QMainWindow):
     # 网页加载完毕事件
     def onLoadFinished(self):
 
+        global USER_VID
+        global HEADERS
+
         # 获取cookies
-        cookies = ['{}={};'.format(key, value)for key,value in self.DomainCookies.items()]
+        cookies = ['{}={};'.format(key, value) for key,value in self.DomainCookies.items()]
         cookies = ' '.join(cookies)
-
-        # 设置header
-        headers = {
-            'Host': 'i.weread.qq.com',
-            'Connection': 'keep-alive',
-            'Upgrade-Insecure-Requests': '1',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/73.0.3683.103 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3',
-            'Accept-Encoding': 'gzip, deflate, br',
-            'Accept-Language': 'zh-CN,zh;q=0.9,en;q=0.8'
-        }
-
         # 添加Cookie到header
-        headers.update(Cookie=cookies)
-
+        HEADERS.update(Cookie=cookies)
 
         # 判断是否成功登录微信读书
-        if login_success(headers):
+        if login_success(HEADERS):
             print('登录微信读书成功!')
+
+            # 获取用户user_vid
+            if 'wr_vid' in self.DomainCookies.keys():
+                USER_VID = self.DomainCookies['wr_vid']
+
             # 关闭整个qt窗口
             QCoreApplication.instance().quit()
+
         else:
             print('请扫描二维码登录微信读书...')
 
@@ -115,4 +126,4 @@ if __name__=='__main__':
 
 
 
-    print('11111111')
+    print(get_bookshelf(USER_VID, HEADERS))
