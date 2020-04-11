@@ -10,8 +10,10 @@
 """
 
 from wereader import *
-from excel import *
+from excel_func import *
 import sys
+import os
+import time
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QUrl
@@ -83,8 +85,8 @@ class MainWindow(QMainWindow):
                 USER_VID = self.DomainCookies['wr_vid']
                 print('用户id:{}'.format(USER_VID))
 
-            # 关闭整个qt窗口
-            QCoreApplication.instance().quit()
+                # 关闭整个qt窗口
+                self.close()
 
         else:
             print('请扫描二维码登录微信读书...')
@@ -127,24 +129,40 @@ if __name__=='__main__':
     app.exec_() # 运行应用，并监听事件
 
 
+    # 创建目录
+    data_dir = './导出资料/'
+    if not os.path.exists(data_dir):
+        os.makedirs(data_dir)
+
+
 
     books = get_bookshelf(USER_VID, HEADERS) # 获取书架上的书籍
     books_finish_read = books['finishReadBooks']
-    #books_finish_read =
-    print(books_finish_read)
-    exit()
+    books_finish_read = [[book.bookId, book.title, book.author, book.cover, book.intro, book.category] for book in books_finish_read]
     books_recent_read = books['recentBooks']
+    books_recent_read = [[book.bookId, book.title, book.author, book.cover, book.intro, book.category] for book in books_recent_read]
     books_all = books['allBooks']
+    books_all = [[book.bookId, book.title, book.author, book.cover, book.intro, book.category] for book in books_all]
+    write_excel_xls(data_dir + '我的书架.xls', ['已读完的书籍', '最近阅读的书籍', '所有的书籍'], [["ID", "标题", "作者", "封面", "简介", "所属目录"], ]) # 写入excel文件
+    write_excel_xls_append(data_dir + '我的书架.xls', '已读完的书籍', books_finish_read) # 追加写入excel文件
+    write_excel_xls_append(data_dir + '我的书架.xls', '最近阅读的书籍', books_recent_read)  # 追加写入excel文件
+    write_excel_xls_append(data_dir + '我的书架.xls', '所有的书籍', books_all)  # 追加写入excel文件
 
 
-    write_excel_xls('我的书架.xls', ['已读完的书籍', '最近阅读的书籍', '所有的书籍'], value_title) # 写入excel文件
-    write_excel_xls_append('我的书架.xls', '已读完的书籍', '') # 追加写入excel文件
 
-    for type_books in books.keys():
-        for book in books[type_books]:
-            print(book)
-            # print(get_bookmarklist(book.bookId, HEADERS))
 
-        print('\n\n')
-        #29845865
+    # 获取书架上的每本书籍的笔记
+    for index, book in enumerate(books_finish_read):
+        book_id = book[0]
+        book_name = book[1]
+        notes = get_bookmarklist(book[0], HEADERS)
+
+        with open(data_dir + book_name + '.txt', 'w') as f:
+            f.write(notes)
+
+
+        print('导出笔记 {} ({}/{})'.format(data_dir + book_name + '.txt', index+1, len(books_finish_read)))
+
+
+
 

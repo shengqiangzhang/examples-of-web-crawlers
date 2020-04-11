@@ -191,6 +191,7 @@ def get_notebooklist(headers):
     books.sort(key=itemgetter(-1))
     return books
 
+
 def login_success(headers):
     """判断是否登录成功"""
     url = "https://i.weread.qq.com/user/notebooks"
