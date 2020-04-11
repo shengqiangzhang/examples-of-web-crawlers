@@ -498,7 +498,7 @@ python app.py
 <br />
 
 
-## [12.一键导出微信读书的书籍和笔记][wereader]
+## [12.一键导出微信读书的书籍和笔记][weread]
 
 
 ### 简介
@@ -517,10 +517,6 @@ python app.py
 
 ### 如何运行
 
-在线演示程序:[http://39.106.118.77:8090](http://39.106.118.77:8090)(普通服务器，勿测压)
-
-运行本程序十分简单，只需要按照以下命令即可运行：
-
 ```bash
 # 跳转到当前目录
 cd 目录名
@@ -529,9 +525,7 @@ pip uninstall -y -r requirement.txt
 # 再重新安装依赖库
 pip install -r requirement.txt
 # 开始运行
-python app.py
-
-# 运行成功后，通过浏览器打开http://localhost:8090
+python pyqt_gui.py
 ```
 
 
@@ -592,6 +586,8 @@ python app.py
 
 [chrome_history_data]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/11.%E4%B8%80%E9%94%AE%E5%88%86%E6%9E%90%E4%BD%A0%E7%9A%84%E4%B8%8A%E7%BD%91%E8%A1%8C%E4%B8%BA(web%E9%A1%B5%E9%9D%A2%E5%8F%AF%E8%A7%86%E5%8C%96)
 
+[weread]:https://github.com/shengqiangzhang/examples-of-web-crawlers/tree/master/12.%E4%B8%80%E9%94%AE%E5%AF%BC%E5%87%BA%E5%BE%AE%E4%BF%A1%E8%AF%BB%E4%B9%A6%E7%9A%84%E4%B9%A6%E7%B1%8D%E5%92%8C%E7%AC%94%E8%AE%B0
+
 
 [1]:https://www.google.com/chrome/
 [2]:http://chromedriver.storage.googleapis.com/index.html
@@ -604,3 +600,5 @@ python app.py
 [9]:http://chromedriver.storage.googleapis.com/index.html
 
 
+
+[wereader]: 
