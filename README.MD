@@ -497,6 +497,49 @@ python app.py
 <br />
 <br />
 
+
+## [12.一键导出微信读书的书籍和笔记][wereader]
+
+
+### 简介
+
+全民阅读的时代已经来临，目前使用读书软件的用户数2.1亿，日活跃用户超过500万，其中19-35岁年轻用户占比超过60%，本科及以上学历用户占比高达80%，北上广深及其他省会城市/直辖市用户占比超过80%。**本人习惯使用微信读书，为了方便整理书籍和导出笔记，便开发了这个小工具。**
+
+
+### 功能截图
+
+在开始写代码思路之前，我们先看看最终生成的效果。
+
+![](12.一键导出微信读书的书籍和笔记/demo1.png)
+![](12.一键导出微信读书的书籍和笔记/demo2.png)
+![](12.一键导出微信读书的书籍和笔记/demo3.png)
+
+
+### 如何运行
+
+在线演示程序:[http://39.106.118.77:8090](http://39.106.118.77:8090)(普通服务器，勿测压)
+
+运行本程序十分简单，只需要按照以下命令即可运行：
+
+```bash
+# 跳转到当前目录
+cd 目录名
+# 先卸载依赖库
+pip uninstall -y -r requirement.txt
+# 再重新安装依赖库
+pip install -r requirement.txt
+# 开始运行
+python app.py
+
+# 运行成功后，通过浏览器打开http://localhost:8090
+```
+
+
+
+<br />
+<br />
+
+
 ## 如何下载
 
 本仓库大小为<a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/github/repo-size/shengqiangzhang/examples-of-web-crawlers"></a>, 为提高下载速度, 建议使用代理服务器下载。
