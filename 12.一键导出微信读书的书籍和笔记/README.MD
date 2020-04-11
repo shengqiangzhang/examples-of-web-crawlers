@@ -110,6 +110,7 @@ class MainWindow(QMainWindow):
 4. 绑定self.onLoadFinished事件
 5. 加载网页
 
+<br />
 
 ```python
     # 网页加载完毕事件
@@ -147,6 +148,7 @@ class MainWindow(QMainWindow):
 3. 如果失败登录微信读书，则继续等待用户扫描二维码
 
 
+<br />
 
 ```python
     # 添加cookies事件
@@ -163,6 +165,7 @@ class MainWindow(QMainWindow):
 1. 保存微信读书网址的cookies，以便后续操作
 
 
+<br />
 
 ```python
     books = get_bookshelf(USER_VID, HEADERS) # 获取书架上的书籍
@@ -231,6 +234,7 @@ def get_bookshelf(userVid, headers):
 2. 过滤公众号部分
 2. 将书籍数据保存为字典格式
 
+<br />
 
 ```python
 def get_bookmarklist(bookId, headers):
@@ -272,8 +276,6 @@ def get_bookmarklist(bookId, headers):
 1. 获取某一本书籍的笔记
 2. 将返回的字符串改写成markdown格式并输出
 
-<br />
-<br />
 
 
 
