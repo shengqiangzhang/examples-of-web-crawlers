@@ -13,11 +13,29 @@
 </p>
 <br />
 
-
-## 简介
+## 项目简介
 一些常见的网站爬虫例子，代码通用性较高，时效性较久。**项目代码对新手比较友好**，尽量用简单的python代码，并配有大量注释。
 
 
+
+
+
+<br />
+<br />
+
+## 如何下载
+
+本仓库大小为<a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/github/repo-size/shengqiangzhang/examples-of-web-crawlers"></a>, 为提高下载速度, 建议使用代理服务器下载。
+
+<br />
+
+没有或不懂如何设置代理服务器的![chinese_flag](./chinese_flag.png)**中国用户**, 请跳转至本仓库同步镜像[码云Gitee](https://gitee.com/shengqiangzhang/examples-of-web-crawlers)进行下载, 以便获得较快的下载速度。
+
+
+
+
+
+<br />
 <br />
 
 ## [1.淘宝模拟登录][taobao_login]
@@ -530,17 +548,6 @@ python pyqt_gui.py
 
 
 
-<br />
-<br />
-
-
-## 如何下载
-
-本仓库大小为<a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/github/repo-size/shengqiangzhang/examples-of-web-crawlers"></a>, 为提高下载速度, 建议使用代理服务器下载。
-
-<br />
-
-没有或不懂如何设置代理服务器的![chinese_flag](./chinese_flag.png)**中国用户**, 请跳转至本仓库同步镜像[码云Gitee](https://gitee.com/shengqiangzhang/examples-of-web-crawlers)进行下载, 以便获得较快的下载速度。
 
 
 
