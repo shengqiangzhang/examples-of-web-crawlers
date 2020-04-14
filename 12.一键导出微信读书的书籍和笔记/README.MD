@@ -1,13 +1,17 @@
-## 一键导出微信读书的书籍和笔记
+# 一键导出微信读书的书籍和笔记
 
-### 简介
+> 本项目基于[@arry-lee](https://github.com/arry-lee)的项目[wereader](https://github.com/arry-lee/wereader/issues/20)修改而来，感谢原作者提供的源代码。
+
+<br />
+
+## 简介
 
 全民阅读的时代已经来临，目前使用读书软件的用户数2.1亿，日活跃用户超过500万，其中19-35岁年轻用户占比超过60%，本科及以上学历用户占比高达80%，北上广深及其他省会城市/直辖市用户占比超过80%。**本人习惯使用微信读书，为了方便整理书籍和导出笔记，便开发了这个小工具。**
 
 <br />
 <br />
 
-### 部分截图
+## 部分截图
 ![](demo1.png)
 <br />
 ![](demo2.png)
@@ -17,9 +21,9 @@
 <br />
 <br />
 
-### 代码思路
+## 代码思路
 
-#### 1. 目录结构
+### 1. 目录结构
 首先，我们先看一下整体目录结构
 
 ```bash
@@ -40,7 +44,7 @@ Code
 
 <br />
 
-#### 2. excel_func.py
+### 2. excel_func.py
 
 ```python
 def write_excel_xls(path, sheet_name_list, value):
@@ -75,7 +79,7 @@ def write_excel_xls(path, sheet_name_list, value):
 <br />
 
 
-#### 3. pyqt_gui.py
+### 3. pyqt_gui.py
 
 ```python
 class MainWindow(QMainWindow):
@@ -201,7 +205,7 @@ class MainWindow(QMainWindow):
 <br />
 
 
-#### 4. wereader.py
+### 4. wereader.py
 
 ```python
 def get_bookshelf(userVid, headers):
@@ -287,7 +291,7 @@ def get_bookmarklist(bookId, headers):
 <br />
 <br />
 
-### 如何运行
+## 如何运行
 
 ```bash
 # 跳转到当前目录
@@ -303,7 +307,7 @@ python pyqt_gui.py
 <br />
 <br />
 
-### 补充
+## 补充
 
 完整版源代码存放在[github][5]上，有需要的可以下载
 
@@ -312,7 +316,7 @@ python pyqt_gui.py
 <br />
 <br />
 
-### License
+## License
 [The MIT License (MIT)][6]
 
 [5]:https://github.com/shengqiangzhang/examples-of-web-crawlers

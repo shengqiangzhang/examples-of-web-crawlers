@@ -25,11 +25,11 @@
 
 ## 如何下载
 
-本仓库大小为<a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/github/repo-size/shengqiangzhang/examples-of-web-crawlers"></a>, 为提高下载速度, 建议使用代理服务器下载。
+本仓库总大小为<a href="https://github.com/shengqiangzhang/examples-of-web-crawlers"><img src="https://img.shields.io/github/repo-size/shengqiangzhang/examples-of-web-crawlers"></a>, 为提高下载速度, **建议使用代理下载**。
 
 <br />
 
-没有或不懂如何设置代理服务器的![chinese_flag](./chinese_flag.png)**中国用户**, 请跳转至本仓库同步镜像[码云Gitee](https://gitee.com/shengqiangzhang/examples-of-web-crawlers)进行下载, 以便获得较快的下载速度。
+没有或不懂如何设置代理的![chinese_flag](./chinese_flag.png)**中国用户**, 请跳转至本仓库同步镜像[码云Gitee](https://gitee.com/shengqiangzhang/examples-of-web-crawlers)进行下载, 以便获得较快的下载速度。
 
 
 
@@ -518,6 +518,9 @@ python app.py
 
 ## [12.一键导出微信读书的书籍和笔记][weread]
 
+> 本项目基于[@arry-lee](https://github.com/arry-lee)的项目[wereader](https://github.com/arry-lee/wereader/issues/20)修改而来，感谢原作者提供的源代码。
+
+<br />
 
 ### 简介
 
@@ -605,7 +608,3 @@ python pyqt_gui.py
 [7]:https://raw.githubusercontent.com/shengqiangzhang/examples-of-web-crawlers/master/3.%E6%B7%98%E5%AE%9D%E5%B7%B2%E4%B9%B0%E5%88%B0%E7%9A%84%E5%AE%9D%E8%B4%9D%E6%95%B0%E6%8D%AE%E7%88%AC%E8%99%AB(%E5%B7%B2%E6%A8%A1%E6%8B%9F%E7%99%BB%E5%BD%95)/example.gif
 [8]:http://paper.meiyuan.in/
 [9]:http://chromedriver.storage.googleapis.com/index.html
-
-
-
-[wereader]: 

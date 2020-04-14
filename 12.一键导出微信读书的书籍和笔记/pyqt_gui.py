@@ -52,9 +52,10 @@ class MainWindow(QMainWindow):
         url = 'https://weread.qq.com/#login' # 目标地址
         self.browser = QWebEngineView() # 实例化浏览器对象
 
-        QWebEngineProfile.defaultProfile().cookieStore().deleteAllCookies() # 初次运行软件时删除所有cookies
+        self.profile = QWebEngineProfile.defaultProfile()
+        self.profile.cookieStore().deleteAllCookies() # 初次运行软件时删除所有cookies
+        self.profile.cookieStore().cookieAdded.connect(self.onCookieAdd) # cookies增加时触发self.onCookieAdd()函数
 
-        QWebEngineProfile.defaultProfile().cookieStore().cookieAdded.connect(self.onCookieAdd) # cookies增加时触发self.onCookieAdd()函数
         self.browser.loadFinished.connect(self.onLoadFinished) # 网页加载完毕时触发self.onLoadFinished()函数
 
         self.browser.load(QUrl(url)) # 加载网页
@@ -84,6 +85,9 @@ class MainWindow(QMainWindow):
             if 'wr_vid' in self.DomainCookies.keys():
                 USER_VID = self.DomainCookies['wr_vid']
                 print('用户id:{}'.format(USER_VID))
+
+                # 注入javascript脚本，与网页交互
+                self.browser.page().runJavaScript('alert("登录成功！")')
 
                 # 关闭整个qt窗口
                 self.close()
@@ -117,7 +121,7 @@ class MainWindow(QMainWindow):
 
         # 关闭软件软件之前删除所有cookies
         # 此代码不可删除，否则下次打开软件会自动加载浏览器中旧的cookies
-        QWebEngineProfile.defaultProfile().cookieStore().deleteAllCookies()
+        self.profile.cookieStore().deleteAllCookies()
 
 
 
