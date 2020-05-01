@@ -7,6 +7,7 @@ import queue
 import threading
 import csv
 import json
+from bs4 import BeautifulSoup
 
 # user_agent列表
 user_agent_list = [
@@ -33,9 +34,21 @@ referer_list = [
 # 代理池搭建github地址https://github.com/1again/ProxyPool
 # 搭建完毕后，把下方的proxy.1again.cc改成你的your_server_ip，本地搭建的话可以写成127.0.0.1或者localhost
 def get_proxy():
-    data_json = requests.get("http://proxy.1again.cc:35050/api/v1/proxy/?type=2").text
-    data = json.loads(data_json)
-    return data['data']['proxy']
+    url = "https://proxygather.com/zh"
+    resp = requests.get(url)
+    proxy_list = []
+    if resp.status_code == 200:
+        demo = resp.content
+        soup = BeautifulSoup(demo, 'lxml')
+        src = soup.select('script')[7:-4]
+        for i in src:
+            temp = json.loads(
+                str(i).replace('<script type="text/javascript">', '').replace('</script>', '').replace(
+                    'gp.insertPrx(',
+                    '').replace(');',
+                                ''))
+            proxy_list.append({'http': temp['PROXY_IP'] + ':' + str(int(temp['PROXY_PORT'], 16))})
+    return proxy_list
 
 
 # 获取所有基金代码
@@ -87,7 +100,7 @@ def get_fund_data():
         # 如果不捕获异常，程序可能崩溃
         try:
             # 使用代理访问
-            req = requests.get("http://fundgz.1234567.com.cn/js/" + str(fund_code) + ".js", proxies={"http": proxy}, timeout=3, headers=header)
+            req = requests.get("http://fundgz.1234567.com.cn/js/" + str(fund_code) + ".js", proxies=random.choice(proxy), timeout=3, headers=header)
 
             # 没有报异常，说明访问成功
             # 获得返回数据
