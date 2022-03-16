@@ -15,8 +15,6 @@
 ![](demo1.png)
 <br />
 ![](demo2.png)
-<br />
-![](demo3.png)
 
 <br />
 <br />

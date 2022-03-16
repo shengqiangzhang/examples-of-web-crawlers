@@ -5,7 +5,7 @@
 @project: PyCharm
 @file: wereader.py
 @author: Shengqiang Zhang
-@time: 2020/4/11 21:14
+@time: 2022-03-16 22:30:52
 @mail: sqzhang77@gmail.com
 """
 
@@ -27,7 +27,7 @@ import urllib3
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 # 书籍信息
-Book = namedtuple('Book', ['bookId', 'title', 'author', 'cover', 'intro', 'category'])
+Book = namedtuple('Book', ['bookId', 'title', 'author', 'cover'])
 
 
 
@@ -149,11 +149,10 @@ def get_bookshelf(userVid, headers):
     books_recent_read = set() # 最近阅读的书籍
     books_all = set() # 书架上的所有书籍
 
-
     for book in data['finishReadBooks']:
-        if not book['bookId'].isdigit(): # 过滤公众号
+        if ('bookId' not in book.keys()) or (not book['bookId'].isdigit()):  # 过滤公众号
             continue
-        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['intro'], book['category'])
+        b = Book(book['bookId'], book['title'], book['author'], book['cover'])
         books_finish_read.add(b)
     books_finish_read = list(books_finish_read)
     books_finish_read.sort(key=itemgetter(-1)) # operator.itemgetter(-1)指的是获取对象的最后一个域的值，即以category进行排序
@@ -161,9 +160,9 @@ def get_bookshelf(userVid, headers):
 
 
     for book in data['recentBooks']:
-        if not book['bookId'].isdigit(): # 过滤公众号
+        if ('bookId' not in book.keys()) or (not book['bookId'].isdigit()): # 过滤公众号
             continue
-        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['intro'], book['category'])
+        b = Book(book['bookId'], book['title'], book['author'], book['cover'])
         books_recent_read.add(b)
     books_recent_read = list(books_recent_read)
     books_recent_read.sort(key=itemgetter(-1)) # operator.itemgetter(-1)指的是获取对象的最后一个域的值，即以category进行排序
@@ -186,7 +185,7 @@ def get_notebooklist(headers):
     books = []
     for b in data['books']:
         book = b['book']
-        b = Book(book['bookId'], book['title'], book['author'], book['cover'], book['intro'], book['category'])
+        b = Book(book['bookId'], book['title'], book['author'], book['cover'])
         books.append(b)
     books.sort(key=itemgetter(-1))
     return books

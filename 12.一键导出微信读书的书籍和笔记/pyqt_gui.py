@@ -5,7 +5,7 @@
 @project: PyCharm
 @file: pyqt_gui.py
 @author: Shengqiang Zhang
-@time: 2020/4/11 21:14
+@time: 2022-03-16 21:35:46
 @mail: sqzhang77@gmail.com
 """
 
@@ -14,6 +14,7 @@ from excel_func import *
 import sys
 import os
 import time
+from tqdm import tqdm
 from PyQt5.QtWidgets import QMainWindow
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QUrl
@@ -146,30 +147,40 @@ if __name__=='__main__':
 
     books = get_bookshelf(USER_VID, HEADERS) # 获取书架上的书籍
     books_finish_read = books['finishReadBooks']
-    books_finish_read = [[book.bookId, book.title, book.author, book.cover, book.intro, book.category] for book in books_finish_read]
+
+    books_finish_read = [[book.bookId, book.title, book.author, book.cover] for book in books_finish_read]
     books_recent_read = books['recentBooks']
-    books_recent_read = [[book.bookId, book.title, book.author, book.cover, book.intro, book.category] for book in books_recent_read]
+    books_recent_read = [[book.bookId, book.title, book.author, book.cover] for book in books_recent_read]
     books_all = books['allBooks']
-    books_all = [[book.bookId, book.title, book.author, book.cover, book.intro, book.category] for book in books_all]
-    write_excel_xls(data_dir + '我的书架.xls', ['已读完的书籍', '最近阅读的书籍', '所有的书籍'], [["ID", "标题", "作者", "封面", "简介", "所属目录"], ]) # 写入excel文件
+    books_all = [[book.bookId, book.title, book.author, book.cover] for book in books_all]
+    write_excel_xls(data_dir + '我的书架.xls', ['已读完的书籍', '最近阅读的书籍', '所有的书籍'], [["ID", "标题", "作者", "封面"], ]) # 写入excel文件
     write_excel_xls_append(data_dir + '我的书架.xls', '已读完的书籍', books_finish_read) # 追加写入excel文件
     write_excel_xls_append(data_dir + '我的书架.xls', '最近阅读的书籍', books_recent_read)  # 追加写入excel文件
     write_excel_xls_append(data_dir + '我的书架.xls', '所有的书籍', books_all)  # 追加写入excel文件
 
 
 
-
-    # 获取书架上的每本书籍的笔记
-    for index, book in enumerate(books_finish_read):
+    # 获取【已读完的书籍】的笔记，如果想获取所有书籍的笔记，
+    # 请自行更改books_finish_read为books_all
+    pbar = tqdm(books_finish_read)
+    for book in pbar:
         book_id = book[0]
         book_name = book[1]
-        notes = get_bookmarklist(book[0], HEADERS)
 
-        with open(note_dir + book_name + '.txt', 'w', encoding='utf-8') as f:
-            f.write(notes)
+        # 失败重试，最大重试次数为4
+        for try_count in range(4):
+            try:
+                pbar.set_description("正在导出笔记【{}】".format(book_name))
+                notes = get_bookmarklist(book[0], HEADERS)
+                with open(note_dir + book_name + '.txt', 'w', encoding='utf-8') as f:
+                    f.write(notes)
 
+                # 写入成功后跳出循环，防止重复写入
+                break
+            except:
+                # 忽略异常，直接重试
+                pbar.set_description("获取笔记【{}】失败，开始第{}次重试".format(book_name, try_count + 1))
 
-        print('导出笔记 {} ({}/{})'.format(note_dir + book_name + '.txt', index+1, len(books_finish_read)))
-
-
+                # 等待3秒后再重试
+                time.sleep(3)
 

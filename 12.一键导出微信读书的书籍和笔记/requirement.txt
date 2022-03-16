@@ -3,5 +3,6 @@ clipboard
 xlutils
 xlrd
 xlwt
+tqdm
 PyQt5==5.13.0
 PyQtWebEngine==5.13.0
