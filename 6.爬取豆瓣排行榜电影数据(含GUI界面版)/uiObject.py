@@ -1,7 +1,9 @@
 # -*- coding:utf-8 -*-
 
 from PIL import Image, ImageTk
-from getMovieInRankingList import *
+from getMovieInRankingList import movieData
+from getMovieInRankingList import get_url_data_in_ranking_list
+from getMovieInRankingList import get_url_data_in_keyWord
 from tkinter import Tk
 from tkinter import ttk
 from tkinter import font
@@ -18,6 +20,7 @@ from tkinter import NS
 from tkinter import NW
 from tkinter import N
 from tkinter import Y
+from tkinter import messagebox
 from tkinter import DISABLED
 from tkinter import NORMAL
 from re import findall
@@ -25,10 +28,10 @@ from json import loads
 from threading import Thread
 from urllib.parse import quote
 from webbrowser import open
+import urllib
 import os
 import ssl
 ssl._create_default_https_context = ssl._create_unverified_context #关闭SSL证书验证
-
 
 
 
@@ -301,7 +304,7 @@ class uiObject:
         self.clear_tree(self.treeview_bt_download)
 
         item = self.treeview.selection()
-        if(item):
+        if item:
             item_text = self.treeview.item(item, "values")
             movieName = item_text[0] # 输出电影名
             for movie in self.jsonData:
@@ -402,12 +405,20 @@ class uiObject:
         jsonMovieData = loads(movieData)
         for subMovieData in jsonMovieData:
             if(subMovieData['title'] == self.C_type.get()):
+                res_data = get_url_data_in_ranking_list(subMovieData['type'], self.T_count.get(), self.T_rating.get(), self.T_vote.get())  # 返回符合条件的电影信息
+                if len(res_data) == 2:
+                    # 获取数据成功
+                    res_list = res_data[0]
+                    jsonData = res_data[1]
 
-                movieObject = getMovieInRankingList() #创建对象
-                list,jsonData = movieObject.get_url_data_in_ranking_list(subMovieData['type'], self.T_count.get(), self.T_rating.get(), self.T_vote.get())  # 返回符合条件的电影信息
-                self.jsonData = jsonData
-                self.add_tree(list, self.treeview) # 将数据添加到tree中
-                break
+                    self.jsonData = jsonData
+                    self.add_tree(res_list, self.treeview)  # 将数据添加到tree中
+
+                else:
+                    # 获取数据失败，出现异常
+                    err_str = res_data[0]
+                    messagebox.showinfo('提示', err_str[:1000])
+
 
         # 按钮设置为正常状态
         self.B_0['state'] = NORMAL
@@ -423,6 +434,11 @@ class uiObject:
 
 
     def keyboard_T_vote_keyword(self, event):
+        """
+        在搜索框中键入回车键后触发相应的事件
+        :param event:
+        :return:
+        """
         thread_it(self.searh_movie_in_keyword)
 
     def searh_movie_in_keyword(self):
@@ -442,12 +458,19 @@ class uiObject:
         self.jsonData = ""
 
 
+        res_data = get_url_data_in_keyWord(self.T_vote_keyword.get())
+        if len(res_data) == 2:
+            # 获取数据成功
+            res_list = res_data[0]
+            jsonData = res_data[1]
 
+            self.jsonData = jsonData
+            self.add_tree(res_list, self.treeview)  # 将数据添加到tree中
+        else:
+            # 获取数据失败，出现异常
+            err_str = res_data[0]
+            messagebox.showinfo('提示', err_str[:1000])
 
-        movieObject = getMovieInRankingList(); #创建对象
-        list,jsonData = movieObject.get_url_data_in_keyWord(self.T_vote_keyword.get())
-        self.jsonData = jsonData
-        self.add_tree(list, self.treeview) # 将数据添加到tree中
 
 
 
@@ -470,7 +493,7 @@ class uiObject:
         :return:
         """
         item = self.treeview.selection()
-        if(item):
+        if item:
             item_text = self.treeview.item(item, "values")
             movieName = item_text[0]
             for movie in self.jsonData:
@@ -527,7 +550,7 @@ class uiObject:
         root = Tk()
         self.root = root
         # 设置窗口位置
-        root.title("豆瓣电影小助手(可筛选、下载自定义电影)----吾爱破解论坛  www.52pojie.cn")
+        root.title("豆瓣电影小助手(可筛选、下载自定义电影)")
         self.center_window(root, 1000, 565)
         root.resizable(0, 0)  # 框体大小可调性，分别表示x,y方向的可变性
 
@@ -565,7 +588,7 @@ class uiObject:
         # 文本框
         T_count = Entry(labelframe, width=5)
         T_count.delete(0, END)
-        T_count.insert(0, '500')
+        T_count.insert(0, '100')
         T_count.place(x=220, y=7)
         self.T_count = T_count
 
@@ -906,7 +929,7 @@ class uiObject:
 
         #项目的一些信息
         ft = font.Font(size=14, weight=font.BOLD)
-        project_statement = Label(root, text="豆瓣电影小助手(可筛选、下载自定义电影)----吾爱破解论坛  www.52pojie.cn", fg='#FF0000', font=ft,anchor=NW)
+        project_statement = Label(root, text="豆瓣电影小助手(可筛选、下载自定义电影)", fg='#FF0000', font=ft,anchor=NW)
         project_statement.place(x=5, y=540)
         self.project_statement = project_statement
 
