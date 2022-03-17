@@ -89,7 +89,7 @@ def generate_data():
 
     # 创建一个自己编写的qq bot对象
     bot = Bot()
-    custom_print(u'登录成功,正在获取数据...')
+    custom_print(u'登录成功!')
     # 更新一下欲输出的markdown文本
     markdown_content = markdown_content.replace('{qq_number}',bot.qq_number)
     markdown_content = markdown_content.replace('{qq_icon_png}', 'data/qq_icon.png')
@@ -98,7 +98,7 @@ def generate_data():
 
 
     # 获取该登录账户的详细资料
-    custom_print(u'正在获取该登录账户的详细数据...')
+    custom_print(u'正在获取该账户的个人数据...')
     detail_information = bot.get_detail_information()
     # content为markdown语法文本
     content = '\n<br/><br/>\n' + '## 我的详细资料\n' + '种类|内容\n:- | :-\n'
@@ -139,26 +139,22 @@ def generate_data():
 
 
 
-
-
-
-
-
+    # 获取所有好友列表接口已失效
+    '''
     # 获取所有qq好友的备注名和qq号
-    all_qq_friends = bot.get_all_friends_in_qq()
-    custom_print(u'所有qq好友号码和备注名中...')
+    custom_print(u'正在获取该账户的好友数据...')
+    all_qq_friends = bot.get_all_friends_in_qq() # 获取所有好友列表接口已失效
     qq_number_list = []
     for key, friend_group in all_qq_friends.items():
         for info in friend_group['mems']:
             qq_number_list.append(info['uin'])
-
+    '''
 
 
 
     # 获取所有群信息
-    custom_print(u'获取该QQ加入的所有群信息...')
+    custom_print(u'正在获取该账户的所有群信息...')
     group_list = bot.get_group()
-    print(group_list)
     # content为markdown语法文本
     content = '\n\n<br/><br/>\n' + '## 我加入的群资料\n' + '序号|群名|群号|群主QQ\n:- | :-| :-| :-\n'
     # 获取某个群的群成员信息
@@ -179,7 +175,7 @@ def generate_data():
 
 
     # 获取过去30天内退出的群名单
-    custom_print(u'获取过去30天退出的群...')
+    custom_print(u'正在获取该账户过去30天退出的群...')
     data = bot.get_quit_of_group()
     delete_group_count = 0
     # content为markdown语法文本
@@ -210,7 +206,7 @@ def generate_data():
 
 
     # 获取过去364天内删除的好友名单
-    custom_print(u'获取过去12个月删除的好友名单...')
+    custom_print(u'正在获取该账户过去12个月删除的好友名单...')
     delete_friend_list = bot.get_delete_friend_in_360day()
     delete_friend_count = len(delete_friend_list)
     # content为markdown语法文本
@@ -238,7 +234,7 @@ def generate_data():
     # 判断此次登录的qq是否为vip或者svip
     # content为markdown语法文本
     content = '\n\n<br/><br/>\n' + '## 财产分析\n'
-    custom_print(u'判断该QQ是否为高级用户...')
+    custom_print(u'正在判断该账户是否为VIP...')
     data = bot.is_vip_svip()
     isSvip = data['isSvip']
     isVip = data['isSvip']
@@ -252,14 +248,14 @@ def generate_data():
         content += '此时此刻，我是**QQ VIP**，但不是**QQ SVIP**\n'
 
     # 获取qb值
-    custom_print(u'获取账户QB值...')
+    custom_print(u'正在获取该账户的Q币...')
     qb_value = bot.get_qb()
     timeArray = time.localtime()
     otherStyleTime = time.strftime("%Y--%m--%d %H:%M:%S", timeArray)
     content += '截止到**{}**，我剩余的Q币个数为：**{}**个\n\n'.format(otherStyleTime,qb_value)
 
     # 获取代付信息
-    custom_print(u'获取代付信息中...')
+    custom_print(u'正在获取该账户的代付信息...')
     pay_list = bot.get_pay_for_another()
     content += '截止到**{}**，我收到的代付信息条数为：**{}**个'.format(otherStyleTime, len(pay_list))
     if(len(pay_list) > 0):
@@ -283,7 +279,7 @@ def generate_data():
 
 
     # 亲密度排行榜 谁在意我
-    custom_print(u'分析好友亲密度数据-谁在意我...')
+    custom_print(u'正在分析好友亲密度数据-谁在意我...')
     # content为markdown语法文本
     content = '\n\n<br/><br/>\n' + '## 谁在意我\n'
     data_list = bot.who_care_about_me()
@@ -292,14 +288,15 @@ def generate_data():
         n = len(data_list)
 
     if (len(data_list) > 0):
-        content += '序号|头像|QQ|亲密度\n:- | :-| :-| :-\n'
+        content += '序号|头像|昵称|QQ|亲密度\n:- | :-| :-| :-\n'
         for index, sub_data in enumerate(data_list[:n]):
             uin = sub_data['uin']
             score = sub_data['score']
+            name = sub_data['name']
             profile = bot.get_profile_picture(uin, size=40)
             with open('data/' + str(uin) + '.jpg', 'wb') as f:
                 f.write(profile)
-            content += '{}|![](data/{}.jpg)|{}|{}\n'.format(index, uin, uin, score)
+            content += '{}|![](data/{}.jpg)|{}|{}|{}\n'.format(index, uin, name, uin, score)
 
         # 更新一下欲输出的markdown文本
         markdown_content += content
@@ -312,7 +309,7 @@ def generate_data():
 
 
     # 亲密度排行榜 我在意谁
-    custom_print(u'分析好友亲密度数据-我在意谁...')
+    custom_print(u'正在分析好友亲密度数据-我在意谁...')
     # content为markdown语法文本
     content = '\n\n<br/><br/>\n' + '## 我在意谁\n'
     data_list = bot.i_care_about_who()
@@ -321,14 +318,15 @@ def generate_data():
         n = len(data_list)
 
     if (len(data_list) > 0):
-        content += '序号|头像|QQ|亲密度\n:- | :-| :-| :-\n'
+        content += '序号|头像|昵称|QQ|亲密度\n:- | :-| :-| :-\n'
         for index, sub_data in enumerate(data_list[:n]):
             uin = sub_data['uin']
             score = sub_data['score']
+            name = sub_data['name']
             profile = bot.get_profile_picture(uin, size=40)
             with open('data/' + str(uin) + '.jpg', 'wb') as f:
                 f.write(profile)
-            content += '{}|![](data/{}.jpg)|{}|{}\n'.format(index, uin, uin, score)
+            content += '{}|![](data/{}.jpg)|{}|{}|{}\n'.format(index, uin, name, uin, score)
 
         # 更新一下欲输出的markdown文本
         markdown_content += content
@@ -338,11 +336,12 @@ def generate_data():
 
 
 
-
     # 每个步骤完成后，保存markdown文件，以便防止程序出错时能够保存到最新的数据
     with open('{}的个人QQ历史报告.md'.format(bot.qq_number), 'w', encoding='utf-8') as file:
         file.write(markdown_content)
-    custom_print(u'所有数据获取完毕, 并生成了一份报告文件:[{}的个人QQ历史报告.md], 该文件为markdown格式文件, 请下载typora软件以便查看该格式文件, 下载地址为https://typora.io/#windows'.format(bot.qq_number))
+
+    custom_print(u'所有数据获取完毕, 并在当前工作目录下生成了一份报告文件:[{}的个人QQ历史报告.md]'.format(bot.qq_number))
+    custom_print(u'该文件为markdown格式, 请下载typora软件以便查看该文件, 下载地址为https://typora.io/')
 
 if __name__ == "__main__":
 

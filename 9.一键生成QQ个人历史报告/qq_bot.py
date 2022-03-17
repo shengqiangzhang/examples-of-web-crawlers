@@ -57,7 +57,7 @@ class Bot(object):
         # 登录qun.qq.com
 
         # 访问网页，为了获取参数pt_login_sig
-        login_url = 'http://ui.ptlogin2.qq.com/cgi-bin/login?appid=549000912&s_url=http://qun.qq.com/member.html'
+        login_url='https://xui.ptlogin2.qq.com/cgi-bin/xlogin?pt_disable_pwd=1&appid=715030901&daid=73&hide_close_icon=1&pt_no_auth=1&s_url=https%3A%2F%2Fqun.qq.com%2Fmember.html%23'
         html = get_html(login_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
         cookies_back_dict = dict_from_cookiejar(html.cookies)
@@ -65,7 +65,8 @@ class Bot(object):
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
 
         # 访问网页，为了获取参数ptqrtoken
-        qrcode_url = 'https://ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=4&d=72&v=4&t=0.39550762134604156'
+        #qrcode_url = 'https://ptlogin2.qq.com/ptqrshow?appid=549000912&e=2&l=M&s=4&d=72&v=4&t=0.39550762134604156'
+        qrcode_url='https://ssl.ptlogin2.qq.com/ptqrshow?appid=715030901&e=2&l=M&s=3&d=72&v=4&t=0.055986512113441966&daid=73&pt_3rd_aid=0'
         html = get_html(qrcode_url, '')
         # 对返回的cookies进行转化为dict类型，方便处理
         cookies_back_dict = dict_from_cookiejar(html.cookies)
@@ -81,13 +82,10 @@ class Bot(object):
         image_label['image'] = image
 
 
-
         # 实时检测二维码状态
         while (True):
             # 目标网址
-            target_url = 'http://ptlogin2.qq.com/ptqrlogin?u1=http://qun.qq.com/member.html&' + 'ptqrtoken=' + str(
-                ptqrtoken) + '&ptredirect=1&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=0-0-1499652067577&js_ver=10224&js_type=1&login_sig=' + str(
-                pt_login_sig) + '&pt_uistyle=40&aid=549000912&'
+            target_url ='https://ssl.ptlogin2.qq.com/ptqrlogin?u1=https%3A%2F%2Fqun.qq.com%2Fmember.html%23&ptqrtoken={}&ptredirect=1&h=1&t=1&g=1&from_ui=1&ptlang=2052&action=1-5-1647508149682&js_ver=22030810&js_type=1&login_sig={}&pt_uistyle=40&aid=715030901&daid=73&ptdrvs=zE3Wcrd07f4ZnrPfNLLsdLfVh-6bEh5vNlgIR2dcTfep1pxoywDr2Yw03vvhZswWdGxT2OCdJkA_&sid=2353889993957767859&'.format(ptqrtoken, pt_login_sig)
 
             # 登录，需要带上访问cookies
             html = get_html(target_url, self.cookies_merge_dict_in_qun_qq_com)
@@ -119,18 +117,19 @@ class Bot(object):
         self.qq_number = qq_list[0]
 
 
+        #print(html.text)
         # 登录成功后，会返回一个地址，需要对该地址进行访问以便获取新的返回cookies
-        startIndex = (html.text).find('http')
+        startIndex = (html.text).find('https')
         endIndex = (html.text).find('pt_3rd_aid=0')
         url = (html.text)[startIndex:endIndex] + 'pt_3rd_aid=0'
 
         # 这里需要注意的是，需要禁止重定向，才能正确获得返回的cookies
-        html = get(url, cookies=self.cookies_merge_dict_in_qun_qq_com, allow_redirects=False)
+        # 需要禁止重定向, allow_redirects=False
+        # 需要关闭SSL验证, verify=False
+        html = get(url, cookies = self.cookies_merge_dict_in_qun_qq_com, allow_redirects=False, verify=False)
         # 把返回的cookies合并进去
         cookies_back_dict = dict_from_cookiejar(html.cookies)
         self.cookies_merge_dict_in_qun_qq_com.update(cookies_back_dict)
-
-
 
 
 
@@ -306,7 +305,6 @@ class Bot(object):
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_group_list', self.cookies_merge_dict_in_qun_qq_com, submit_data)
         group_info = loads(html.text)
-        print(group_info)
         return group_info['join']
 
 
@@ -326,14 +324,19 @@ class Bot(object):
 
     def get_all_friends_in_qq(self):
 
+        '''
         # 获取所有qq好友基本信息
         # bkn由参数skey通过另一个加密函数得到
         bkn = hash33_bkn(self.cookies_merge_dict_in_qun_qq_com['skey'])
         submit_data = {'bkn': bkn}
         html = post_html('https://qun.qq.com/cgi-bin/qun_mgr/get_friend_list', self.cookies_merge_dict_in_qun_qq_com, submit_data)
         friend_info = loads(html.text)
-        # print(friend_info)
         return friend_info['result']
+        '''
+
+        # 获取所有好友列表接口已失效
+        return None
+
 
 
 
@@ -662,16 +665,20 @@ class Bot(object):
         # bkn由参数skey通过另一个加密函数得到
         bkn = hash33_bkn(self.cookies_merge_dict_in_qzone_qq_com['p_skey'])
 
-        # 获取参数qzonetoken
-        urllib3.disable_warnings()
-        target_url = 'https://user.qzone.qq.com/' + self.qq_number
-        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
-        qzonetoken = re.findall(r'{ try{return "(.+?)";', html.text)
-        qzonetoken = qzonetoken[0]
+        # # 获取参数qzonetoken
+        # urllib3.disable_warnings()
+        # target_url = 'https://user.qzone.qq.com/' + self.qq_number
+        # print(target_url)
+        # html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+        # print(html.text)
+        # qzonetoken = re.findall(r'{ try{return "(.+?)";', html.text)
+        # qzonetoken = qzonetoken[0]
 
 
         # 获取谁在意我数据
-        target_url = 'https://rc.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin=' + self.qq_number + '&do=2&rd=0.32313768189269365&fupdate=1&clean=0&g_tk=' + str(bkn) + '&qzonetoken=' + str(qzonetoken) + '&g_tk=' + str(bkn)
+        #target_url = 'https://rc.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin=' + self.qq_number + '&do=2&rd=0.32313768189269365&fupdate=1&clean=0&g_tk=' + str(bkn) + '&qzonetoken=' + str(qzonetoken) + '&g_tk=' + str(bkn)
+        target_url = 'https://user.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin={}&do=2&rd=0.6629930546880991&fupdate=1&clean=1&g_tk={}&g_tk={}'.format(self.qq_number, bkn, bkn)
+
         urllib3.disable_warnings()
         html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
 
@@ -692,16 +699,17 @@ class Bot(object):
         # bkn由参数skey通过另一个加密函数得到
         bkn = hash33_bkn(self.cookies_merge_dict_in_qzone_qq_com['p_skey'])
 
-        # 获取参数qzonetoken
-        urllib3.disable_warnings()
-        target_url = 'https://user.qzone.qq.com/' + self.qq_number
-        html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
-        qzonetoken = re.findall(r'{ try{return "(.+?)";', html.text)
-        qzonetoken = qzonetoken[0]
+        # # 获取参数qzonetoken
+        # urllib3.disable_warnings()
+        # target_url = 'https://user.qzone.qq.com/' + self.qq_number
+        # html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
+        # qzonetoken = re.findall(r'{ try{return "(.+?)";', html.text)
+        # qzonetoken = qzonetoken[0]
 
 
         # 获取我在意谁数据
-        target_url = 'https://rc.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin=' + self.qq_number + '&do=1&rd=0.9680629025032721&fupdate=1&clean=1&g_tk=' + str(bkn) + '&qzonetoken=' + str(qzonetoken) + '&g_tk=' + str(bkn)
+        #target_url = 'https://rc.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin=' + self.qq_number + '&do=1&rd=0.9680629025032721&fupdate=1&clean=1&g_tk=' + str(bkn) + '&qzonetoken=' + str(qzonetoken) + '&g_tk=' + str(bkn)
+        target_url = 'https://user.qzone.qq.com/proxy/domain/r.qzone.qq.com/cgi-bin/tfriend/friend_ship_manager.cgi?uin={}&do=1&rd=0.6629930546880991&fupdate=1&clean=1&g_tk={}&g_tk={}'.format(self.qq_number, bkn, bkn)
         urllib3.disable_warnings()
         html = get_html(target_url, self.cookies_merge_dict_in_qzone_qq_com)
 
