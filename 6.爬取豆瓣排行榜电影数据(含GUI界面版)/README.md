@@ -10,14 +10,12 @@
 
 ![](example_rating.png)
 
-![](example_keyword.png)
-
 
 ## 如何运行
 
 1. 打开Chrome浏览器，在网址栏输入chrome://version/查询当前Chrome版本
 2. 打开[http://chromedriver.storage.googleapis.com/index.html][1]，下载对应版本的chromedriver驱动，**下载完成后务必解压**
-3. 打开当前目录下的文件`getMovieInRankingList.py`，定位到第`59行`，将`executable_path=./chromedriver.exe`修改为你的chromedriver驱动路径
+3. 打开当前目录下的文件`getMovieInRankingList.py`，定位到第`107行`，将`executable_path=./chromedriver.exe`修改为你的chromedriver驱动路径
 4. 执行命令`pip install -r requirement.txt`安装程序所需的依赖包
 5. 执行命令`python main.py`运行程序
 
@@ -31,15 +29,6 @@
 - [x] 提供多个云盘站点搜索该视频，以便保存到云盘
 - [x] 提供多个站点下载该视频
 - [ ] 等待更新
-
-
-## 存在问题
-
-目前没有加入反爬虫策略，如果运行出现403 forbidden提示，则说明暂时被禁止使用，解决方式如下：
-
-- 加入cookies
-- 采用随机延时方式
-- 采用IP代理池方式(较不稳定)
 
 
 ## 补充

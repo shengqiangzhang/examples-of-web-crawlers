@@ -25,6 +25,7 @@ from tkinter import DISABLED
 from tkinter import NORMAL
 from re import findall
 from json import loads
+from ssl import _create_unverified_context
 from threading import Thread
 from urllib.parse import quote
 from webbrowser import open
@@ -105,12 +106,20 @@ def resize(w_box, h_box, pil_image):
     return pil_image.resize((width, height), Image.ANTIALIAS)
 
 
-def get_mid_str(content,startStr,endStr):
-    startIndex = content.index(startStr)
-    if startIndex>=0:
+def get_mid_str(content, startStr, endStr):
+    startIndex = content.find(startStr, 0)  # 定位到起始字符串的首个字符，从起始位置开始查找
+
+    if startIndex >= 0:
         startIndex += len(startStr)
-    endIndex = content.index(endStr)
-    return content[startIndex:endIndex]
+    else:
+        return ""
+
+    endIndex = content.find(endStr, startIndex)  # 定位到结束字符串，要从起始字符串开始查找
+
+    if endIndex >= 0 and endIndex >= startIndex:
+        return content[startIndex:endIndex]
+    else:
+        return ""
 
 
 class uiObject:
@@ -152,132 +161,108 @@ class uiObject:
 
         self.label_movie_rating_imdb.config(text='正在加载IMDB评分')
         self.B_0_imdb['state'] = DISABLED
-        rating_imdb = '未知'
 
 
 
         item = self.treeview.selection()
-        if(item):
+        if item:
             item_text = self.treeview.item(item, "values")
-            movieName = item_text[0] # 输出电影名
+            movieName = item_text[0]  # 输出电影名
             for movie in self.jsonData:
-                if(movie['title'] == movieName):
+                if movie['title'] == movieName:
 
-                    f = urllib.request.urlopen(movie['url'])
-                    response = (f.read()).decode()
-                    url_imdb = get_mid_str(response, 'IMDb链接:</span> <a href=\"', '\" target=\"_blank\" rel=\"nofollow\">')
-
-                    f = urllib.request.urlopen(url_imdb)
-                    data_imdb = (f.read()).decode()
-                    rating_imdb = get_mid_str(data_imdb, '<span class=\"rating">', '<span class=\"ofTen\">')
-
-
-
-
+                    context = _create_unverified_context()  # 屏蔽ssl证书
+                    headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/55.0.2883.87 Safari/537.36'}
+                    req = urllib.request.Request(url=movie['url'], headers=headers)
+                    f = urllib.request.urlopen(req, context=context)
+                    response = f.read().decode()
 
 
 
                     self.clear_tree(self.treeview_play_online)
                     s = response
-                    name = findall(r"<a class=\"playBtn\" data-cn=\"(.*?)\" href=\"", s)
-                    down_url = findall(r"data-cn=\".*?\" href=\"(.*?)\" target=", s)
-                    real_movie_name = get_mid_str(s, "<title>", "</title>").replace(" ","").replace("\n","").replace("(豆瓣)","")
-                    print(real_movie_name)
-                    list = []
+                    name = findall(r'<a class="playBtn" data-cn="(.*?)" data-impression-track', s)
+                    down_url = findall(r'data-cn=".*?" href="(.*?)" target=', s)
+
+                    res_list = []
                     for i in range(len(name)):
-                        list.append([name[i], "限VIP免费", down_url[i]])
-                    list.append(["4K屋", "免费", "http://www.4kwu.cc/?m=vod-search&wd=" + quote(real_movie_name)])
-                    list.append(["91黑米", "免费", "http://www.91heimi.com/index.php/vod/search.html?wd=" + quote(real_movie_name)])
-                    list.append(["AAQQS", "免费", "http://aaxxy.com/vod-search-pg-1-wd-" + quote(real_movie_name) + ".html"])
-                    list.append(["Neets", "免费", "http://neets.cc/search?key=" + quote(real_movie_name)])
-                    list.append(["Q2电影网", "免费", "http://www.q2002.com/search?wd=" + quote(real_movie_name)])
-                    list.append(["霸气村", "免费", "http://www.baqicun.co/search.php?searchword=" + quote(real_movie_name)])
-                    list.append(["魔力电影网", "免费", "http://www.magbt.net/search.php?searchword=" + quote(real_movie_name)])
-                    list.append(["新论语", "免费", "http://www.honggujiu.net/index.php?m=vod-search&wd=" + quote(real_movie_name)])
-                    list.append(["左手吃斋", "免费", "https://www.xiangkanju.com/index.php?m=vod-search&wd=" + quote(real_movie_name)])
-                    self.add_tree(list, self.treeview_play_online)
-
-
-
-
-
-
-
-
-
-
+                        res_list.append([name[i], "限VIP免费", down_url[i]])
+                    self.add_tree(res_list, self.treeview_play_online)
 
                     self.clear_tree(self.treeview_save_cloud_disk)
-                    list = []
-                    list.append(["56网盘搜索", "有效", "https://www.56wangpan.com/search/o2kw" + quote(real_movie_name)])
-                    list.append(["爱搜资源", "有效", "https://www.aisouziyuan.com/?name=" + quote(real_movie_name) + "&page=1"])
-                    list.append(["盘多多", "有效", "http://www.panduoduo.net/s/comb/n-" + quote(real_movie_name) + "&f-f4"])
-                    list.append(["小白盘", "有效", "https://www.xiaobaipan.com/list-" + quote(real_movie_name) + "-1.html" ])
-                    list.append(["云盘精灵", "有效", "https://www.yunpanjingling.com/search/" + quote(real_movie_name) + "?sort=size.desc"])
-                    self.add_tree(list, self.treeview_save_cloud_disk)
-
-
-
-
-
+                    res_list = []
+                    res_list.append(["56网盘搜索", "有效", "https://www.56wangpan.com/search/o2kw" + quote(movie['title'])])
+                    res_list.append(["爱搜资源", "有效", "https://www.aisouziyuan.com/?name=" + quote(movie['title']) + "&page=1"])
+                    res_list.append(["盘多多", "有效", "http://www.panduoduo.net/s/comb/n-" + quote(movie['title']) + "&f-f4"])
+                    res_list.append(["小白盘", "有效", "https://www.xiaobaipan.com/list-" + quote(movie['title']) + "-1.html" ])
+                    res_list.append(["云盘精灵", "有效", "https://www.yunpanjingling.com/search/" + quote(movie['title']) + "?sort=size.desc"])
+                    self.add_tree(res_list, self.treeview_save_cloud_disk)
 
                     self.clear_tree(self.treeview_bt_download)
-                    list = []
-                    list.append(  ['19影视', '有效', 'https://www.19kan.com/vodsearch.html?wd=' + quote(real_movie_name)  ])
-                    list.append(  ['2TU影院', '有效', 'http://www.82tu.cc/search.php?submit=%E6%90%9C+%E7%B4%A2&searchword=' + quote(real_movie_name)  ])
-                    list.append(  ['4K电影', '有效', 'https://www.dygc.org/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['52 Movie', '有效', 'http://www.52movieba.com/search.htm?keyword=' + quote(real_movie_name)  ])
-                    list.append(  ['592美剧', '有效', 'http://www.592meiju.com/search/?wd=' + quote(real_movie_name)  ])
-                    list.append(  ['97电影网', '有效', 'http://www.55xia.com/search?q=' + quote(real_movie_name)  ])
-                    list.append(  ['98TVS', '有效', 'http://www.98tvs.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['9去这里', '有效', 'http://9qzl.com/index.php?s=/video/search/wd/' + quote(real_movie_name)  ])
-                    list.append(  ['CK电影', '有效', 'http://www.ck180.net/search.html?q=' + quote(real_movie_name)  ])
-                    list.append(  ['LOL电影', '有效', 'http://www.993dy.com/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
-                    list.append(  ['MP4Vv', '有效', 'http://www.mp4pa.com/search.php?searchword=' + quote(real_movie_name)  ])
-                    list.append(  ['MP4电影', '有效', 'http://www.domp4.com/search/' + quote(real_movie_name)   + '-1.html'])
-                    list.append(  ['TL95', '有效', 'http://www.tl95.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['比特大雄', '有效', 'https://www.btdx8.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['比特影视', '有效', 'https://www.bteye.com/search/' + quote(real_movie_name)  ])
-                    list.append(  ['春晓影视', '有效', 'http://search.chunxiao.tv/?keyword=' + quote(real_movie_name)  ])
-                    list.append(  ['第一电影网', '有效', 'https://www.001d.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['电影日志', '有效', 'http://www.dyrizhi.com/search?s=' + quote(real_movie_name)  ])
-                    list.append(  ['高清888', '有效', 'https://www.gaoqing888.com/search?kw=' + quote(real_movie_name)  ])
-                    list.append(  ['高清MP4', '有效', 'http://www.mp4ba.com/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
-                    list.append(  ['高清电台', '有效', 'https://gaoqing.fm/s.php?q=' + quote(real_movie_name)  ])
-                    list.append(  ['高清控', '有效', 'http://www.gaoqingkong.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['界绍部', '有效', 'http://www.jsb456.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['看美剧', '有效', 'http://www.kanmeiju.net/index.php?s=/video/search/wd/' + quote(real_movie_name)  ])
-                    list.append(  ['蓝光网', '有效', 'http://www.languang.co/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['老司机电影', '有效', 'http://www.lsjdyw.net/search/?s=' + quote(real_movie_name)  ])
-                    list.append(  ["乐赏电影", '有效', 'http://www.gscq.me/search.htm?keyword=' + quote(real_movie_name)  ])
-                    list.append(  ["美剧汇", '有效', 'http://www.meijuhui.net/search.php?q=' + quote(real_movie_name)  ])
-                    list.append(  ['美剧鸟', '有效', 'http://www.meijuniao.com/index.php?s=vod-search-wd-' + quote(real_movie_name)  ])
-                    list.append(  ['迷你MP4', '有效', 'http://www.minimp4.com/search?q=' + quote(real_movie_name)  ])
-                    list.append(  ['泡饭影视', '有效', 'http://www.chapaofan.com/search/' + quote(real_movie_name)  ])
-                    list.append(  ['片吧', '有效', 'http://so.pianbar.com/search.aspx?q=' + quote(real_movie_name)  ])
-                    list.append(  ['片源网', '有效', 'http://pianyuan.net/search?q=' + quote(real_movie_name)  ])
-                    list.append(  ['飘花资源网', '有效', 'https://www.piaohua.com/plus/search.php?kwtype=0&keyword=' + quote(real_movie_name)  ])
-                    list.append(  ['趣味源', '有效', 'http://quweiyuan.cc/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['人生05', '有效', 'http://www.rs05.com/search.php?s=' + quote(real_movie_name)  ])
-                    list.append(  ['贪玩影视', '有效', 'http://www.tanwanyingshi.com/movie/search?keyword=' + quote(real_movie_name)  ])
-                    list.append(  ['新片网', '有效', 'http://www.91xinpian.com/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
-                    list.append(  ['迅雷影天堂', '有效', 'https://www.xl720.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['迅影网', '有效', 'http://www.xunyingwang.com/search?q=' + quote(real_movie_name)  ])
-                    list.append(  ['一只大榴莲', '有效', 'http://www.llduang.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['音范丝', '有效', 'http://www.yinfans.com/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['影海', '有效', 'http://www.yinghub.com/search/list.html?keyword=' + quote(real_movie_name)  ])
-                    list.append(  ['影视看看', '有效', 'http://www.yskk.tv/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
-                    list.append(  ['云播网', '有效', 'http://www.yunbowang.cn/index.php?m=vod-search&wd=' + quote(real_movie_name)  ])
-                    list.append(  ['中国高清网', '有效', 'http://gaoqing.la/?s=' + quote(real_movie_name)  ])
-                    list.append(  ['最新影视站', '有效', 'http://www.zxysz.com/?s=' + quote(real_movie_name)  ])
-                    self.add_tree(list, self.treeview_bt_download)
+                    res_list = []
+                    res_list.append(['19影视', '有效', 'https://www.19kan.com/vodsearch.html?wd=' + quote(movie['title'])])
+                    res_list.append(['2TU影院', '有效', 'http://www.82tu.cc/search.php?submit=%E6%90%9C+%E7%B4%A2&searchword=' + quote(movie['title'])])
+                    res_list.append(['4K电影', '有效', 'https://www.dygc.org/?s=' + quote(movie['title'])])
+                    res_list.append(['52 Movie', '有效', 'http://www.52movieba.com/search.htm?keyword=' + quote(movie['title'])])
+                    res_list.append(['592美剧', '有效', 'http://www.592meiju.com/search/?wd=' + quote(movie['title'])])
+                    res_list.append(['97电影网', '有效', 'http://www.55xia.com/search?q=' + quote(movie['title'])])
+                    res_list.append(['98TVS', '有效', 'http://www.98tvs.com/?s=' + quote(movie['title'])])
+                    res_list.append(['9去这里', '有效', 'http://9qzl.com/index.php?s=/video/search/wd/' + quote(movie['title'])])
+                    res_list.append(['CK电影', '有效', 'http://www.ck180.net/search.html?q=' + quote(movie['title'])])
+                    res_list.append(['LOL电影', '有效', 'http://www.993dy.com/index.php?m=vod-search&wd=' + quote(movie['title'])])
+                    res_list.append(['MP4Vv', '有效', 'http://www.mp4pa.com/search.php?searchword=' + quote(movie['title'])])
+                    res_list.append(['MP4电影', '有效', 'http://www.domp4.com/search/' + quote(movie['title']) + '-1.html'])
+                    res_list.append(['TL95', '有效', 'http://www.tl95.com/?s=' + quote(movie['title'])])
+                    res_list.append(['比特大雄', '有效', 'https://www.btdx8.com/?s=' + quote(movie['title'])])
+                    res_list.append(['比特影视', '有效', 'https://www.bteye.com/search/' + quote(movie['title'])])
+                    res_list.append(['春晓影视', '有效', 'http://search.chunxiao.tv/?keyword=' + quote(movie['title'])])
+                    res_list.append(['第一电影网', '有效', 'https://www.001d.com/?s=' + quote(movie['title'])])
+                    res_list.append(['电影日志', '有效', 'http://www.dyrizhi.com/search?s=' + quote(movie['title'])])
+                    res_list.append(['高清888', '有效', 'https://www.gaoqing888.com/search?kw=' + quote(movie['title'])])
+                    res_list.append(['高清MP4', '有效', 'http://www.mp4ba.com/index.php?m=vod-search&wd=' + quote(movie['title'])])
+                    res_list.append(['高清电台', '有效', 'https://gaoqing.fm/s.php?q=' + quote(movie['title'])])
+                    res_list.append(['高清控', '有效', 'http://www.gaoqingkong.com/?s=' + quote(movie['title'])])
+                    res_list.append(['界绍部', '有效', 'http://www.jsb456.com/?s=' + quote(movie['title'])])
+                    res_list.append(['看美剧', '有效', 'http://www.kanmeiju.net/index.php?s=/video/search/wd/' + quote(movie['title'])])
+                    res_list.append(['蓝光网', '有效', 'http://www.languang.co/?s=' + quote(movie['title'])])
+                    res_list.append(['老司机电影', '有效', 'http://www.lsjdyw.net/search/?s=' + quote(movie['title'])])
+                    res_list.append(["乐赏电影", '有效', 'http://www.gscq.me/search.htm?keyword=' + quote(movie['title'])])
+                    res_list.append(["美剧汇", '有效', 'http://www.meijuhui.net/search.php?q=' + quote(movie['title'])])
+                    res_list.append(['美剧鸟', '有效', 'http://www.meijuniao.com/index.php?s=vod-search-wd-' + quote(movie['title'])])
+                    res_list.append(['迷你MP4', '有效', 'http://www.minimp4.com/search?q=' + quote(movie['title'])])
+                    res_list.append(['泡饭影视', '有效', 'http://www.chapaofan.com/search/' + quote(movie['title'])])
+                    res_list.append(['片吧', '有效', 'http://so.pianbar.com/search.aspx?q=' + quote(movie['title'])])
+                    res_list.append(['片源网', '有效', 'http://pianyuan.net/search?q=' + quote(movie['title'])])
+                    res_list.append(['飘花资源网', '有效', 'https://www.piaohua.com/plus/search.php?kwtype=0&keyword=' + quote(movie['title'])])
+                    res_list.append(['趣味源', '有效', 'http://quweiyuan.cc/?s=' + quote(movie['title'])])
+                    res_list.append(['人生05', '有效', 'http://www.rs05.com/search.php?s=' + quote(movie['title'])])
+                    res_list.append(['贪玩影视', '有效', 'http://www.tanwanyingshi.com/movie/search?keyword=' + quote(movie['title'])])
+                    res_list.append(['新片网', '有效', 'http://www.91xinpian.com/index.php?m=vod-search&wd=' + quote(movie['title'])])
+                    res_list.append(['迅雷影天堂', '有效', 'https://www.xl720.com/?s=' + quote(movie['title'])])
+                    res_list.append(['迅影网', '有效', 'http://www.xunyingwang.com/search?q=' + quote(movie['title'])])
+                    res_list.append(['一只大榴莲', '有效', 'http://www.llduang.com/?s=' + quote(movie['title'])])
+                    res_list.append(['音范丝', '有效', 'http://www.yinfans.com/?s=' + quote(movie['title'])])
+                    res_list.append(['影海', '有效', 'http://www.yinghub.com/search/list.html?keyword=' + quote(movie['title'])])
+                    res_list.append(['影视看看', '有效', 'http://www.yskk.tv/index.php?m=vod-search&wd=' + quote(movie['title'])])
+                    res_list.append(['云播网', '有效', 'http://www.yunbowang.cn/index.php?m=vod-search&wd=' + quote(movie['title'])])
+                    res_list.append(['中国高清网', '有效', 'http://gaoqing.la/?s=' + quote(movie['title'])])
+                    res_list.append(['最新影视站', '有效', 'http://www.zxysz.com/?s=' + quote(movie['title'])])
+                    self.add_tree(res_list, self.treeview_bt_download)
 
 
+                    imdb_num = get_mid_str(response, 'IMDb:</span>', '<br>').strip()
+                    imdb_url = "https://www.imdb.com/title/{}/".format(imdb_num)
+                    print("电影名:{}, IMDb:{}".format(movie['title'], imdb_num))
 
-                    break;
+                    f = urllib.request.urlopen(imdb_url)
+                    data_imdb = f.read().decode()
+                    rating_imdb = get_mid_str(data_imdb, '{"@type":"AggregateRating"', '}')
+                    rating_imdb = rating_imdb.split(":")[-1]
 
-        self.label_movie_rating_imdb.config(text='IMDB评分:' + rating_imdb + '分')
+                    self.label_movie_rating_imdb.config(text='IMDB评分:' + rating_imdb + '分')
 
+
+        self.B_0_imdb['state'] = NORMAL
 
 
     def project_statement_show(self, event):
@@ -929,7 +914,7 @@ class uiObject:
 
         #项目的一些信息
         ft = font.Font(size=14, weight=font.BOLD)
-        project_statement = Label(root, text="豆瓣电影小助手(可筛选、下载自定义电影)", fg='#FF0000', font=ft,anchor=NW)
+        project_statement = Label(root, text="1.鼠标双击可打开相应的链接, 2.点击初始化按钮后将显示完整信息", fg='#FF0000', font=ft,anchor=NW)
         project_statement.place(x=5, y=540)
         self.project_statement = project_statement
 

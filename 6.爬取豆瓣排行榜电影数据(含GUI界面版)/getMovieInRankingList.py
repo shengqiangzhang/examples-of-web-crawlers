@@ -104,7 +104,7 @@ def get_url_data_in_keyWord(key_word):
     browser = None
     wait = None
     try:
-        browser = webdriver.Chrome(executable_path='./chromedriver', chrome_options=chrome_options)  # 设置chromedriver驱动路径
+        browser = webdriver.Chrome(executable_path='./chromedriver.exe', chrome_options=chrome_options)  # 设置chromedriver驱动路径
         browser.set_page_load_timeout(10)  # 页面加载超时时间为10s
         browser.set_script_timeout(10)  # 页面js加载超时时间为10s
 
