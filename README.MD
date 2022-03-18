@@ -190,23 +190,24 @@ weibo_password = "改成你的微博密码"
 
 这里有一款Mac下的小清新壁纸神器[Pap.er][8]，可能是Mac下最好的壁纸软件，**自带5K超清分辨率壁纸**，富有多种类型壁纸，当我们想在Windows或者Linux下使用的时候，就可以考虑将**5K超清分辨率壁纸**爬取下来。
 
-### 使用教程
-
-1. 确保以下库均已安装：
-
-```python
-# 如果没有安装，请使用pip install module安装
-import requests
-import filetype
-import os
-import json
-from contextlib import closing
-```
-
-### 演示图片
+### 功能截图
 
 ![](5.爬取5K分辨率超清唯美壁纸/example1.png)
 ![](5.爬取5K分辨率超清唯美壁纸/example2.gif)
+
+
+### 如何运行
+
+```bash
+# 跳转到当前目录
+cd 目录名
+# 先卸载依赖库
+pip uninstall -y -r requirement.txt
+# 再重新安装依赖库
+pip install -r requirement.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 开始运行
+python main.py
+```
 
 
 

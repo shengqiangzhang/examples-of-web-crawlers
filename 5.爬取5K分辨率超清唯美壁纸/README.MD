@@ -6,17 +6,34 @@
 
 <br />
 
-<br />
-
 这里有一款Mac下的小清新壁纸神器[Pap.er][3]，可能是Mac下最好的壁纸软件，**自带5K超清分辨率壁纸**，富有多种类型壁纸，当我们想在Windows或者Linux下使用的时候，就可以考虑将**5K超清分辨率壁纸**爬取下来。
+
+
+## 功能截图
+
+![](example1.png)
+
+![](example2.gif)
+
+
+## 如何运行
+
+```bash
+# 跳转到当前目录
+cd 目录名
+# 先卸载依赖库
+pip uninstall -y -r requirement.txt
+# 再重新安装依赖库
+pip install -r requirement.txt -i https://pypi.tuna.tsinghua.edu.cn/simple
+# 开始运行
+python main.py
+```
 
 
 
 ## 编写思路
 
-首先，打开Charles软件，进行抓包。打开[Pap.er][3]，开始抓包。(由于是Mac系统下的APP，所以非Mac系统的朋友可以直接看抓包结果)
-
-抓包分析结果如下：
+首先，打开Charles软件，进行抓包。打开[Pap.er][3]，开始抓包。抓包分析结果如下：
 
 | 类型 | 地址                                                         |
 | ---- | ------------------------------------------------------------ |
@@ -141,27 +158,6 @@ if __name__ == '__main__':
 
 
 
-## 使用教程
-
-1. 确保以下库均已安装：
-
-```python
-# 如果没有安装，请使用pip install module安装
-import requests
-import filetype
-import os
-import json
-from contextlib import closing
-```
-
-
-
-## 演示图片
-
-![](example1.png)
-
-![](example2.gif)
-
 
 ## 完整源代码
 项目源代码在[GitHub仓库][1]
@@ -170,7 +166,7 @@ from contextlib import closing
 
 
 
-# License
+## License
 [The MIT License (MIT)][2]
 
 
