@@ -1,9 +1,9 @@
 # -*- coding:utf-8 -*-
 
 from PIL import Image, ImageTk
-from getMovieInRankingList import movieData
-from getMovieInRankingList import get_url_data_in_ranking_list
-from getMovieInRankingList import get_url_data_in_keyWord
+from get_movie_data import movieData
+from get_movie_data import get_url_data_in_ranking_list
+from get_movie_data import get_url_data_in_keyWord
 from tkinter import Tk
 from tkinter import ttk
 from tkinter import font
@@ -127,7 +127,6 @@ class uiObject:
     def __init__(self):
         self.jsonData = ""
         self.jsonData_keyword = ""
-
 
     def show_GUI_movie_detail(self):
         '''
@@ -264,7 +263,6 @@ class uiObject:
 
         self.B_0_imdb['state'] = NORMAL
 
-
     def project_statement_show(self, event):
         open("https://github.com/shengqiangzhang/examples-of-web-crawlers")
 
@@ -273,7 +271,6 @@ class uiObject:
 
     def project_statement_lose_focus(self, event):
         self.project_statement.config(fg="#FF0000")
-
 
     def show_movie_data(self, event):
         '''
@@ -312,11 +309,6 @@ class uiObject:
 
         # self.show_GUI_movie_detail()
 
-
-
-
-
-
     def show_movie_img(self, file_name):
         '''
         更新图片GUI
@@ -328,7 +320,6 @@ class uiObject:
         img = ImageTk.PhotoImage(pil_image_resized) #读入图片
         self.label_img.config(image=img, width = pil_image_resized.size[0], height = pil_image_resized.size[1])
         self.label_img.image = img
-
 
     def center_window(self, root, w, h):
         """
@@ -348,8 +339,6 @@ class uiObject:
 
         root.geometry('%dx%d+%d+%d' % (w, h, x, y))
 
-
-
     def clear_tree(self, tree):
         '''
         清空表格
@@ -368,7 +357,6 @@ class uiObject:
             i = i + 1
         tree.grid()
 
-
     def searh_movie_in_rating(self):
         """
         从排行榜中搜索符合条件的影片信息
@@ -385,7 +373,6 @@ class uiObject:
         self.T_vote_keyword['state'] = DISABLED
         self.B_0['text'] = '正在努力搜索'
         self.jsonData = ""
-
 
         jsonMovieData = loads(movieData)
         for subMovieData in jsonMovieData:
@@ -404,7 +391,6 @@ class uiObject:
                     err_str = res_data[0]
                     messagebox.showinfo('提示', err_str[:1000])
 
-
         # 按钮设置为正常状态
         self.B_0['state'] = NORMAL
         self.C_type['state'] = 'readonly'
@@ -414,9 +400,6 @@ class uiObject:
         self.B_0_keyword['state'] = NORMAL
         self.T_vote_keyword['state'] = NORMAL
         self.B_0['text'] = '从排行榜搜索'
-
-
-
 
     def keyboard_T_vote_keyword(self, event):
         """
@@ -456,9 +439,6 @@ class uiObject:
             err_str = res_data[0]
             messagebox.showinfo('提示', err_str[:1000])
 
-
-
-
         # 按钮设置为正常状态
         self.B_0['state'] = NORMAL
         self.C_type['state'] = 'readonly'
@@ -468,8 +448,6 @@ class uiObject:
         self.B_0_keyword['state'] = NORMAL
         self.T_vote_keyword['state'] = NORMAL
         self.B_0_keyword['text'] = '从关键字搜索'
-
-
 
     def open_in_browser_douban_url(self, event):
         """
@@ -484,7 +462,6 @@ class uiObject:
             for movie in self.jsonData:
                 if(movie['title'] == movieName):
                     open(movie['url'])
-
 
     def open_in_browser(self, event):
         """
@@ -511,8 +488,6 @@ class uiObject:
             url = item_text[2]
             open(url)
 
-
-
     def open_in_browser_bt_download(self, event):
         """
         从浏览器中打开指定网页
@@ -524,7 +499,6 @@ class uiObject:
             item_text = self.treeview_bt_download.item(item, "values")
             url = item_text[2]
             open(url)
-
 
     def ui_process(self):
         """
@@ -538,7 +512,6 @@ class uiObject:
         root.title("豆瓣电影小助手(可筛选、下载自定义电影)")
         self.center_window(root, 1000, 565)
         root.resizable(0, 0)  # 框体大小可调性，分别表示x,y方向的可变性
-
 
         # 从排行榜 电影搜索布局开始
         # 容器控件
@@ -564,7 +537,6 @@ class uiObject:
         C_type.place(x=65, y=8)
         self.C_type = C_type
 
-
         # 欲获取的电影数量
         L_count = Label(labelframe, text='获取数量=')
         L_count.place(x=150, y=10)
@@ -576,7 +548,6 @@ class uiObject:
         T_count.insert(0, '100')
         T_count.place(x=220, y=7)
         self.T_count = T_count
-
 
         # 评分
         L_rating = Label(labelframe, text='影片评分>')
@@ -933,7 +904,5 @@ class uiObject:
         project_statement.bind('<ButtonPress-1>', self.project_statement_show)  # 标签绑定鼠标单击事件
         project_statement.bind('<Enter>', self.project_statement_get_focus)  # 标签绑定获得焦点事件
         project_statement.bind('<Leave>', self.project_statement_lose_focus)  # 标签绑定失去焦点事件
-
-
 
         root.mainloop()
