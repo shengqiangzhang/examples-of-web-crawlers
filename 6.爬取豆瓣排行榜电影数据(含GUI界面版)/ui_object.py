@@ -301,7 +301,12 @@ class uiObject:
                     else:
                         string_actors = movie['actors']
                     self.label_movie_actor.config(text=string_actors)
-                    self.label_movie_rating.config(text=str(movie['rating'][0]) + '分 ' + str(movie['vote_count']) + '人评价')
+                    if str(movie['rating'][0]) == "":
+                        self.label_movie_rating.config(
+                            text="暂无人评分")
+                    else:
+                        self.label_movie_rating.config(
+                            text=str(movie['rating'][0]) + '分 ' + str(movie['vote_count']) + '人评价')
                     self.label_movie_time.config(text=movie['release_date'])
                     self.label_movie_type.config(text=movie['types'])
 
