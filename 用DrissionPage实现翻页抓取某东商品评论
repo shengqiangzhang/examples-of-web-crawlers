@@ -1,0 +1,35 @@
+from DrissionPage import Chromium
+import time
+import  pandas as pd
+browser=Chromium()
+tab=browser.latest_tab
+tab.get('https://item.jd.com/100192774925.html')
+tab.wait(5)
+tab.listen.start('client.action')#找到接口，开始监听数据
+tab.ele('x://div[text()="全部评价"]').click()
+page_data = tab.ele('x://div[@class="_rateListContainer_1ygkr_45"]')
+comment_all=[]
+for page_i in range(1,101):
+    print(f'正在加载第{page_i}页')
+    page_data.scroll.to_bottom()#标签页面数据元素部分下滑到底部
+    tab.scroll.to_bottom()#标签页下滑到底部
+    time.sleep(2)
+    listen_dat=tab.listen.wait()
+    json_dat=listen_dat.response.body
+    comment_list=json_dat['result']['floors'][2]['data']
+    for item in comment_list:
+        if 'commentInfo'  in item.keys():
+            dic={
+            '商品名称':item['commentInfo']['productSpecifications'].replace('已购 ', ''),
+            '昵称':item['commentInfo']['userNickName'],
+            '评论内容':item['commentInfo']['commentData'],
+            '评论日期':item['commentInfo']['commentDate'],
+            '评分':item['commentInfo']['commentScore'],
+            }
+            print(dic)
+            comment_all.append(dic)
+df=pd.DataFrame(comment_all)
+df.index=df.index+1
+df.to_excel(f'京东_{time.strftime('%Y%m%d%H%M%S')}.xlsx')
+print(f'数据加载完毕，已抓取{page_i}页计{len(df)}条记录。\n'
+      f'已保存为Excel文件：京东_{time.strftime('%Y%m%d%H%M%S')}.xlsx！')
