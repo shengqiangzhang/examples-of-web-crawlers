@@ -16,11 +16,10 @@ headers = {
         'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36'
     }
 def get_response(html_url):
-    response = requests.get(url=html_url, headers=headers)
-    return response
-
-
-def get_response(html_url):
+    # 对普通视频URL追加高画质参数，确保 __playinfo__ 包含最高画质
+    if '/video/' in html_url and 'fnval' not in html_url:
+        sep = '&' if '?' in html_url else '?'
+        html_url = f"{html_url}{sep}qn=127&fnval=4048"
     response = requests.get(url=html_url, headers=headers)
     return response
 
@@ -31,7 +30,67 @@ def sanitize_filename(name):
     name = ''.join(c for c in name if unicodedata.category(c)[0] != 'C' and not unicodedata.name(c, '').startswith('EMOJI'))
     return name.strip()[:100]
 
+def resolve_ss_to_ep(html_url):
+    """将 /ss{id} (season) URL 解析为 ep_id 和标题。
+    先尝试 season API，失败则从页面 HTML 中提取。"""
+    ss_match = re.search(r'/ss(\d+)', html_url)
+    if not ss_match:
+        return None, None
+    season_id = ss_match.group(1)
+
+    # 方式1：通过番剧 season API 获取剧集列表
+    api_url = f"https://api.bilibili.com/pgc/view/web/season?season_id={season_id}"
+    try:
+        api_resp = requests.get(api_url, headers=headers).json()
+        if api_resp.get('code') == 0:
+            result = api_resp.get('result', {})
+            title = sanitize_filename(result.get('title', 'bili_bangumi'))
+            episodes = result.get('episodes', [])
+            if episodes:
+                return episodes[0]['id'], title
+    except Exception:
+        pass
+
+    # 方式2：从页面 __INITIAL_STATE__ 中提取
+    try:
+        response = get_response(html_url)
+        state_match = re.search(r'window\.__INITIAL_STATE__=(\{.*?\});', response.text)
+        if state_match:
+            state = json.loads(state_match.group(1))
+            ep_list = state.get('epList', [])
+            if ep_list:
+                title_match = re.search(r'<title[^>]*>(.*?)</title>', response.text)
+                title = sanitize_filename(title_match.group(1).split('_')[0].strip()) if title_match else 'bili_bangumi'
+                return ep_list[0].get('id'), title
+    except Exception:
+        pass
+
+    return None, None
+
+
+def get_bangumi_playurl(ep_id):
+    """通过 ep_id 获取番剧/电影的视频流数据。"""
+    api_url = f"https://api.bilibili.com/pgc/player/web/playurl?ep_id={ep_id}&qn=127&fnval=4048"
+    api_response = requests.get(api_url, headers=headers)
+    json_data = api_response.json()
+    if json_data.get('code') != 0:
+        raise Exception("番剧/电影接口返回异常，可能需要大会员或登录Cookie。")
+    data = json_data.get("result")
+    if not data:
+        raise Exception("番剧/电影接口未返回视频流信息。")
+    return data
+
+
 def get_info(html_url):
+    # 判断是否为 /ss (season/电影) URL
+    ss_match = re.search(r'/bangumi/play/ss\d+', html_url)
+    if ss_match:
+        ep_id, title = resolve_ss_to_ep(html_url)
+        if not ep_id:
+            raise Exception("无法从该电影/番剧URL解析出剧集信息，请尝试使用具体的 ep 链接。")
+        data = get_bangumi_playurl(ep_id)
+        return _extract_streams(data, title or 'bili_bangumi')
+
     response = get_response(html_url)
     # 提取标题
     title_match = re.search(r'<title[^>]*>(.*?)</title>', response.text)
@@ -53,24 +112,30 @@ def get_info(html_url):
         if not ep_match:
             raise Exception("未找到视频信息，无法解析。")
         ep_id = ep_match.group(1)
-        api_url = f"https://api.bilibili.com/pgc/player/web/playurl?ep_id={ep_id}&qn=80&fnval=4048"
-        api_response = requests.get(api_url, headers=headers)
-        json_data = api_response.json()
-        if json_data.get('code') != 0:
-            raise Exception("番剧接口返回异常，无法下载。")
-        # 关键处：番剧接口返回的是 result 字段
-        data = json_data.get("result")
+        data = get_bangumi_playurl(ep_id)
+
     if not data:
         raise Exception("未找到视频流信息。")
 
+    return _extract_streams(data, title)
+
+
+def _extract_streams(data, title):
+    """从视频流数据中提取最高画质的音频和视频URL。"""
     # 优先使用 dash 流
     if "dash" in data:
         dash = data["dash"]
-        audio_url = dash['audio'][0]['baseUrl']
-        video_url = dash['video'][0]['baseUrl']
+        # 按 bandwidth 降序排序，取最高码率（即最高画质）
+        best_video = max(dash['video'], key=lambda v: v.get('bandwidth', 0))
+        video_url = best_video['baseUrl']
+        # 音频同理，取最高码率
+        if dash.get('audio'):
+            best_audio = max(dash['audio'], key=lambda a: a.get('bandwidth', 0))
+            audio_url = best_audio['baseUrl']
+        else:
+            audio_url = video_url
     # 兼容部分没有 dash 的番剧（有些接口只返回 durl）
     elif "durl" in data:
-        # 这里只能下载合成流（无独立音频）
         video_url = data["durl"][0]["url"]
         audio_url = video_url    # 没有独立音频
     else:
