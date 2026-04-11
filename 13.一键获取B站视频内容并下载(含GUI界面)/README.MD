@@ -48,4 +48,6 @@ cd 目录名
 python getVideo.py
 
 # 运行成功后，通过GUI操作即可
+如果需要使用cookie，在输入框输入以下内容，每一项都可以在F12内找到，替换为自己的：
+SESSDATA=; bili_jct=; DedeUserID=; DedeUserID__ckMd5=;
 ```
